@@ -753,6 +753,11 @@
   </main>
 </div>
 
+<!-- This GitHub Pages copy has no window.claude runtime, so it talks to its own Firebase
+     project (trailhead-trek) instead -- see initFirebaseDb() below. The Claude Artifact
+     version of this app does not load these and is unaffected. -->
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
 <script>
 (function(){
   "use strict";
@@ -1527,12 +1532,33 @@
     return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[] };
   }
 
+  /* On claude.ai this app uses the Artifact db capability. This GitHub Pages copy has no
+     window.claude runtime at all, so it falls back to its own Firebase project instead --
+     same collection/doc shape (users/{slug}, stats/{slug}, meta/admin), so every other
+     function in this file that talks to `db` works unchanged either way. */
+  function initFirebaseDb(){
+    try{
+      if (typeof firebase === 'undefined') return null;
+      if (!firebase.apps.length){
+        firebase.initializeApp({
+          apiKey: "AIzaSyDmfJ8OZk14oOvnq7AGI2fYYkg5m2Rf7sk",
+          authDomain: "trailhead-trek.firebaseapp.com",
+          projectId: "trailhead-trek",
+          storageBucket: "trailhead-trek.firebasestorage.app",
+          messagingSenderId: "676072112808",
+          appId: "1:676072112808:web:ad307e4c174ba00506789d"
+        });
+      }
+      return firebase.firestore();
+    } catch(e){ return null; }
+  }
+
   function initDb(){
     return new Promise(function(resolve){
       try{
-        if (!window.claude || !window.claude.use) { resolve(null); return; }
-        window.claude.use('db').then(function(d){ resolve(d); }).catch(function(){ resolve(null); });
-      } catch(e){ resolve(null); }
+        if (!window.claude || !window.claude.use) { resolve(initFirebaseDb()); return; }
+        window.claude.use('db').then(function(d){ resolve(d || initFirebaseDb()); }).catch(function(){ resolve(initFirebaseDb()); });
+      } catch(e){ resolve(initFirebaseDb()); }
     });
   }
 
