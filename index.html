@@ -1535,30 +1535,45 @@
   /* On claude.ai this app uses the Artifact db capability. This GitHub Pages copy has no
      window.claude runtime at all, so it falls back to its own Firebase project instead --
      same collection/doc shape (users/{slug}, stats/{slug}, meta/admin), so every other
-     function in this file that talks to `db` works unchanged either way. */
+     function in this file that talks to `db` works unchanged either way.
+     The two firebase-*-compat.js <script> tags are plain, in-order, blocking scripts placed
+     right before this one, so `firebase` should already be fully set up by the time this
+     runs -- but we poll briefly rather than assume that, since a single missed synchronous
+     check here would otherwise permanently drop a kid's profile into single-device offline
+     mode for that whole session with no way to notice or recover. */
+  function waitForFirebase(retriesLeft){
+    return new Promise(function(resolve){
+      if (typeof firebase !== 'undefined' && firebase.firestore){ resolve(true); return; }
+      if (retriesLeft <= 0){ resolve(false); return; }
+      setTimeout(function(){ waitForFirebase(retriesLeft - 1).then(resolve); }, 100);
+    });
+  }
+
   function initFirebaseDb(){
-    try{
-      if (typeof firebase === 'undefined') return null;
-      if (!firebase.apps.length){
-        firebase.initializeApp({
-          apiKey: "AIzaSyDmfJ8OZk14oOvnq7AGI2fYYkg5m2Rf7sk",
-          authDomain: "trailhead-trek.firebaseapp.com",
-          projectId: "trailhead-trek",
-          storageBucket: "trailhead-trek.firebasestorage.app",
-          messagingSenderId: "676072112808",
-          appId: "1:676072112808:web:ad307e4c174ba00506789d"
-        });
-      }
-      return firebase.firestore();
-    } catch(e){ return null; }
+    return waitForFirebase(30).then(function(ready){
+      if (!ready) return null;
+      try{
+        if (!firebase.apps.length){
+          firebase.initializeApp({
+            apiKey: "AIzaSyDmfJ8OZk14oOvnq7AGI2fYYkg5m2Rf7sk",
+            authDomain: "trailhead-trek.firebaseapp.com",
+            projectId: "trailhead-trek",
+            storageBucket: "trailhead-trek.firebasestorage.app",
+            messagingSenderId: "676072112808",
+            appId: "1:676072112808:web:ad307e4c174ba00506789d"
+          });
+        }
+        return firebase.firestore();
+      } catch(e){ return null; }
+    });
   }
 
   function initDb(){
     return new Promise(function(resolve){
       try{
-        if (!window.claude || !window.claude.use) { resolve(initFirebaseDb()); return; }
-        window.claude.use('db').then(function(d){ resolve(d || initFirebaseDb()); }).catch(function(){ resolve(initFirebaseDb()); });
-      } catch(e){ resolve(initFirebaseDb()); }
+        if (!window.claude || !window.claude.use) { initFirebaseDb().then(resolve); return; }
+        window.claude.use('db').then(function(d){ if (d) resolve(d); else initFirebaseDb().then(resolve); }).catch(function(){ initFirebaseDb().then(resolve); });
+      } catch(e){ initFirebaseDb().then(resolve); }
     });
   }
 
@@ -2391,8 +2406,10 @@
   }
 
   function start(){
+    try{ console.log('[trailhead-trek] pre-initDb firebase typeof:', typeof firebase); }catch(e){}
     initDb().then(function(d){
       db = d;
+      try{ console.log('[trailhead-trek] initDb resolved, db:', !!db); }catch(e){}
       if (db) refreshProfilesAndShowLogin();
       else startOfflineMode();
     });
