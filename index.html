@@ -2406,10 +2406,8 @@
   }
 
   function start(){
-    try{ console.log('[trailhead-trek] pre-initDb firebase typeof:', typeof firebase); }catch(e){}
     initDb().then(function(d){
       db = d;
-      try{ console.log('[trailhead-trek] initDb resolved, db:', !!db); }catch(e){}
       if (db) refreshProfilesAndShowLogin();
       else startOfflineMode();
     });
