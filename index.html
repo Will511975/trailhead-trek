@@ -33,6 +33,8 @@
     --cocoa-ink:#FFF3E8;
     --cyan:#0891B2;
     --cyan-ink:#EAFBFF;
+    --lime:#65A30D;
+    --lime-ink:#F7FFEA;
     --shadow: 4px 6px 0 rgba(58,43,18,0.25);
     --focus: #1C5C9C;
     --outline-strong:#3A2B12;
@@ -88,6 +90,8 @@
       --cocoa-ink:#2B1B0A;
       --cyan:#67E8F9;
       --cyan-ink:#062A30;
+      --lime:#B7E85C;
+      --lime-ink:#1B2B02;
       --shadow: 4px 6px 0 rgba(0,0,0,0.55);
       --focus: #8FD0F0;
       --outline-strong:#F0D9A8;
@@ -143,6 +147,8 @@
     --cocoa-ink:#2B1B0A;
     --cyan:#67E8F9;
     --cyan-ink:#062A30;
+    --lime:#B7E85C;
+    --lime-ink:#1B2B02;
     --shadow: 4px 6px 0 rgba(0,0,0,0.55);
     --focus: #8FD0F0;
     --outline-strong:#F0D9A8;
@@ -715,6 +721,13 @@
           recognition (matching a color swatch, no words to lean on); Kindergarten connects a color name to a
           real object (an apple is red, a blueberry is blue); 1st Grade moves into basic color mixing — red and
           blue make purple, blue and yellow make green, red and yellow make orange.
+          <br><br>
+          <strong>Health Hollow.</strong> Utah's Core Standards for Early Learning list naming major body parts
+          under Health, Safety & Nutrition, so Preschool is pure point-to-it recognition — eyes, ears, arms, toes,
+          and the rest. Kindergarten steps up to function ("what do you use to see?"), a distinct and harder skill
+          than labeling alone. 1st Grade formalizes that into the five senses (sight, hearing, smell, taste, touch)
+          plus a first look at simple body systems — the heart, lungs, brain, and bones — matching how NGSS-aligned
+          1st grade life science introduces structure and function in the body.
         </div>
       </details>
     </footer>
@@ -1192,6 +1205,69 @@
     return tagSkill(sample(pool, 6).map(mapNatureQ), 'Weather & Living Things');
   }
 
+  /* -- health hollow: body parts, what they do, and (at 1st grade) the five senses & simple body
+     systems -- Utah's Core Standards for Early Learning include naming major body parts under
+     Health, Safety & Nutrition, and NGSS-aligned 1st grade life science introduces the senses and
+     how the body works — see the "for grown-ups" note. */
+  var BODY_POOL_PRE = [
+    {emoji:'👀', label:'Eyes'},
+    {emoji:'👂', label:'Ears'},
+    {emoji:'👃', label:'Nose'},
+    {emoji:'👄', label:'Mouth'},
+    {emoji:'✋', label:'Hands'},
+    {emoji:'💪', label:'Arms'},
+    {emoji:'🦵', label:'Legs'},
+    {emoji:'🦶', label:'Toes'},
+    {emoji:'🦷', label:'Teeth'}
+  ];
+  var BODY_FUNCTION_POOL_K = [
+    {prompt:'What do you use to see?', correct:{emoji:'👀',label:'Eyes'}, distract:[{emoji:'👂',label:'Ears'},{emoji:'👃',label:'Nose'}]},
+    {prompt:'What do you use to hear?', correct:{emoji:'👂',label:'Ears'}, distract:[{emoji:'👀',label:'Eyes'},{emoji:'👄',label:'Mouth'}]},
+    {prompt:'What do you use to smell?', correct:{emoji:'👃',label:'Nose'}, distract:[{emoji:'👀',label:'Eyes'},{emoji:'👂',label:'Ears'}]},
+    {prompt:'What do you use to chew your food?', correct:{emoji:'🦷',label:'Teeth'}, distract:[{emoji:'✋',label:'Hands'},{emoji:'🦶',label:'Feet'}]},
+    {prompt:'What do you use to walk and run?', correct:{emoji:'🦵',label:'Legs'}, distract:[{emoji:'💪',label:'Arms'},{emoji:'✋',label:'Hands'}]},
+    {prompt:'What do you use to wave hello?', correct:{emoji:'✋',label:'Hands'}, distract:[{emoji:'🦶',label:'Feet'},{emoji:'🦵',label:'Legs'}]},
+    {prompt:'What do you use to taste your food?', correct:{emoji:'👅',label:'Tongue'}, distract:[{emoji:'👃',label:'Nose'},{emoji:'👂',label:'Ears'}]},
+    {prompt:'What helps you think and remember?', correct:{emoji:'🧠',label:'Brain'}, distract:[{emoji:'🫀',label:'Heart'},{emoji:'✋',label:'Hands'}]},
+    {prompt:'What pumps blood through your body?', correct:{emoji:'🫀',label:'Heart'}, distract:[{emoji:'🧠',label:'Brain'},{emoji:'🦷',label:'Teeth'}]}
+  ];
+  var SENSES_POOL_1 = [
+    {prompt:'Which body part gives you your sense of sight?', correct:{emoji:'👀',label:'Eyes'}, distract:[{emoji:'👂',label:'Ears'},{emoji:'👃',label:'Nose'}]},
+    {prompt:'Which body part gives you your sense of hearing?', correct:{emoji:'👂',label:'Ears'}, distract:[{emoji:'👅',label:'Tongue'},{emoji:'👀',label:'Eyes'}]},
+    {prompt:'Which body part gives you your sense of smell?', correct:{emoji:'👃',label:'Nose'}, distract:[{emoji:'✋',label:'Hands'},{emoji:'👂',label:'Ears'}]},
+    {prompt:'Which body part gives you your sense of taste?', correct:{emoji:'👅',label:'Tongue'}, distract:[{emoji:'👃',label:'Nose'},{emoji:'🦶',label:'Feet'}]},
+    {prompt:'Which body part gives you most of your sense of touch?', correct:{emoji:'✋',label:'Hands'}, distract:[{emoji:'👀',label:'Eyes'},{emoji:'👅',label:'Tongue'}]}
+  ];
+  var BODY_SYSTEMS_POOL_1 = [
+    {prompt:'Which body part pumps blood all through your body?', correct:{emoji:'🫀',label:'Heart'}, distract:[{emoji:'🧠',label:'Brain'},{emoji:'🫁',label:'Lungs'}]},
+    {prompt:'Which body part helps you breathe air in and out?', correct:{emoji:'🫁',label:'Lungs'}, distract:[{emoji:'🫀',label:'Heart'},{emoji:'🦴',label:'Bones'}]},
+    {prompt:'Which body part sends messages so you can move and think?', correct:{emoji:'🧠',label:'Brain'}, distract:[{emoji:'🫀',label:'Heart'},{emoji:'🦷',label:'Teeth'}]},
+    {prompt:'What gives your body its shape and helps you stand up tall?', correct:{emoji:'🦴',label:'Bones'}, distract:[{emoji:'🫁',label:'Lungs'},{emoji:'🧠',label:'Brain'}]}
+  ];
+  function buildBodyPreschool(){
+    return sample(BODY_POOL_PRE, 6).map(function(target){
+      var distractors = sample(BODY_POOL_PRE.filter(function(b){ return b.label !== target.label; }), 2);
+      var opts = shuffle([target].concat(distractors)).map(function(b){
+        return { html:'<span class="opt-emoji">'+b.emoji+'</span><span class="opt-label">'+b.label+'</span>', correct: b.label === target.label };
+      });
+      return { speak:'Find your ' + target.label.toLowerCase() + '.', visual:'', options: opts };
+    });
+  }
+  function mapBodyQ(q){
+    var opts = shuffle([q.correct].concat(q.distract)).map(function(o){
+      return { html:'<span class="opt-emoji">'+o.emoji+'</span><span class="opt-label">'+o.label+'</span>', correct: o.label === q.correct.label };
+    });
+    return { speak:q.prompt, visual:'', options:opts };
+  }
+  function buildHealth(level){
+    if (level === 'preschool') return tagSkill(buildBodyPreschool(), 'Body Parts');
+    if (level === 'first') return shuffle(
+      tagSkill(sample(SENSES_POOL_1, 3).map(mapBodyQ), 'Five Senses')
+        .concat(tagSkill(sample(BODY_SYSTEMS_POOL_1, 3).map(mapBodyQ), 'Body Systems'))
+    );
+    return tagSkill(sample(BODY_FUNCTION_POOL_K, 6).map(mapBodyQ), 'Body Part Functions');
+  }
+
   /* -- story cove: fluency + comprehension, the pillar that sits after phonemic awareness & phonics -- */
   var STORY_POOL_PRE = [
     {phrase:'The big bear', correct:'🐻', distract:['🐟','🌳']},
@@ -1473,7 +1549,9 @@
     { id:'adding', accent:'--gold', accentInk:'--gold-ink', name:'Base Camp Math', stop:'Stop 10',
       desc:{preschool:'More or fewer', kindergarten:'Adding to 10', first:'Adding & subtracting to 20'}, build:buildAdding },
     { id:'nature', accent:'--plum', accentInk:'--plum-ink', name:'Nature Notebook', stop:'Stop 11',
-      desc:{preschool:'Weather & living things', kindergarten:'Weather & living things', first:'Seasons & habitats'}, build:buildNature }
+      desc:{preschool:'Weather & living things', kindergarten:'Weather & living things', first:'Seasons & habitats'}, build:buildNature },
+    { id:'health', accent:'--lime', accentInk:'--lime-ink', name:'Health Hollow', stop:'Stop 12',
+      desc:{preschool:'Point to body parts', kindergarten:'What each part does', first:'Senses & body systems'}, build:buildHealth }
   ];
   function visibleStations(){
     return STATIONS.filter(function(s){ return !s.requiresName || (STATE.hasCustomName && STATE.userName); });
