@@ -301,6 +301,9 @@
     display:flex; align-items:center; justify-content:center;
     border:2px solid var(--surface); box-shadow:1px 2px 0 rgba(0,0,0,.25);
   }
+  /* Gentle pulsing ring on the trail's "up next" stop -- the first one not yet fully mastered --
+     to invite a child toward it without blocking any other stop from being played. */
+  .stop-badge.is-next{ animation:next-pulse 1.8s ease-in-out infinite; }
   .stop-body{
     flex:1; background:transparent; border:none;
     border-radius:0; padding:0; box-shadow:none;
@@ -342,7 +345,16 @@
     background:var(--surface); border:3px solid var(--line); border-radius:26px;
     box-shadow:var(--shadow); padding:26px 22px; text-align:center;
   }
-  .stage{ min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+  #questionCard{ position:relative; z-index:0; overflow:hidden; }
+  .stage-icon-bg{
+    position:absolute; z-index:-1; top:-18px; right:-18px; width:150px; height:150px;
+    color:var(--stop-accent, var(--forest)); opacity:.07; pointer-events:none;
+  }
+  .stage-icon-bg svg{ width:100%; height:100%; }
+  .stage{
+    min-height:70px; display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;
+    animation:gentle-float 3.6s ease-in-out infinite;
+  }
   .big-letter{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:4.2rem; color:var(--stop-accent); line-height:1; display:flex; align-items:baseline; gap:6px; }
   .big-letter-lower{ font-size:2.6rem; opacity:.85; }
   .rhyme-target{ display:flex; align-items:center; gap:12px; }
@@ -399,6 +411,12 @@
   .results-card{ display:flex; flex-direction:column; align-items:center; gap:14px; }
   .results-stars{ display:flex; gap:8px; }
   .results-stars svg{ width:52px; height:52px; }
+  .results-stars span{ display:inline-flex; opacity:0; animation:star-fill-pop .5s ease forwards; }
+  .confetti-piece{
+    position:fixed; top:32%; width:10px; height:14px; border-radius:2px;
+    pointer-events:none; z-index:60; opacity:0;
+    animation:confetti-fall 1.15s ease-out forwards;
+  }
   .results-line{ font-family:'Baloo 2',sans-serif; font-size:1.4rem; font-weight:700; }
   .results-sub{ color:var(--ink-soft); font-weight:600; }
   .results-actions{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:8px; }
@@ -443,6 +461,22 @@
   @media (prefers-reduced-motion: reduce){
     .option-btn.is-correct, .option-btn.is-wrong, .star-pop{ animation:none !important; }
     .stop:hover .stop-badge, .option-btn:hover:not(:disabled){ transform:none; }
+    .stage, .stop-badge.is-next, .confetti-piece{ animation:none !important; }
+    .results-stars span{ opacity:1; animation:none !important; }
+  }
+  @keyframes gentle-float{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
+  @keyframes next-pulse{
+    0%,100%{ box-shadow:0 0 0 2px var(--stop-accent, var(--forest)), 0 0 0 2px var(--stop-accent, var(--forest)); }
+    50%{ box-shadow:0 0 0 2px var(--stop-accent, var(--forest)), 0 0 0 9px color-mix(in srgb, var(--stop-accent, var(--forest)) 35%, transparent); }
+  }
+  @keyframes star-fill-pop{
+    0%{ opacity:0; transform:scale(0.3) rotate(-15deg); }
+    60%{ opacity:1; transform:scale(1.2) rotate(5deg); }
+    100%{ opacity:1; transform:scale(1) rotate(0); }
+  }
+  @keyframes confetti-fall{
+    0%{ opacity:1; transform:translate(0,0) rotate(0deg); }
+    100%{ opacity:0; transform:translate(var(--dx,0), 240px) rotate(var(--rot,180deg)); }
   }
   @keyframes pop-correct{ 0%{transform:scale(1);} 45%{transform:scale(1.08);} 100%{transform:scale(1);} }
   @keyframes shake-wrong{ 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
@@ -765,6 +799,7 @@
     </div>
 
     <div class="card" id="questionCard">
+      <div class="stage-icon-bg" id="stageIconBg" aria-hidden="true"></div>
       <div class="stage" id="stage"></div>
       <div class="prompt-row">
         <button class="speak-btn" id="speakBtn" type="button" aria-label="Hear the question again">🔊</button>
@@ -909,7 +944,8 @@
     colors: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 7 0 0 0 0 14c1 0 1.8-.6 1.8-1.6 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.6 1.8-1.6H16a5 5 0 0 0 5-5c0-3.9-4-6.4-9-6.4Z"/><circle cx="8.3" cy="10.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.8" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.7" cy="10.6" r="1.1" fill="currentColor" stroke="none"/></svg>',
     patterns: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4.5" cy="12" r="2.4"/><rect x="9.6" y="9.6" width="4.8" height="4.8" rx="1"/><circle cx="19.5" cy="12" r="2.4"/></svg>',
     sightwords: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
-    myname: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10.3" r="1.7"/><path d="M6 16c0-1.7 1.4-2.8 3-2.8s3 1.1 3 2.8"/><path d="M14.2 9.3h4.3M14.2 12.6h4.3"/></svg>'
+    myname: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10.3" r="1.7"/><path d="M6 16c0-1.7 1.4-2.8 3-2.8s3 1.1 3 2.8"/><path d="M14.2 9.3h4.3M14.2 12.6h4.3"/></svg>',
+    health: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7.5-4.6-9.6-9.3C1.2 7.8 3 4.8 6.2 4.4c1.9-.2 3.6.8 5.8 3 2.2-2.2 3.9-3.2 5.8-3 3.2.4 5 3.4 3.8 6.5-2.1 4.7-9.6 9.3-9.6 9.3Z"/><path d="M8.5 12.2h2l1-2 1.5 4 1-2h2"/></svg>'
   };
 
   /* ---------------- content pools ---------------- */
@@ -2439,6 +2475,7 @@
   var elQuestionCard = document.getElementById('questionCard');
   var elResultsCard = document.getElementById('resultsCard');
   var elStage = document.getElementById('stage');
+  var elStageIconBg = document.getElementById('stageIconBg');
   var elPromptText = document.getElementById('promptText');
   var elSpeakBtn = document.getElementById('speakBtn');
   var elOptions = document.getElementById('options');
@@ -2479,13 +2516,20 @@
 
   function renderTrail(){
     elStarTotal.textContent = '⭐ ' + totalStars() + ' / ' + maxStars();
+    /* "Up next" is just the first stop (in trail order) that hasn't been fully mastered yet -- a
+       gentle visual nudge, never a gate: every other stop stays just as clickable. */
+    var nextId = null;
+    visibleStations().some(function(s){
+      if (bestStars(s.id) < 3){ nextId = s.id; return true; }
+      return false;
+    });
     elTrailList.innerHTML = visibleStations().map(function(s){
       var stars = bestStars(s.id);
       var starsHtml = '';
       for (var i=0;i<3;i++) starsHtml += '<span style="color:var('+s.accent+')">' + (i<stars?STAR_SVG:STAR_OUTLINE_SVG) + '</span>';
       return '<li>'+
         '<button class="stop" style="--stop-accent:var('+s.accent+');--stop-accent-ink:var('+s.accentInk+')" data-id="'+s.id+'">'+
-          '<span class="stop-badge'+(stars===3?' is-complete':'')+'">'+STOP_ICONS[s.id]+'</span>'+
+          '<span class="stop-badge'+(stars===3?' is-complete':'')+(s.id===nextId?' is-next':'')+'">'+STOP_ICONS[s.id]+'</span>'+
           '<span class="stop-body">'+
             '<span class="stop-eyebrow">'+s.stop+'</span>'+
             '<span class="stop-name" style="display:block;">'+s.name+'</span>'+
@@ -2522,6 +2566,7 @@
     elViewStation.style.setProperty('--stop-accent', 'var('+station.accent+')');
     var levelLabel = LEVELS.filter(function(l){ return l.id === STATE.level; })[0].label;
     elStationTitle.innerHTML = station.name + ' <span class="station-level-tag">'+levelLabel+'</span>';
+    try{ elStageIconBg.innerHTML = STOP_ICONS[id] || ''; }catch(e){}
     elQuestionCard.hidden = false;
     elResultsCard.hidden = true;
     showView('station');
@@ -2641,6 +2686,23 @@
     setTimeout(function(){ s.remove(); }, 650);
   }
 
+  /* A short, purely-decorative confetti burst for a perfect (3-star) round -- every piece removes
+     itself after its own fall animation finishes, so nothing lingers in the DOM. */
+  function popConfetti(){
+    var colors = ['var(--sunset)','var(--sky)','var(--gold)','var(--berry)','var(--forest)','var(--plum)'];
+    for (var i=0;i<24;i++){
+      var el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = (42 + Math.random()*16) + '%';
+      el.style.background = colors[i % colors.length];
+      el.style.setProperty('--dx', (Math.random()*220-110) + 'px');
+      el.style.setProperty('--rot', (Math.random()*720-360) + 'deg');
+      el.style.animationDelay = (Math.random()*0.18) + 's';
+      document.body.appendChild(el);
+      (function(piece){ setTimeout(function(){ piece.remove(); }, 1500); })(el);
+    }
+  }
+
   function showResults(){
     /* The screen swap to the results card (with its always-present "Play again" / "Back to
        trail" buttons) happens FIRST and unconditionally -- before any of the star/review/speech
@@ -2665,9 +2727,11 @@
       for (var i=0;i<3;i++){
         var span = document.createElement('span');
         span.style.color = i < stars ? 'var(--gold)' : 'var(--line)';
+        span.style.animationDelay = (i*0.15) + 's';
         span.innerHTML = i < stars ? STAR_SVG : STAR_OUTLINE_SVG;
         elResultsStars.appendChild(span);
       }
+      if (stars === 3){ try{ popConfetti(); }catch(e){} }
       elResultsLine.textContent = stars === 3 ? 'Trail Master!' : (stars === 2 ? 'Great hiking!' : 'Nice try, explorer!');
       elResultsSub.textContent = 'You got ' + STATE.correctFirstTry + ' of 6 right on the first try.';
       speak(elResultsLine.textContent);
