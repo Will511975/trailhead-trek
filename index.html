@@ -377,6 +377,7 @@
 
   .options{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
   .options.opts-2{ grid-template-columns:repeat(2,1fr); max-width:420px; margin-inline:auto; }
+  .options.opts-4{ grid-template-columns:repeat(2,1fr); max-width:480px; margin-inline:auto; }
   @media (max-width:560px){ .options{ grid-template-columns:repeat(2,1fr);} }
   .option-btn{
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
@@ -409,6 +410,21 @@
   .results-review-row{ display:flex; align-items:flex-start; gap:8px; padding:6px 4px; font-size:0.92rem; font-weight:700; line-height:1.3; }
   .results-review-row .mark{ font-size:1.05rem; flex-shrink:0; }
   .results-review-row.is-miss{ color:var(--ink-soft); }
+
+  .read-check{
+    align-self:stretch; width:100%; max-width:420px; margin:0 auto; text-align:center;
+    background:var(--surface-2); border:3px solid var(--line); border-radius:20px; padding:16px 14px;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .read-check-label{ font-weight:800; font-size:0.82rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); }
+  .read-check-name{
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1.8rem,5vw + 1rem,2.6rem);
+    color:var(--stop-accent); letter-spacing:.03em; margin:4px 0;
+  }
+  .read-check-sub{ margin:0; color:var(--ink-soft); font-weight:600; font-size:0.92rem; }
+  .read-check-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
+  .read-check-btn{ font-size:0.92rem; padding:10px 18px; }
+  .read-check-result{ font-weight:700; color:var(--forest); margin-top:2px; }
   .btn{
     border-radius:999px; border:none; padding:12px 22px; font-weight:700; font-size:1rem;
     cursor:pointer; color:var(--sunset-ink); background:var(--sunset); box-shadow:var(--shadow);
@@ -518,6 +534,11 @@
   .admin-table th, .admin-table td{ padding:8px 10px; text-align:left; border-bottom:2px solid var(--line); font-size:0.88rem; }
   .admin-table th{ color:var(--ink-soft); text-transform:uppercase; font-size:0.7rem; letter-spacing:.06em; }
   .admin-empty{ color:var(--ink-soft); font-weight:600; padding:20px 0; text-align:center; }
+  .week-table td{ vertical-align:middle; }
+  .week-bar{ position:relative; width:88px; height:10px; border-radius:6px; background:var(--bg-soft); overflow:hidden; display:flex; }
+  .week-bar-empty{ background:var(--line); opacity:.35; }
+  .week-bar-correct{ background:var(--forest); height:100%; }
+  .week-bar-wrong{ background:var(--berry); height:100%; }
   .admin-card{
     background:var(--surface); border:3px solid var(--outline-strong); border-radius:20px;
     padding:16px 18px; box-shadow:var(--shadow); margin-bottom:14px;
@@ -758,6 +779,16 @@
       <div class="results-line" id="resultsLine"></div>
       <div class="results-sub" id="resultsSub"></div>
       <div class="results-review" id="resultsReview"></div>
+      <div class="read-check" id="readCheck" hidden>
+        <div class="read-check-label">👪 Parent check-in</div>
+        <div class="read-check-name" id="readCheckName"></div>
+        <p class="read-check-sub">Ask your explorer to read their name out loud — did they get it?</p>
+        <div class="read-check-actions" id="readCheckActions">
+          <button class="btn read-check-btn" id="readCheckYesBtn" type="button">✓ Read it right</button>
+          <button class="btn secondary read-check-btn" id="readCheckNoBtn" type="button">✗ Needs practice</button>
+        </div>
+        <div class="read-check-result" id="readCheckResult" hidden></div>
+      </div>
       <div class="results-actions">
         <button class="btn" id="playAgainBtn" type="button">Play again</button>
         <button class="btn secondary" id="toTrailBtn" type="button">Back to trail</button>
@@ -792,6 +823,41 @@
   function tagSkill(arr, skill){
     for (var i=0;i<arr.length;i++) arr[i].skill = skill;
     return arr;
+  }
+  /* How many answer choices a round shows, by level -- applies across every station. A few
+     questions are inherently binary (comparing exactly two groups, or a single odd-one-out among
+     otherwise-alike items) and are deliberately left out of this scaling; those are called out
+     where they occur. */
+  var LEVEL_OPTION_COUNTS = { preschool:3, kindergarten:4, first:5 };
+  function optionCountForLevel(level){ return LEVEL_OPTION_COUNTS[level] || 3; }
+  /* Tops up a question's own hand-authored wrong answers with extra ones borrowed from a wider
+     pool of same-shaped {label,...} items, when a level needs more choices than were originally
+     written for that question. Only ever ADDS distractors (never removes a hand-authored one),
+     de-duplicates by label, and silently returns fewer than `needed` if the pool runs out. */
+  function padDistract(correct, distract, extraPool, needed){
+    var chosen = distract.slice();
+    var used = {}; used[correct.label] = true;
+    chosen.forEach(function(d){ used[d.label] = true; });
+    if (chosen.length < needed){
+      var candidates = shuffle(extraPool.filter(function(e){ return !used[e.label]; }));
+      while (chosen.length < needed && candidates.length){
+        var c = candidates.pop();
+        chosen.push(c);
+        used[c.label] = true;
+      }
+    }
+    return chosen.slice(0, needed);
+  }
+  /* Plain-text description of an already-rendered option button, used to tell a child what they
+     just picked on a wrong answer. Almost every option renders visible text (a letter, word,
+     number, or emoji+label) that this reads directly off the button; the one silent case (a bare
+     color swatch) carries its color name in a data attribute instead. */
+  function getOptionLabel(btn){
+    var text = (btn.textContent || '').trim();
+    if (text) return text;
+    var swatch = btn.querySelector('[data-color-label]');
+    if (swatch) return swatch.getAttribute('data-color-label');
+    return '';
   }
   function uniqueNumbersAround(target, count, lo, hi){
     var set = [target];
@@ -961,9 +1027,10 @@
       };
     });
   }
-  function buildLettersSound(){
+  function buildLettersSound(optionCount){
+    optionCount = optionCount || 3;
     return sample(LETTER_POOL, 6).map(function(item){
-      var distractors = sample(LETTER_POOL.filter(function(p){ return p.letter !== item.letter; }), 2);
+      var distractors = sample(LETTER_POOL.filter(function(p){ return p.letter !== item.letter; }), optionCount-1);
       var opts = shuffle([item].concat(distractors)).map(function(o){
         return { html:'<span class="opt-emoji">'+o.emoji+'</span><span class="opt-label">'+o.word+'</span>', correct:o.letter===item.letter };
       });
@@ -974,9 +1041,10 @@
       };
     });
   }
-  function buildWordMatch(){
+  function buildWordMatch(optionCount){
+    optionCount = optionCount || 3;
     return sample(FIRST_WORD_POOL, 6).map(function(item){
-      var distractors = sample(FIRST_WORD_POOL.filter(function(w){ return w.word !== item.word; }), 2);
+      var distractors = sample(FIRST_WORD_POOL.filter(function(w){ return w.word !== item.word; }), optionCount-1);
       var opts = shuffle([item].concat(distractors)).map(function(w){
         return { html:'<span class="opt-word">'+w.word+'</span>', correct: w.word === item.word };
       });
@@ -992,8 +1060,8 @@
       tagSkill(buildLettersRecognition(3), 'Letter Recognition')
         .concat(tagSkill(buildLettersCaseMatch(3), 'Letter Uppercase & Lowercase Match'))
     );
-    if (level === 'first') return tagSkill(buildWordMatch(), 'Beginning Words');
-    return tagSkill(buildLettersSound(), 'Letter Sounds');
+    if (level === 'first') return tagSkill(buildWordMatch(optionCountForLevel(level)), 'Beginning Words');
+    return tagSkill(buildLettersSound(optionCountForLevel(level)), 'Letter Sounds');
   }
 
   /* -- rhyme: preschool=2-option match, kindergarten=3-option match, first=odd-one-out -- */
@@ -1011,6 +1079,10 @@
       };
     });
   }
+  /* Exception to the app-wide 3/4/5-choices-by-level rule: this "odd one out" puzzle only works
+     with exactly one pair of alike (rhyming) words plus one outsider -- adding more outsider words
+     from other pairs would give several equally-valid "doesn't rhyme with the pair" answers with
+     only one marked correct, which would be confusing rather than harder. Stays at 3 options. */
   function buildRhymeOddOneOut(){
     var out = [], used = {}, tries = 0;
     while (out.length < 6 && tries < 60){
@@ -1034,9 +1106,9 @@
     return out;
   }
   function buildRhyme(level){
-    if (level === 'preschool') return tagSkill(buildRhymeMatch(1), 'Rhyming');
+    if (level === 'preschool') return tagSkill(buildRhymeMatch(optionCountForLevel(level)-1), 'Rhyming');
     if (level === 'first') return tagSkill(buildRhymeOddOneOut(), 'Rhyming');
-    return tagSkill(buildRhymeMatch(2), 'Rhyming');
+    return tagSkill(buildRhymeMatch(optionCountForLevel(level)-1), 'Rhyming');
   }
 
   /* -- counting: range grows with level; each round mixes three skills — counting a group to
@@ -1044,12 +1116,13 @@
      aloud — so "counting / matching / naming numbers" all get practiced together. -- */
   var NUMBER_WORDS = ['zero','one','two','three','four','five','six','seven','eight','nine','ten',
     'eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
-  function buildCountQuantity(n, lo, hi, rangeLo, rangeHi){
+  function buildCountQuantity(n, lo, hi, rangeLo, rangeHi, optionCount){
+    optionCount = optionCount || 3;
     var out = [];
     for (var i=0;i<n;i++){
       var num = randInt(lo,hi);
       var emoji = COUNT_EMOJI[randInt(0,COUNT_EMOJI.length-1)];
-      var nums = shuffle(uniqueNumbersAround(num,3,rangeLo,rangeHi));
+      var nums = shuffle(uniqueNumbersAround(num,optionCount,rangeLo,rangeHi));
       out.push({
         speak:'How many do you see? Count them!',
         visual:'<div class="count-stage">'+ repeatEmoji(num, emoji) +'</div>',
@@ -1058,12 +1131,13 @@
     }
     return out;
   }
-  function buildCountMatch(n, lo, hi, rangeLo, rangeHi){
+  function buildCountMatch(n, lo, hi, rangeLo, rangeHi, optionCount){
+    optionCount = optionCount || 3;
     var out = [];
     for (var i=0;i<n;i++){
       var num = randInt(lo,hi);
       var emoji = COUNT_EMOJI[randInt(0,COUNT_EMOJI.length-1)];
-      var distractorNums = uniqueNumbersAround(num,3,rangeLo,rangeHi).filter(function(v){ return v!==num; }).slice(0,2);
+      var distractorNums = uniqueNumbersAround(num,optionCount,rangeLo,rangeHi).filter(function(v){ return v!==num; }).slice(0,optionCount-1);
       var opts = shuffle([num].concat(distractorNums)).map(function(v){
         return { html:'<div class="count-stage" style="min-height:auto;gap:3px;">'+repeatEmoji(v,emoji)+'</div>', correct: v===num };
       });
@@ -1075,11 +1149,12 @@
     }
     return out;
   }
-  function buildNumberName(n, lo, hi, rangeLo, rangeHi){
+  function buildNumberName(n, lo, hi, rangeLo, rangeHi, optionCount){
+    optionCount = optionCount || 3;
     var out = [];
     for (var i=0;i<n;i++){
       var num = randInt(lo,hi);
-      var nums = shuffle(uniqueNumbersAround(num,3,rangeLo,rangeHi));
+      var nums = shuffle(uniqueNumbersAround(num,optionCount,rangeLo,rangeHi));
       out.push({
         speak:'Which number is ' + NUMBER_WORDS[num] + '?',
         prompt:'Which number is "' + NUMBER_WORDS[num] + '"?',
@@ -1095,10 +1170,11 @@
     else if (level === 'first'){ lo=11; hi=20; rangeLo=9; rangeHi=22; }
     var matchLo = lo, matchHi = hi;
     if (level === 'first'){ matchLo = 8; matchHi = 14; } /* keep matched groups readable inside a button */
+    var oc = optionCountForLevel(level);
     return shuffle(
-      tagSkill(buildCountQuantity(2, lo, hi, rangeLo, rangeHi), 'Counting Quantity')
-        .concat(tagSkill(buildCountMatch(2, matchLo, matchHi, rangeLo, rangeHi), 'Number Match'))
-        .concat(tagSkill(buildNumberName(2, lo, hi, rangeLo, rangeHi), 'Number Names'))
+      tagSkill(buildCountQuantity(2, lo, hi, rangeLo, rangeHi, oc), 'Counting Quantity')
+        .concat(tagSkill(buildCountMatch(2, matchLo, matchHi, rangeLo, rangeHi, oc), 'Number Match'))
+        .concat(tagSkill(buildNumberName(2, lo, hi, rangeLo, rangeHi, oc), 'Number Names'))
     );
   }
 
@@ -1117,12 +1193,16 @@
     return out;
   }
   function buildShapes(level){
-    if (level === 'preschool') return tagSkill(buildShapesFromList(BASIC_SHAPES, 1), 'Shapes');
-    if (level === 'first') return tagSkill(buildShapesFromList(SHAPES_3D, 2), 'Shapes');
-    return tagSkill(buildShapesFromList(SHAPES, 2), 'Shapes');
+    var oc = optionCountForLevel(level);
+    if (level === 'preschool') return tagSkill(buildShapesFromList(BASIC_SHAPES, oc-1), 'Shapes');
+    if (level === 'first') return tagSkill(buildShapesFromList(SHAPES_3D, oc-1), 'Shapes');
+    return tagSkill(buildShapesFromList(SHAPES, oc-1), 'Shapes');
   }
 
   /* -- adding: preschool=compare quantities, kindergarten=add to 10, first=add/subtract to 20 -- */
+  /* Exception to the app-wide 3/4/5-choices-by-level rule: "which group has more" is inherently a
+     comparison between exactly two groups, so it always stays a 2-option question regardless of
+     level. */
   function buildCompareQuantities(){
     var out = [];
     for (var i=0;i<6;i++){
@@ -1138,7 +1218,8 @@
     }
     return out;
   }
-  function buildAddTo10(){
+  function buildAddTo10(optionCount){
+    optionCount = optionCount || 3;
     var out = [], used = {}, tries = 0;
     while (out.length < 6 && tries < 60){
       tries++;
@@ -1148,7 +1229,7 @@
       if (used[key]) continue;
       used[key] = true;
       var sum = a+b;
-      var nums = shuffle(uniqueNumbersAround(sum,3,0,10));
+      var nums = shuffle(uniqueNumbersAround(sum,optionCount,0,10));
       var obj = ADD_OBJECTS[randInt(0, ADD_OBJECTS.length-1)];
       out.push({
         speak: a+' '+wordFor(obj,a)+' plus '+b+' more '+wordFor(obj,b)+'. How many in all?',
@@ -1158,7 +1239,8 @@
     }
     return out;
   }
-  function buildAddSubtract20(){
+  function buildAddSubtract20(optionCount){
+    optionCount = optionCount || 3;
     var out = [], used = {}, tries = 0;
     while (out.length < 6 && tries < 90){
       tries++;
@@ -1169,7 +1251,7 @@
       var key = op+a+'-'+b;
       if (used[key]) continue;
       used[key] = true;
-      var nums = shuffle(uniqueNumbersAround(result,3,0,20));
+      var nums = shuffle(uniqueNumbersAround(result,optionCount,0,20));
       var obj = ADD_OBJECTS[randInt(0, ADD_OBJECTS.length-1)];
       if (op === '+'){
         out.push({
@@ -1189,20 +1271,38 @@
   }
   function buildAdding(level){
     if (level === 'preschool') return tagSkill(buildCompareQuantities(), 'More or Fewer');
-    if (level === 'first') return tagSkill(buildAddSubtract20(), 'Adding & Subtracting');
-    return tagSkill(buildAddTo10(), 'Adding');
+    if (level === 'first') return tagSkill(buildAddSubtract20(optionCountForLevel(level)), 'Adding & Subtracting');
+    return tagSkill(buildAddTo10(optionCountForLevel(level)), 'Adding');
   }
 
   /* -- nature: preschool & kindergarten share the concrete pool, first grade extends it -- */
-  function mapNatureQ(q){
-    var opts = shuffle(q.opts).map(function(o){
-      return { html:'<span class="opt-emoji">'+o.emoji+'</span><span class="opt-label">'+o.label+'</span>', correct:o.correct };
+  /* Collects every unique {emoji,label} option appearing anywhere in a nature pool, used to top up
+     a question with extra plausible-but-wrong choices when a level needs more than that question
+     was originally authored with. */
+  function buildExtraPool(pool, key){
+    var seen = {}, extra = [];
+    pool.forEach(function(item){
+      item[key].forEach(function(o){ if (!seen[o.label]){ seen[o.label] = true; extra.push({emoji:o.emoji, label:o.label}); } });
+    });
+    return extra;
+  }
+  /* The two "push or pull?" questions are inherently binary (an action is one or the other, never
+     a third thing), so they're a deliberate exception and always stay 2-option regardless of level. */
+  function mapNatureQ(q, needed, extraPool){
+    var isBinary = q.opts.length === 2;
+    var correct = q.opts.filter(function(o){ return o.correct; })[0];
+    var distract = q.opts.filter(function(o){ return !o.correct; });
+    var finalDistract = isBinary ? distract : padDistract(correct, distract, extraPool, needed-1);
+    var opts = shuffle([correct].concat(finalDistract)).map(function(o){
+      return { html:'<span class="opt-emoji">'+o.emoji+'</span><span class="opt-label">'+o.label+'</span>', correct: o.label === correct.label };
     });
     return { speak:q.prompt, visual:'', options:opts };
   }
   function buildNature(level){
     var pool = level === 'first' ? NATURE_POOL_1 : NATURE_POOL;
-    return tagSkill(sample(pool, 6).map(mapNatureQ), 'Weather & Living Things');
+    var oc = optionCountForLevel(level);
+    var extraPool = buildExtraPool(pool, 'opts');
+    return tagSkill(sample(pool, 6).map(function(q){ return mapNatureQ(q, oc, extraPool); }), 'Weather & Living Things');
   }
 
   /* -- health hollow: body parts, what they do, and (at 1st grade) the five senses & simple body
@@ -1244,28 +1344,44 @@
     {prompt:'Which body part sends messages so you can move and think?', correct:{emoji:'🧠',label:'Brain'}, distract:[{emoji:'🫀',label:'Heart'},{emoji:'🦷',label:'Teeth'}]},
     {prompt:'What gives your body its shape and helps you stand up tall?', correct:{emoji:'🦴',label:'Bones'}, distract:[{emoji:'🫁',label:'Lungs'},{emoji:'🧠',label:'Brain'}]}
   ];
-  function buildBodyPreschool(){
+  function buildBodyPreschool(optionCount){
+    optionCount = optionCount || 3;
     return sample(BODY_POOL_PRE, 6).map(function(target){
-      var distractors = sample(BODY_POOL_PRE.filter(function(b){ return b.label !== target.label; }), 2);
+      var distractors = sample(BODY_POOL_PRE.filter(function(b){ return b.label !== target.label; }), optionCount-1);
       var opts = shuffle([target].concat(distractors)).map(function(b){
         return { html:'<span class="opt-emoji">'+b.emoji+'</span><span class="opt-label">'+b.label+'</span>', correct: b.label === target.label };
       });
       return { speak:'Find your ' + target.label.toLowerCase() + '.', visual:'', options: opts };
     });
   }
-  function mapBodyQ(q){
-    var opts = shuffle([q.correct].concat(q.distract)).map(function(o){
+  /* Every body part/organ that shows up anywhere in the kindergarten/1st-grade health pools (plus
+     the generic preschool body-part pool), used as the source of extra distractors when a level
+     needs more choices than a hand-authored question originally listed. */
+  var HEALTH_EXTRA_PARTS = (function(){
+    var seen = {}, extra = [];
+    function add(o){ if (o && !seen[o.label]){ seen[o.label] = true; extra.push({emoji:o.emoji, label:o.label}); } }
+    BODY_POOL_PRE.forEach(add);
+    [BODY_FUNCTION_POOL_K, SENSES_POOL_1, BODY_SYSTEMS_POOL_1].forEach(function(pool){
+      pool.forEach(function(q){ add(q.correct); q.distract.forEach(add); });
+    });
+    return extra;
+  })();
+  function mapBodyQ(q, needed){
+    needed = needed || (q.distract.length + 1);
+    var distract = padDistract(q.correct, q.distract, HEALTH_EXTRA_PARTS, needed-1);
+    var opts = shuffle([q.correct].concat(distract)).map(function(o){
       return { html:'<span class="opt-emoji">'+o.emoji+'</span><span class="opt-label">'+o.label+'</span>', correct: o.label === q.correct.label };
     });
     return { speak:q.prompt, visual:'', options:opts };
   }
   function buildHealth(level){
-    if (level === 'preschool') return tagSkill(buildBodyPreschool(), 'Body Parts');
+    var oc = optionCountForLevel(level);
+    if (level === 'preschool') return tagSkill(buildBodyPreschool(oc), 'Body Parts');
     if (level === 'first') return shuffle(
-      tagSkill(sample(SENSES_POOL_1, 3).map(mapBodyQ), 'Five Senses')
-        .concat(tagSkill(sample(BODY_SYSTEMS_POOL_1, 3).map(mapBodyQ), 'Body Systems'))
+      tagSkill(sample(SENSES_POOL_1, 3).map(function(q){ return mapBodyQ(q, oc); }), 'Five Senses')
+        .concat(tagSkill(sample(BODY_SYSTEMS_POOL_1, 3).map(function(q){ return mapBodyQ(q, oc); }), 'Body Systems'))
     );
-    return tagSkill(sample(BODY_FUNCTION_POOL_K, 6).map(mapBodyQ), 'Body Part Functions');
+    return tagSkill(sample(BODY_FUNCTION_POOL_K, 6).map(function(q){ return mapBodyQ(q, oc); }), 'Body Part Functions');
   }
 
   /* -- story cove: fluency + comprehension, the pillar that sits after phonemic awareness & phonics -- */
@@ -1313,22 +1429,37 @@
       };
     });
   }
-  function buildStoryLeveled(pool){
+  /* Every answer choice that appears anywhere across a story pool's hand-authored questions, used
+     to top up a question with extra plausible-but-wrong choices when a level needs more of them
+     than that question originally listed. */
+  function buildStoryExtraPool(pool){
+    var seen = {}, extra = [];
+    pool.forEach(function(item){
+      item.options.forEach(function(o){ if (!seen[o.label]){ seen[o.label] = true; extra.push({label:o.label}); } });
+    });
+    return extra;
+  }
+  function buildStoryLeveled(pool, needed){
+    var extraPool = buildStoryExtraPool(pool);
     return sample(pool, 6).map(function(item){
-      var opts = shuffle(item.options);
+      var correct = item.options.filter(function(o){ return o.correct; })[0];
+      var distract = item.options.filter(function(o){ return !o.correct; });
+      var finalDistract = padDistract(correct, distract, extraPool, needed-1);
+      var opts = shuffle([correct].concat(finalDistract));
       return {
         speak: item.sentence + ' ' + item.question,
         prompt: item.question,
         visual:'<div class="story-text">'+item.sentence+'</div>',
         stack:true,
-        options: opts.map(function(o){ return { html:'<span class="opt-word" style="font-size:1.05rem;">'+o.label+'</span>', correct:o.correct }; })
+        options: opts.map(function(o){ return { html:'<span class="opt-word" style="font-size:1.05rem;">'+o.label+'</span>', correct: o.label === correct.label }; })
       };
     });
   }
   function buildStory(level){
+    var oc = optionCountForLevel(level);
     if (level === 'preschool') return tagSkill(buildStoryPreschool(), 'Story Comprehension');
-    if (level === 'first') return tagSkill(buildStoryLeveled(STORY_POOL_1), 'Story Comprehension');
-    return tagSkill(buildStoryLeveled(STORY_POOL_K), 'Story Comprehension');
+    if (level === 'first') return tagSkill(buildStoryLeveled(STORY_POOL_1, oc), 'Story Comprehension');
+    return tagSkill(buildStoryLeveled(STORY_POOL_K, oc), 'Story Comprehension');
   }
 
   /* -- colors: preschool=pure swatch recognition, kindergarten=color-to-object, first=color mixing --
@@ -1354,29 +1485,32 @@
     {a:'Yellow', aHex:'#EFC23A', b:'Blue', bHex:'#2F6FE0', result:'Green', resultHex:'#3FA34D'},
     {a:'Yellow', aHex:'#EFC23A', b:'Red', bHex:'#D8432A', result:'Orange', resultHex:'#EF8330'}
   ];
-  function buildColorsPreschool(){
+  function buildColorsPreschool(optionCount){
+    optionCount = optionCount || 3;
     return sample(COLOR_POOL, 6).map(function(target){
-      var distractors = sample(COLOR_POOL.filter(function(c){ return c.name !== target.name; }), 2);
+      var distractors = sample(COLOR_POOL.filter(function(c){ return c.name !== target.name; }), optionCount-1);
       var opts = shuffle([target].concat(distractors)).map(function(c){
-        return { html:'<span class="opt-swatch" style="background:'+c.hex+';"></span>', correct: c.name === target.name };
+        return { html:'<span class="opt-swatch" style="background:'+c.hex+';" data-color-label="'+c.name+'"></span>', correct: c.name === target.name };
       });
       return { speak:'Find the color ' + target.name + '.', visual:'', options: opts };
     });
   }
-  function buildColorsMatch(){
+  function buildColorsMatch(optionCount){
+    optionCount = optionCount || 3;
     return sample(COLOR_OBJECTS, 6).map(function(target){
-      var distractors = sample(COLOR_OBJECTS.filter(function(o){ return o.color !== target.color; }), 2);
+      var distractors = sample(COLOR_OBJECTS.filter(function(o){ return o.color !== target.color; }), optionCount-1);
       var opts = shuffle([target].concat(distractors)).map(function(o){
         return { html:'<span class="opt-emoji">'+o.emoji+'</span>', correct: o.color === target.color };
       });
       return { speak:'Find something ' + target.color + '.', visual:'', options: opts };
     });
   }
-  function buildColorsMix(){
+  function buildColorsMix(optionCount){
+    optionCount = optionCount || 3;
     return shuffle(COLOR_MIX).map(function(m){
-      var distractors = sample(COLOR_POOL.filter(function(c){ return c.name !== m.result && c.name !== m.a && c.name !== m.b; }), 2);
+      var distractors = sample(COLOR_POOL.filter(function(c){ return c.name !== m.result && c.name !== m.a && c.name !== m.b; }), optionCount-1);
       var opts = shuffle([{name:m.result, hex:m.resultHex}].concat(distractors)).map(function(c){
-        return { html:'<span class="opt-swatch" style="background:'+c.hex+';"></span>', correct: c.name === m.result };
+        return { html:'<span class="opt-swatch" style="background:'+c.hex+';" data-color-label="'+c.name+'"></span>', correct: c.name === m.result };
       });
       return {
         speak: m.a + ' and ' + m.b + '. What color do you get when you mix them?',
@@ -1386,9 +1520,10 @@
     });
   }
   function buildColors(level){
-    if (level === 'first') return tagSkill(buildColorsMix(), 'Color Mixing');
-    if (level === 'kindergarten') return tagSkill(buildColorsMatch(), 'Color Recognition');
-    return tagSkill(buildColorsPreschool(), 'Color Recognition');
+    var oc = optionCountForLevel(level);
+    if (level === 'first') return tagSkill(buildColorsMix(oc), 'Color Mixing');
+    if (level === 'kindergarten') return tagSkill(buildColorsMatch(oc), 'Color Recognition');
+    return tagSkill(buildColorsPreschool(oc), 'Color Recognition');
   }
 
   /* -- patterns: preschool=match a short AB pattern, kindergarten=extend AB/ABC, first=more complex
@@ -1415,24 +1550,25 @@
       options: opts
     };
   }
-  function buildPatternsMatch(){
-    var out = []; for (var i=0;i<6;i++) out.push(buildPatternQuestion(2, 4, 2)); return out;
+  function buildPatternsMatch(optionCount){
+    var out = []; for (var i=0;i<6;i++) out.push(buildPatternQuestion(2, 4, optionCount)); return out;
   }
-  function buildPatternsExtend(){
+  function buildPatternsExtend(optionCount){
     var out = [];
     for (var i=0;i<6;i++){
       var unitLen = Math.random() < 0.5 ? 2 : 3;
-      out.push(buildPatternQuestion(unitLen, unitLen === 2 ? 5 : 6, 3));
+      out.push(buildPatternQuestion(unitLen, unitLen === 2 ? 5 : 6, optionCount));
     }
     return out;
   }
-  function buildPatternsCreate(){
-    var out = []; for (var i=0;i<6;i++) out.push(buildPatternQuestion(3, 7, 3)); return out;
+  function buildPatternsCreate(optionCount){
+    var out = []; for (var i=0;i<6;i++) out.push(buildPatternQuestion(3, 7, optionCount)); return out;
   }
   function buildPatterns(level){
-    if (level === 'preschool') return tagSkill(buildPatternsMatch(), 'Patterns');
-    if (level === 'first') return tagSkill(buildPatternsCreate(), 'Patterns');
-    return tagSkill(buildPatternsExtend(), 'Patterns');
+    var oc = optionCountForLevel(level);
+    if (level === 'preschool') return tagSkill(buildPatternsMatch(oc), 'Patterns');
+    if (level === 'first') return tagSkill(buildPatternsCreate(oc), 'Patterns');
+    return tagSkill(buildPatternsExtend(oc), 'Patterns');
   }
 
   /* -- sight words: leveled high-frequency word lists (Dolch-style pre-primer/primer/1st grade),
@@ -1442,8 +1578,9 @@
   var SIGHT_WORDS_1 = ['about','after','again','could','every','from','give','many','said','were'];
   function buildSightWords(level){
     var pool = level === 'preschool' ? SIGHT_WORDS_PRE : (level === 'first' ? SIGHT_WORDS_1 : SIGHT_WORDS_K);
+    var oc = optionCountForLevel(level);
     return tagSkill(sample(pool, 6).map(function(word){
-      var distractors = sample(pool.filter(function(w){ return w !== word; }), 2);
+      var distractors = sample(pool.filter(function(w){ return w !== word; }), oc-1);
       var opts = shuffle([word].concat(distractors)).map(function(w){
         return { html:'<span class="opt-word">'+w.toUpperCase()+'</span>', correct: w === word };
       });
@@ -1466,27 +1603,38 @@
     for (var i=0;i<name.length;i++){ var c = name[i]; if (!seen[c]){ seen[c] = true; out.push(c); } }
     return out;
   }
-  function buildNameRecognition(name, n){
+  /* The child's actual name is never printed as on-screen text in this station -- only spoken
+     aloud (speak, via the 🔊 button/audio) and used internally to pick the right letters. Every
+     question below sets a separate, generic `prompt` for the visible text, and buildNameOrder
+     masks every non-blank letter of the spelled-out name so the letters themselves never appear
+     on screen either. */
+  function buildNameRecognition(name, n, optionCount){
+    optionCount = optionCount || 3;
     var letters = nameLetters(name);
     var notInName = ALPHABET.filter(function(l){ return letters.indexOf(l) === -1; });
     var out = [];
     for (var i=0;i<n;i++){
       var target = letters[i % letters.length];
-      var distPool = notInName.length >= 2 ? notInName : ALPHABET.filter(function(l){ return l !== target; });
-      var distractors = sample(distPool, 2);
+      var distPool = notInName.length >= (optionCount-1) ? notInName : ALPHABET.filter(function(l){ return l !== target; });
+      var distractors = sample(distPool, optionCount-1);
       var opts = shuffle([target].concat(distractors)).map(function(l){
         return { html:'<span class="opt-big-letter">'+l+'</span>', correct: l === target };
       });
-      out.push({ speak:'Which letter is in the name ' + name + '?', visual:'', options: opts });
+      out.push({
+        speak:'Which letter is in the name ' + name + '?',
+        prompt:'Which letter is in your name?',
+        visual:'', options: opts
+      });
     }
     return out;
   }
-  function buildNameCaseMatch(name, n){
+  function buildNameCaseMatch(name, n, optionCount){
+    optionCount = optionCount || 3;
     var letters = nameLetters(name);
     var out = [];
     for (var i=0;i<n;i++){
       var target = letters[i % letters.length];
-      var distractors = sample(ALPHABET.filter(function(l){ return l !== target; }), 2);
+      var distractors = sample(ALPHABET.filter(function(l){ return l !== target; }), optionCount-1);
       var opts = shuffle([target].concat(distractors)).map(function(l){
         return { html:'<span class="opt-big-letter">'+l.toLowerCase()+'</span>', correct: l === target };
       });
@@ -1494,7 +1642,8 @@
     }
     return out;
   }
-  function buildNameOrder(name, n){
+  function buildNameOrder(name, n, optionCount){
+    optionCount = optionCount || 3;
     var out = [];
     for (var i=0;i<n;i++){
       var blankIdx = randInt(0, name.length-1);
@@ -1502,24 +1651,29 @@
       var spelled = name.split('').map(function(c, idx){
         return idx === blankIdx
           ? '<span class="opt-swatch" style="background:var(--stop-accent);width:34px;height:44px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:800;">?</span>'
-          : '<span class="opt-big-letter" style="font-size:1.8rem;">'+c+'</span>';
+          : '<span class="opt-big-letter" style="font-size:1.8rem;color:var(--ink-soft);">•</span>';
       }).join(' ');
-      var distractors = sample(ALPHABET.filter(function(l){ return l !== correctLetter; }), 2);
+      var distractors = sample(ALPHABET.filter(function(l){ return l !== correctLetter; }), optionCount-1);
       var opts = shuffle([correctLetter].concat(distractors)).map(function(l){
         return { html:'<span class="opt-big-letter">'+l+'</span>', correct: l === correctLetter };
       });
-      out.push({ speak:'What letter is missing from ' + name + '?', visual:'<div class="rhyme-target">'+spelled+'</div>', options: opts });
+      out.push({
+        speak:'What letter is missing from ' + name + '?',
+        prompt:'What letter is missing?',
+        visual:'<div class="rhyme-target">'+spelled+'</div>', options: opts
+      });
     }
     return out;
   }
   function buildMyName(level){
     var name = (STATE.userName || 'FRIEND').toUpperCase().replace(/[^A-Z]/g,'') || 'FRIEND';
-    if (level === 'preschool') return tagSkill(buildNameRecognition(name, 6), 'Name Recognition');
+    var oc = optionCountForLevel(level);
+    if (level === 'preschool') return tagSkill(buildNameRecognition(name, 6, oc), 'Name Recognition');
     if (level === 'first') return shuffle(
-      tagSkill(buildNameOrder(name, 4), 'Name Spelling Order')
-        .concat(tagSkill(buildNameRecognition(name, 2), 'Name Recognition'))
+      tagSkill(buildNameOrder(name, 4, oc), 'Name Spelling Order')
+        .concat(tagSkill(buildNameRecognition(name, 2, oc), 'Name Recognition'))
     );
-    return tagSkill(buildNameCaseMatch(name, 6), 'Name Letter Case Match');
+    return tagSkill(buildNameCaseMatch(name, 6, oc), 'Name Letter Case Match');
   }
 
   /* Trail order: recognizing your own name comes first (a common pre-K first step, ahead of general
@@ -1562,7 +1716,11 @@
   var progress = {};
   function bestStars(id){ return progress[id] || 0; }
   function setBestStars(id, stars){
-    if (!progress[id] || stars > progress[id]) progress[id] = stars;
+    var prev = progress[id] || 0;
+    if (stars > prev){
+      progress[id] = stars;
+      getWeekBucket(weekKeyFor(new Date())).starsGained += (stars - prev);
+    }
   }
   function totalStars(){
     return visibleStations().reduce(function(sum,s){ return sum + bestStars(s.id); }, 0);
@@ -1606,8 +1764,56 @@
     return s || ('explorer-' + Math.random().toString(36).slice(2,8));
   }
 
+  /* ---- week-by-week progress bucketing (Parent Dashboard) ----
+     Each answered question, minute of play, and star earned is also tallied into a bucket keyed by
+     the Monday that starts its calendar week, so the Parent Dashboard can show recent trends instead
+     of just lifetime totals. Buckets are capped to the most recent 12 weeks (pruneWeekly, called from
+     saveStats) so the stored document doesn't grow without bound over months of play. */
+  function mondayOf(d){
+    var date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var day = date.getDay();
+    var diff = (day === 0 ? -6 : 1 - day);
+    date.setDate(date.getDate() + diff);
+    return date;
+  }
+  function weekKeyFor(d){
+    var m = mondayOf(d || new Date());
+    var y = m.getFullYear(), mo = String(m.getMonth()+1).padStart(2,'0'), da = String(m.getDate()).padStart(2,'0');
+    return y + '-' + mo + '-' + da;
+  }
+  function weekLabel(key){
+    var parts = key.split('-').map(Number);
+    var d = new Date(parts[0], parts[1]-1, parts[2]);
+    if (key === weekKeyFor(new Date())) return 'This week';
+    if (key === weekKeyFor(new Date(Date.now() - 7*24*3600*1000))) return 'Last week';
+    return 'Week of ' + d.toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  }
+  function getWeekBucket(key){
+    if (!stats.weekly) stats.weekly = {};
+    if (!stats.weekly[key]) stats.weekly[key] = { correct:0, wrong:0, timeSec:0, starsGained:0 };
+    return stats.weekly[key];
+  }
+  function pruneWeekly(){
+    if (!stats.weekly) return;
+    var keys = Object.keys(stats.weekly).sort();
+    if (keys.length > 12){
+      keys.slice(0, keys.length - 12).forEach(function(k){ delete stats.weekly[k]; });
+    }
+  }
+  /* Builds the last N week keys (most recent first), including weeks with no activity at all --
+     seeing a gap is itself useful signal for a parent, not just something to hide. */
+  function recentWeekKeys(n){
+    var out = [];
+    var cursor = mondayOf(new Date());
+    for (var i=0;i<n;i++){
+      out.push(weekKeyFor(cursor));
+      cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - 7);
+    }
+    return out;
+  }
+
   function defaultStats(){
-    return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[] };
+    return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[], weekly:{} };
   }
 
   /* On claude.ai this app uses the Artifact db capability. This GitHub Pages copy has no
@@ -1889,6 +2095,37 @@
     return { status:status, acc:acc, attempts:attempts };
   }
 
+  /* Renders the last 6 calendar weeks (most recent first), including weeks with no play at all --
+     a gap is useful signal for a parent too, not something to hide. Each row's bar visualizes
+     correct (forest) vs. wrong (berry) answers that week, scaled to the busiest week shown. */
+  function renderWeeklyTable(weekly){
+    var keys = recentWeekKeys(6);
+    var maxAttempts = 0;
+    keys.forEach(function(k){
+      var b = (weekly && weekly[k]) || {};
+      var attempts = (b.correct||0) + (b.wrong||0);
+      if (attempts > maxAttempts) maxAttempts = attempts;
+    });
+    var rows = keys.map(function(k){
+      var b = (weekly && weekly[k]) || {};
+      var c = b.correct||0, w = b.wrong||0, attempts = c + w;
+      var acc = attempts ? Math.round((c/attempts)*100) : null;
+      var minutes = Math.round((b.timeSec||0)/60);
+      var barHtml = attempts
+        ? '<div class="week-bar"><div class="week-bar-correct" style="width:'+(maxAttempts?(c/maxAttempts*100):0)+'%"></div><div class="week-bar-wrong" style="width:'+(maxAttempts?(w/maxAttempts*100):0)+'%"></div></div>'
+        : '<div class="week-bar week-bar-empty"></div>';
+      var starsHtml = (b.starsGained||0) > 0 ? ('⭐ +'+b.starsGained) : '—';
+      return '<tr>'+
+        '<td>'+weekLabel(k)+'</td>'+
+        '<td>'+barHtml+'</td>'+
+        '<td style="white-space:nowrap;color:var(--ink-soft);font-size:0.82rem;">'+(attempts ? attempts+' Q · '+acc+'%' : '—')+'</td>'+
+        '<td style="white-space:nowrap;color:var(--ink-soft);font-size:0.82rem;">'+(minutes ? minutes+' min' : '—')+'</td>'+
+        '<td style="white-space:nowrap;">'+starsHtml+'</td>'+
+      '</tr>';
+    }).join('');
+    return '<table class="admin-table week-table"><thead><tr><th>Week</th><th>Activity</th><th>Questions</th><th>Time</th><th>Stars</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+
   function renderUserCard(u, st, showDelete){
     st = st || {};
     var correct = st.totalCorrect || 0, wrong = st.totalWrong || 0;
@@ -1920,6 +2157,8 @@
         '<span>✅ '+correct+' correct</span><span>❌ '+wrong+' wrong</span>'+
         '<span>'+(acc===null?'—':acc+'%')+' accuracy</span><span>⏱ '+minutes+' min total</span>'+
       '</div>'+
+      '<div style="font-weight:800;font-size:0.78rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 4px;">Week by week</div>'+
+      renderWeeklyTable(st.weekly)+
       (skillRows
         ? '<table class="admin-table"><thead><tr><th>Area</th><th>Status</th><th>Accuracy</th></tr></thead><tbody>'+skillRows+'</tbody></table>'
         : '<p class="admin-empty" style="padding:6px 0;">No areas practiced yet.</p>')+
@@ -2017,6 +2256,7 @@
       if (!stats.stars) stats.stars = {};
       if (!stats.tally) stats.tally = {};
       if (!stats.skillTally) stats.skillTally = {};
+      if (!stats.weekly) stats.weekly = {};
       progress = stats.stars;
       loadSound();
       loadLevelPref();
@@ -2045,7 +2285,8 @@
     if (!STATE.userSlug) return Promise.resolve();
     var slug = STATE.userSlug;
     pendingSave = pendingSave.then(function(){
-      var payload = { totalCorrect: stats.totalCorrect, totalWrong: stats.totalWrong, totalTimeSec: stats.totalTimeSec, lastActive: stats.lastActive, sessions: stats.sessions, stars: stats.stars, tally: stats.tally, skillTally: stats.skillTally };
+      pruneWeekly();
+      var payload = { totalCorrect: stats.totalCorrect, totalWrong: stats.totalWrong, totalTimeSec: stats.totalTimeSec, lastActive: stats.lastActive, sessions: stats.sessions, stars: stats.stars, tally: stats.tally, skillTally: stats.skillTally, weekly: stats.weekly };
       /* Building a db path/doc reference can throw SYNCHRONOUSLY (not just reject) if anything about
          it is ever malformed -- and this now runs on every single answered question via
          recordAnswer(), inside the same call stack as the correct-answer feedback. An uncaught throw
@@ -2074,6 +2315,7 @@
     stats.lastActive = new Date().toISOString();
     if (elapsed > 0){
       stats.sessions = (stats.sessions || []).concat([{ date:stats.lastActive, durationSec:elapsed }]).slice(-20);
+      getWeekBucket(weekKeyFor(new Date())).timeSec += elapsed;
     }
     STATE.sessionStart = now;
     var writeP = saveStats();
@@ -2147,7 +2389,7 @@
     roundTally:{correct:0, wrong:0}, roundSkillTally:{}, roundLog:[],
     pendingPin:'', newProfilePin:'', newProfilePinStage:'set', newProfilePinFirst:''
   };
-  var stats = { stars:{}, tally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[] };
+  var stats = { stars:{}, tally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[], weekly:{} };
   var profiles = [];
 
   var elUserChip = document.getElementById('userChip');
@@ -2205,6 +2447,12 @@
   var elResultsLine = document.getElementById('resultsLine');
   var elResultsSub = document.getElementById('resultsSub');
   var elResultsReview = document.getElementById('resultsReview');
+  var elReadCheck = document.getElementById('readCheck');
+  var elReadCheckName = document.getElementById('readCheckName');
+  var elReadCheckActions = document.getElementById('readCheckActions');
+  var elReadCheckYesBtn = document.getElementById('readCheckYesBtn');
+  var elReadCheckNoBtn = document.getElementById('readCheckNoBtn');
+  var elReadCheckResult = document.getElementById('readCheckResult');
   var elPlayAgain = document.getElementById('playAgainBtn');
   var elToTrail = document.getElementById('toTrailBtn');
 
@@ -2296,7 +2544,7 @@
     elStage.innerHTML = q.visual || '';
     elPromptText.textContent = q.prompt || q.speak;
     elFeedback.textContent = '';
-    var cls = 'options' + (q.options.length === 2 ? ' opts-2' : '') + (q.stack ? ' opts-stack' : '');
+    var cls = 'options' + (q.options.length === 2 ? ' opts-2' : (q.options.length === 4 ? ' opts-4' : '')) + (q.stack ? ' opts-stack' : '');
     elOptions.className = cls;
     elOptions.innerHTML = q.options.map(function(o,i){
       return '<button class="option-btn" data-idx="'+i+'">'+o.html+'</button>';
@@ -2317,14 +2565,17 @@
     if (!stats.skillTally) stats.skillTally = {};
     if (!stats.tally[stationId]) stats.tally[stationId] = { correct:0, wrong:0 };
     if (!stats.skillTally[skill]) stats.skillTally[skill] = { correct:0, wrong:0 };
+    var wk = getWeekBucket(weekKeyFor(new Date()));
     if (wasCorrect){
       stats.tally[stationId].correct++;
       stats.skillTally[skill].correct++;
       stats.totalCorrect = (stats.totalCorrect || 0) + 1;
+      wk.correct++;
     } else {
       stats.tally[stationId].wrong++;
       stats.skillTally[skill].wrong++;
       stats.totalWrong = (stats.totalWrong || 0) + 1;
+      wk.wrong++;
     }
     stats.lastActive = new Date().toISOString();
     saveStats();
@@ -2342,7 +2593,7 @@
       if (!STATE.wrongOnCurrent) STATE.correctFirstTry++;
       STATE.roundTally.correct++;
       STATE.roundSkillTally[skill].correct++;
-      STATE.roundLog.push({ skill:skill, label:q.speak, correct: !STATE.wrongOnCurrent });
+      STATE.roundLog.push({ skill:skill, label:(q.prompt || q.speak), correct: !STATE.wrongOnCurrent });
       /* Advancing to the next question is scheduled FIRST, before anything that isn't essential to
          gameplay (saving progress, praise text, speech, the star animation). That way a hiccup in
          any of those extras can never freeze the trail on the current (already-answered) question --
@@ -2373,7 +2624,12 @@
       STATE.roundTally.wrong++;
       STATE.roundSkillTally[skill].wrong++;
       try{ recordAnswer(STATE.stationId, skill, false); }catch(e){}
-      try{ elFeedback.textContent = 'Try again!'; speak('Try again!'); }catch(e){}
+      try{
+        var pickedLabel = getOptionLabel(btn);
+        var msg = pickedLabel ? ('That was ' + pickedLabel + ' — try again!') : 'Try again!';
+        elFeedback.textContent = msg;
+        speak(msg);
+      }catch(e){}
     }
   }
 
@@ -2416,8 +2672,32 @@
       elResultsSub.textContent = 'You got ' + STATE.correctFirstTry + ' of 6 right on the first try.';
       speak(elResultsLine.textContent);
       elStarTotal.textContent = '⭐ ' + totalStars() + ' / ' + maxStars();
+      showReadCheck();
     }catch(e){}
   }
+
+  function showReadCheck(){
+    if (STATE.stationId !== 'myname'){ elReadCheck.hidden = true; return; }
+    var name = (STATE.userName || 'Explorer').toUpperCase().replace(/[^A-Z]/g,'') || 'EXPLORER';
+    elReadCheckName.textContent = name;
+    elReadCheckResult.hidden = true;
+    elReadCheckResult.textContent = '';
+    elReadCheckYesBtn.disabled = false;
+    elReadCheckNoBtn.disabled = false;
+    elReadCheckActions.hidden = false;
+    elReadCheck.hidden = false;
+  }
+
+  function recordReadCheck(gotItRight){
+    elReadCheckYesBtn.disabled = true;
+    elReadCheckNoBtn.disabled = true;
+    elReadCheckActions.hidden = true;
+    elReadCheckResult.hidden = false;
+    elReadCheckResult.textContent = gotItRight ? '⭐ Nice reading!' : 'Keep practicing — you\'ll get it!';
+    try{ recordAnswer('myname', 'Name Read Aloud', !!gotItRight); }catch(e){}
+  }
+  elReadCheckYesBtn.addEventListener('click', function(){ recordReadCheck(true); });
+  elReadCheckNoBtn.addEventListener('click', function(){ recordReadCheck(false); });
 
   elBackBtn.addEventListener('click', function(){ renderTrail(); showView('trail'); });
   elToTrail.addEventListener('click', function(){ renderTrail(); showView('trail'); });
@@ -2466,6 +2746,7 @@
     if (!stats.stars) stats.stars = {};
     if (!stats.tally) stats.tally = {};
     if (!stats.skillTally) stats.skillTally = {};
+    if (!stats.weekly) stats.weekly = {};
     progress = stats.stars;
     STATE.userSlug = 'explorer';
     STATE.userName = 'Explorer';
