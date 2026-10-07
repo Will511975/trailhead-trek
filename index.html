@@ -265,6 +265,16 @@
   .level-btn.active{ background:var(--sunset); border-color:var(--sunset); color:var(--sunset-ink); }
   .level-btn.active .level-sub{ color:var(--sunset-ink); opacity:.85; }
   .level-btn:hover:not(.active){ border-color:var(--sky); }
+  .level-badge{
+    display:inline-flex; align-items:center; gap:8px; padding:7px 16px; border-radius:999px;
+    background:var(--sunset); color:var(--sunset-ink); font-weight:800; font-size:0.95rem;
+    border:2px solid var(--sunset); cursor:default;
+  }
+  .level-badge .level-sub{ font-size:0.75rem; font-weight:700; opacity:.88; }
+  .grade-row{ margin:4px 0 10px; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:2px solid var(--line); }
+  .grade-label{ font-weight:800; font-size:0.78rem; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+  .grade-row .level-switch{ margin-bottom:4px; }
+  .grade-note{ font-size:0.82rem; font-weight:700; color:var(--ink-soft); min-height:1.2em; }
   .station-level-tag{
     display:inline-block; font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
     color:var(--stop-accent); border:1.5px solid var(--stop-accent); border-radius:999px; padding:2px 8px;
@@ -947,7 +957,7 @@
       </div>
       <p>Tap a stop to start your adventure with Sasquatch!</p>
     </div>
-    <div class="level-switch" id="levelSwitch" role="tablist" aria-label="Choose a learning level"></div>
+    <div class="level-switch" id="levelSwitch" aria-live="polite"></div>
     <ul class="trail" id="trailList"></ul>
     <footer class="notes">
       <details>
@@ -1983,6 +1993,14 @@
     } catch(e){ STATE.level = 'kindergarten'; }
   }
   function saveLevelPref(){ try{ localStorage.setItem(LKEY, STATE.level); } catch(e){} }
+  /* Each explorer's grade is stored on their profile (users/{slug}.level) and can only be changed
+     from the passphrase-protected Parent Dashboard. Anything missing/unknown falls back to Kindergarten. */
+  function normLevel(v){
+    return LEVELS.some(function(l){ return l.id === v; }) ? v : 'kindergarten';
+  }
+  function levelInfo(id){
+    return LEVELS.filter(function(l){ return l.id === normLevel(id); })[0];
+  }
 
   /* ---------------- accounts, db & tracking ---------------- */
   var AVATARS = ['🦌','🐻','🦉','🐿️','🦅','🐇','🦫','🐐','🦔','🐢'];
@@ -2105,7 +2123,7 @@
     return db.collection('users').get().then(function(qs){
       return qs.docs.map(function(d){
         var data = d.data() || {};
-        return { slug:d.id, name:data.name || d.id, avatar:data.avatar || '🥾', pinHash:data.pinHash };
+        return { slug:d.id, name:data.name || d.id, avatar:data.avatar || '🥾', pinHash:data.pinHash, level:data.level };
       });
     }).catch(function(){ return []; });
   }
@@ -2534,12 +2552,25 @@
       var name = (stationById(sid) || {}).name || sid;
       return '<tr><td>'+name+'</td><td>'+t.correct+'</td><td>'+t.wrong+'</td></tr>';
     }).join('');
+    var lvl = levelInfo(u.level);
+    var gradeBlock = showDelete
+      ? '<div class="grade-row"><div class="grade-label">Grade level</div>'+
+          '<div class="level-switch" data-grade-for="'+u.slug+'">'+
+            LEVELS.map(function(l){
+              return '<button type="button" class="level-btn grade-btn'+(lvl.id===l.id?' active':'')+'" data-slug="'+u.slug+'" data-level="'+l.id+'" aria-pressed="'+(lvl.id===l.id)+'">'+
+                l.label+'<span class="level-sub">'+l.sub+'</span></button>';
+            }).join('')+
+          '</div><div class="grade-note" data-grade-note="'+u.slug+'"></div></div>'
+      : '<div class="grade-row"><div class="grade-label">Grade level</div>'+
+          '<div style="font-weight:800;">'+lvl.label+' <span style="font-weight:600;color:var(--ink-soft);">('+lvl.sub+')</span></div>'+
+          '<div class="grade-note">A grown-up can change this in the full Parent Dashboard (tap the logo 5 times on the login screen).</div></div>';
     return '<div class="admin-card">'+
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'+
         '<span class="profile-avatar">'+u.avatar+'</span>'+
         '<div><div style="font-weight:800;font-size:1.05rem;">'+u.name+'</div>'+
         '<div style="font-size:0.8rem;color:var(--ink-soft);">Last active: '+last+'</div></div>'+
       '</div>'+
+      gradeBlock+
       '<div style="display:flex;gap:18px;flex-wrap:wrap;font-size:0.9rem;font-weight:700;margin-bottom:10px;">'+
         '<span>✅ '+correct+' correct</span><span>❌ '+wrong+' wrong</span>'+
         '<span>'+(acc===null?'—':acc+'%')+' accuracy</span><span>⏱ '+minutes+' min total</span>'+
@@ -2554,6 +2585,27 @@
         ? '<div style="margin-top:12px;"><button type="button" class="btn secondary admin-delete-btn" data-slug="'+u.slug+'" data-armed="0">🗑 Delete profile</button></div>'
         : '')+
     '</div>';
+  }
+
+  function wireGradeButtons(){
+    Array.prototype.forEach.call(elAdminContent.querySelectorAll('.grade-btn'), function(btn){
+      btn.addEventListener('click', function(){
+        var slug = btn.getAttribute('data-slug'), lv = normLevel(btn.getAttribute('data-level'));
+        var group = btn.parentNode;
+        var note = elAdminContent.querySelector('[data-grade-note="'+slug+'"]');
+        if (!db){ if (note) note.textContent = 'Could not save — database unavailable.'; return; }
+        if (note) note.textContent = 'Saving…';
+        db.collection('users').doc(slug).update({ level: lv }).then(function(){
+          Array.prototype.forEach.call(group.querySelectorAll('.grade-btn'), function(b){
+            var on = b.getAttribute('data-level') === lv;
+            b.classList.toggle('active', on);
+            b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+          profiles.forEach(function(p){ if (p.slug === slug) p.level = lv; });
+          if (note) note.textContent = 'Saved ✓ — now set to ' + levelInfo(lv).label + '.';
+        }).catch(function(){ if (note) note.textContent = 'Could not save — try again.'; });
+      });
+    });
   }
 
   function wireDeleteButtons(){
@@ -2591,7 +2643,7 @@
     showView('admin');
     if (elAdminLogoutLabel) elAdminLogoutLabel.textContent = STATE.userSlug ? 'Back to Trail' : 'Log out';
     if (scopeSlug){
-      var mine = { slug:scopeSlug, name:STATE.userName || scopeSlug, avatar:STATE.userAvatar || '🥾' };
+      var mine = { slug:scopeSlug, name:STATE.userName || scopeSlug, avatar:STATE.userAvatar || '🥾', level:STATE.level };
       if (elAdminDashboardTitle) elAdminDashboardTitle.textContent = mine.name + '’s Dashboard';
       elAdminContent.innerHTML = renderUserCard(mine, stats, false);
       return;
@@ -2603,7 +2655,7 @@
       db.collection('users').get(),
       db.collection('stats').get()
     ]).then(function(results){
-      var users = results[0].docs.map(function(d){ var data = d.data()||{}; return { slug:d.id, name:data.name||d.id, avatar:data.avatar||'🥾' }; }).sort(byName);
+      var users = results[0].docs.map(function(d){ var data = d.data()||{}; return { slug:d.id, name:data.name||d.id, avatar:data.avatar||'🥾', level:data.level }; }).sort(byName);
       var statsById = {};
       results[1].docs.forEach(function(d){ statsById[d.id] = d.data() || {}; });
       var addBtnHtml = '<div style="margin-bottom:14px;"><button type="button" class="btn" id="addExplorerBtn">➕ Add Explorer</button></div>';
@@ -2612,6 +2664,7 @@
       var addBtn = document.getElementById('addExplorerBtn');
       if (addBtn) addBtn.addEventListener('click', openNewProfileCard);
       wireDeleteButtons();
+      wireGradeButtons();
     }).catch(function(){ elAdminContent.innerHTML = '<p class="admin-empty">Could not load stats.</p>'; });
   }
 
@@ -2627,7 +2680,13 @@
     var loadStatsP = db ? db.collection('stats').doc(profile.slug).get().then(function(snap){
       return snap.exists ? snap.data() : defaultStats();
     }).catch(function(){ return defaultStats(); }) : Promise.resolve(defaultStats());
-    loadStatsP.then(function(data){
+    var loadLevelP = db ? db.collection('users').doc(profile.slug).get().then(function(snap){
+      var d = snap && snap.exists ? (snap.data() || {}) : {};
+      return d.level || profile.level;
+    }).catch(function(){ return profile.level; }) : Promise.resolve(profile.level);
+    Promise.all([loadStatsP, loadLevelP]).then(function(res){
+      var data = res[0];
+      STATE.level = normLevel(res[1]);
       /* THE BUG: documents delivered by the database are FROZEN (per its own docs: "Delivered
          snapshots and their data() are frozen"). Object.assign only shallow-copies -- it copies the
          REFERENCE to data.tally / data.skillTally / data.stars, not a fresh copy of them, so those
@@ -2646,7 +2705,6 @@
       if (!stats.weekly) stats.weekly = {};
       progress = stats.stars;
       loadSound();
-      loadLevelPref();
       elSoundToggle.textContent = soundOn ? '🔊' : '🔇';
       renderLevelSwitch();
       renderTrail();
@@ -2854,19 +2912,9 @@
   }
 
   function renderLevelSwitch(){
-    elLevelSwitch.innerHTML = LEVELS.map(function(l){
-      return '<button type="button" class="level-btn'+(STATE.level===l.id?' active':'')+'" role="tab" aria-selected="'+(STATE.level===l.id)+'" data-level="'+l.id+'">'+
-        l.label + '<span class="level-sub">'+l.sub+'</span>'+
-      '</button>';
-    }).join('');
-    Array.prototype.forEach.call(elLevelSwitch.querySelectorAll('.level-btn'), function(btn){
-      btn.addEventListener('click', function(){
-        STATE.level = btn.getAttribute('data-level');
-        saveLevelPref();
-        renderLevelSwitch();
-        renderTrail();
-      });
-    });
+    var l = levelInfo(STATE.level);
+    elLevelSwitch.innerHTML = '<span class="level-badge" title="A grown-up sets this in the Parent Dashboard">📚 '+
+      l.label+'<span class="level-sub">'+l.sub+'</span></span>';
   }
 
   function renderTrail(){
