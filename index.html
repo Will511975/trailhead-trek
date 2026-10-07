@@ -2553,17 +2553,13 @@
       return '<tr><td>'+name+'</td><td>'+t.correct+'</td><td>'+t.wrong+'</td></tr>';
     }).join('');
     var lvl = levelInfo(u.level);
-    var gradeBlock = showDelete
-      ? '<div class="grade-row"><div class="grade-label">Grade level</div>'+
+    var gradeBlock = '<div class="grade-row"><div class="grade-label">Grade level</div>'+
           '<div class="level-switch" data-grade-for="'+u.slug+'">'+
             LEVELS.map(function(l){
               return '<button type="button" class="level-btn grade-btn'+(lvl.id===l.id?' active':'')+'" data-slug="'+u.slug+'" data-level="'+l.id+'" aria-pressed="'+(lvl.id===l.id)+'">'+
                 l.label+'<span class="level-sub">'+l.sub+'</span></button>';
             }).join('')+
-          '</div><div class="grade-note" data-grade-note="'+u.slug+'"></div></div>'
-      : '<div class="grade-row"><div class="grade-label">Grade level</div>'+
-          '<div style="font-weight:800;">'+lvl.label+' <span style="font-weight:600;color:var(--ink-soft);">('+lvl.sub+')</span></div>'+
-          '<div class="grade-note">A grown-up can change this in the full Parent Dashboard (tap the logo 5 times on the login screen).</div></div>';
+          '</div><div class="grade-note" data-grade-note="'+u.slug+'"></div></div>';
     return '<div class="admin-card">'+
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'+
         '<span class="profile-avatar">'+u.avatar+'</span>'+
@@ -2593,17 +2589,24 @@
         var slug = btn.getAttribute('data-slug'), lv = normLevel(btn.getAttribute('data-level'));
         var group = btn.parentNode;
         var note = elAdminContent.querySelector('[data-grade-note="'+slug+'"]');
-        if (!db){ if (note) note.textContent = 'Could not save — database unavailable.'; return; }
-        if (note) note.textContent = 'Saving…';
-        db.collection('users').doc(slug).update({ level: lv }).then(function(){
+        var applied = function(){
           Array.prototype.forEach.call(group.querySelectorAll('.grade-btn'), function(b){
             var on = b.getAttribute('data-level') === lv;
             b.classList.toggle('active', on);
             b.setAttribute('aria-pressed', on ? 'true' : 'false');
           });
           profiles.forEach(function(p){ if (p.slug === slug) p.level = lv; });
+          if (slug === STATE.userSlug){ STATE.level = lv; saveLevelPref(); renderLevelSwitch(); }
           if (note) note.textContent = 'Saved ✓ — now set to ' + levelInfo(lv).label + '.';
-        }).catch(function(){ if (note) note.textContent = 'Could not save — try again.'; });
+        };
+        if (!db){
+          if (slug === STATE.userSlug) applied();
+          else if (note) note.textContent = 'Could not save — database unavailable.';
+          return;
+        }
+        if (note) note.textContent = 'Saving…';
+        db.collection('users').doc(slug).update({ level: lv }).then(applied)
+          .catch(function(){ if (note) note.textContent = 'Could not save — try again.'; });
       });
     });
   }
@@ -2636,7 +2639,8 @@
 
   /* scopeSlug set (a kid is signed in and reached this via the header's Parent button): render
      ONLY that kid's own card from the already-loaded session data — no other explorer's info is
-     fetched or shown, and there's no delete control or "Add Explorer" button here.
+     fetched or shown, and there's no delete control or "Add Explorer" button here. This card also
+     has the grade-level buttons, so the grade can be changed right from here.
      scopeSlug omitted/null (reached pre-login via the 5-tap admin gesture): the full multi-kid
      dashboard, with "+ Add Explorer" and a delete control on every card. */
   function openAdminDashboard(scopeSlug){
@@ -2646,6 +2650,7 @@
       var mine = { slug:scopeSlug, name:STATE.userName || scopeSlug, avatar:STATE.userAvatar || '🥾', level:STATE.level };
       if (elAdminDashboardTitle) elAdminDashboardTitle.textContent = mine.name + '’s Dashboard';
       elAdminContent.innerHTML = renderUserCard(mine, stats, false);
+      wireGradeButtons();
       return;
     }
     if (elAdminDashboardTitle) elAdminDashboardTitle.textContent = 'Parent Dashboard';
@@ -2913,7 +2918,7 @@
 
   function renderLevelSwitch(){
     var l = levelInfo(STATE.level);
-    elLevelSwitch.innerHTML = '<span class="level-badge" title="A grown-up sets this in the Parent Dashboard">📚 '+
+    elLevelSwitch.innerHTML = '<span class="level-badge" title="Change the grade in the 👪 dashboard">📚 '+
       l.label+'<span class="level-sub">'+l.sub+'</span></span>';
   }
 
