@@ -1186,7 +1186,9 @@
     {word:'CAT', emoji:'🐱'}, {word:'DOG', emoji:'🐶'}, {word:'SUN', emoji:'☀️'},
     {word:'HAT', emoji:'🎩'}, {word:'PIG', emoji:'🐷'}, {word:'BUG', emoji:'🐛'},
     {word:'FOX', emoji:'🦊'}, {word:'CUP', emoji:'☕'}, {word:'BED', emoji:'🛏️'},
-    {word:'FISH', emoji:'🐟'}, {word:'BIRD', emoji:'🐦'}, {word:'FROG', emoji:'🐸'}
+    {word:'FISH', emoji:'🐟'}, {word:'BIRD', emoji:'🐦'}, {word:'FROG', emoji:'🐸'},
+    /* picture nouns from the Dolch 95 common-noun list */
+    {word:'BEAR', emoji:'🐻'}, {word:'CHICKEN', emoji:'🐔'}, {word:'COW', emoji:'🐮'}, {word:'DUCK', emoji:'🦆'}, {word:'HORSE', emoji:'🐴'}, {word:'RABBIT', emoji:'🐰'}, {word:'SHEEP', emoji:'🐑'}, {word:'SQUIRREL', emoji:'🐿️'}, {word:'APPLE', emoji:'🍎'}, {word:'BREAD', emoji:'🍞'}, {word:'CAKE', emoji:'🎂'}, {word:'MILK', emoji:'🥛'}, {word:'BELL', emoji:'🔔'}, {word:'BOX', emoji:'📦'}, {word:'CHAIR', emoji:'🪑'}, {word:'COAT', emoji:'🧥'}, {word:'DOOR', emoji:'🚪'}, {word:'HOUSE', emoji:'🏠'}, {word:'PAPER', emoji:'📄'}, {word:'PICTURE', emoji:'🖼️'}, {word:'RING', emoji:'💍'}, {word:'WINDOW', emoji:'🪟'}, {word:'BABY', emoji:'👶'}, {word:'BOY', emoji:'👦'}, {word:'GIRL', emoji:'👧'}, {word:'EYE', emoji:'👁️'}, {word:'HAND', emoji:'✋'}, {word:'LEG', emoji:'🦵'}, {word:'FIRE', emoji:'🔥'}, {word:'FLOWER', emoji:'🌸'}, {word:'ICE', emoji:'🧊'}, {word:'NEST', emoji:'🪺'}, {word:'RAIN', emoji:'🌧️'}, {word:'SNOW', emoji:'❄️'}, {word:'WATER', emoji:'💧'}, {word:'WIND', emoji:'💨'}, {word:'BOAT', emoji:'⛵'}, {word:'CAR', emoji:'🚗'}, {word:'GAME', emoji:'🎲'}, {word:'LETTER', emoji:'✉️'}, {word:'MONEY', emoji:'💰'}, {word:'PARTY', emoji:'🎉'}, {word:'SONG', emoji:'🎵'}, {word:'TOY', emoji:'🧸'}, {word:'SCHOOL', emoji:'🏫'}, {word:'WATCH', emoji:'⌚'}
   ];
   var RHYME_POOL = [
     {word:'Cat', emoji:'🐱', rhyme:'Hat', rhymeEmoji:'🎩'},
@@ -1822,9 +1824,11 @@
 
   /* -- sight words: leveled high-frequency word lists (Dolch-style pre-primer/primer/1st grade),
      spoken aloud with the child picking the matching written word. -- */
-  var SIGHT_WORDS_PRE = ['a','I','the','is','it','to','see','my','you','and'];
-  var SIGHT_WORDS_K = ['see','look','come','like','go','can','we','they','was','for'];
-  var SIGHT_WORDS_1 = ['about','after','again','could','every','from','give','many','said','were'];
+  /* Word lists come from the Dolch lists (Pre-Primer / Primer / 1st Grade); 1st grade also adds the
+     remaining Fry First-100 words that the Dolch lists don't already cover. */
+  var SIGHT_WORDS_PRE = ['a','and','away','big','blue','can','come','down','find','for','funny','go','help','here','I','in','is','it','jump','little','look','make','me','my','not','one','play','red','run','said','see','the','three','to','two','up','we','where','yellow','you'];
+  var SIGHT_WORDS_K = ['all','am','are','at','ate','be','black','brown','but','came','did','do','eat','four','get','good','have','he','into','like','must','new','no','now','on','our','out','please','pretty','ran','ride','run','saw','say','she','so','soon','that','there','they','this','too','under','want','was','well','went','what','white','who','will','with','yes'];
+  var SIGHT_WORDS_1 = ['after','again','an','any','as','ask','by','could','every','fly','from','give','going','had','has','her','him','his','how','just','know','let','live','may','of','old','once','open','over','put','round','some','stop','take','thank','them','then','think','walk','were','when','or','words','your','use','each','which','their','if','other','about','many','these','would','time','more','write','number','way','people','than','first','water','been','called','its','long','day','made','part'];
   function buildSightWords(level){
     var pool = level === 'preschool' ? SIGHT_WORDS_PRE : (level === 'first' ? SIGHT_WORDS_1 : SIGHT_WORDS_K);
     var oc = optionCountForLevel(level);
