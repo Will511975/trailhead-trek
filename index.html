@@ -2066,6 +2066,7 @@
   function getWeekBucket(key){
     if (!stats.weekly) stats.weekly = {};
     if (!stats.missed) stats.missed = {};
+    if (!stats.right) stats.right = {};
     if (!stats.weekly[key]) stats.weekly[key] = { correct:0, wrong:0, timeSec:0, starsGained:0 };
     return stats.weekly[key];
   }
@@ -2089,7 +2090,7 @@
   }
 
   function defaultStats(){
-    return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[], weekly:{}, missed:{} };
+    return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[], weekly:{}, missed:{}, right:{} };
   }
 
   /* On claude.ai this app uses the Artifact db capability. This GitHub Pages copy has no
@@ -2557,14 +2558,16 @@
     var acc = attempts ? Math.round((correct/attempts)*100) : null;
     var minutes = Math.round((st.totalTimeSec || 0) / 60);
     var last = st.lastActive ? new Date(st.lastActive).toLocaleString() : 'Never';
+    var totals = {};
+    try{ totals = skillTotalsFor(u.name); }catch(e){ totals = {}; }
     var skillEntries = Object.keys(st.skillTally || {}).map(function(skill){
       var r = skillStatusFor(st.skillTally[skill]);
-      return { skill:skill, status:r.status, acc:r.acc, attempts:r.attempts, right:(st.skillTally[skill] || {}).correct || 0 };
+      return { skill:skill, status:r.status, acc:r.acc, attempts:r.attempts, cover:coverageText(skill, st, normLevel(u.level), totals) };
     }).sort(function(a,b){ return SKILL_STATUS_WEIGHT[a.status] - SKILL_STATUS_WEIGHT[b.status]; });
     var skillRows = skillEntries.map(function(e){
       return '<tr><td>'+e.skill+'</td>'+
         '<td><span class="skill-status '+e.status+'">'+SKILL_STATUS_LABEL[e.status]+'</span></td>'+
-        '<td style="font-weight:800;white-space:nowrap;">'+e.right+' / '+e.attempts+'</td>'+
+        '<td style="font-weight:800;white-space:nowrap;">'+e.cover+'</td>'+
         '<td style="color:var(--ink-soft);font-size:0.82rem;">'+e.acc+'% · '+e.attempts+' tries</td></tr>';
     }).join('');
     var byStationRows = Object.keys(st.tally || {}).map(function(sid){
@@ -2594,7 +2597,7 @@
       '<div style="font-weight:800;font-size:0.78rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 4px;">Week by week</div>'+
       renderWeeklyTable(st.weekly)+
       (skillRows
-        ? '<table class="admin-table"><thead><tr><th>Area</th><th>Status</th><th>Right / Total</th><th>Accuracy</th></tr></thead><tbody>'+skillRows+'</tbody></table>'
+        ? '<table class="admin-table"><thead><tr><th>Area</th><th>Status</th><th>Right / Total Questions</th><th>Accuracy</th></tr></thead><tbody>'+skillRows+'</tbody></table>'
         : '<p class="admin-empty" style="padding:6px 0;">No areas practiced yet.</p>')+
       (byStationRows ? '<details style="margin-top:8px;"><summary>By station (raw totals)</summary><table class="admin-table"><thead><tr><th>Station</th><th>Correct</th><th>Wrong</th></tr></thead><tbody>'+byStationRows+'</tbody></table></details>' : '')+
       (showDelete
@@ -2786,6 +2789,7 @@
       if (!stats.skillTally) stats.skillTally = {};
       if (!stats.weekly) stats.weekly = {};
       if (!stats.missed) stats.missed = {};
+      if (!stats.right) stats.right = {};
       progress = stats.stars;
       loadSound();
       elSoundToggle.textContent = soundOn ? '🔊' : '🔇';
@@ -2814,7 +2818,7 @@
     var slug = STATE.userSlug;
     pendingSave = pendingSave.then(function(){
       pruneWeekly();
-      var payload = { totalCorrect: stats.totalCorrect, totalWrong: stats.totalWrong, totalTimeSec: stats.totalTimeSec, lastActive: stats.lastActive, sessions: stats.sessions, stars: stats.stars, tally: stats.tally, skillTally: stats.skillTally, weekly: stats.weekly, missed: stats.missed || {} };
+      var payload = { totalCorrect: stats.totalCorrect, totalWrong: stats.totalWrong, totalTimeSec: stats.totalTimeSec, lastActive: stats.lastActive, sessions: stats.sessions, stars: stats.stars, tally: stats.tally, skillTally: stats.skillTally, weekly: stats.weekly, missed: stats.missed || {}, right: stats.right || {} };
       /* Building a db path/doc reference can throw SYNCHRONOUSLY (not just reject) if anything about
          it is ever malformed -- and this now runs on every single answered question via
          recordAnswer(), inside the same call stack as the correct-answer feedback. An uncaught throw
@@ -3083,6 +3087,7 @@
   }
   function addToMissedBank(stationId, level, q){
     if (!stats.missed) stats.missed = {};
+    if (!stats.right) stats.right = {};
     var key = missedKey(stationId, level), sig = qSig(q);
     var bank = stats.missed[key] || (stats.missed[key] = []);
     for (var i = 0; i < bank.length; i++){ if (bank[i].sig === sig){ bank[i].n = (bank[i].n || 1) + 1; return; } }
@@ -3184,6 +3189,86 @@
      end of a full 6-question round) and saves it. A young kid very often wanders off, gets bored,
      or backs out partway through a round -- if progress only got written at round-end, all of that
      real practice would silently vanish and the Parent Dashboard would show nothing for it. */
+  /* ---- "Right / Total" per area ----
+     Every question has a stable identity (what is asked + the right answer -- not the shuffled wrong
+     choices). A question counts as RIGHT once the child has answered it correctly on the first try.
+     The TOTAL is how many different questions that area can ask at that grade, found by building lots
+     of sample rounds from the real question builders (done once, then cached). */
+  function hashStr(str){
+    var h = 5381;
+    for (var i = 0; i < str.length; i++){ h = ((h << 5) + h + str.charCodeAt(i)) | 0; }
+    return (h >>> 0).toString(36);
+  }
+  function qKey(q, stationId){
+    var correct = q.options.filter(function(o){ return o.correct; }).map(function(o){ return o.html; }).join(',');
+    if (stationId === 'adding' || stationId === 'counting'){
+      /* Math questions swap the little pictures and nouns around at random; what makes one question
+         different from another is only its numbers (or, for "more/fewer", the group sizes). */
+      var digits = function(t){ return (String(t).match(/\d+/g) || []).join(','); };
+      var spans = function(t){ return (String(t).match(/<span>/g) || []).length; };
+      var d1 = digits(q.speak), d2 = digits(correct);
+      var sig = (/\bmore\b/i.test(q.speak) ? 'more' : (/\bfewer\b/i.test(q.speak) ? 'fewer' : '')) + '|' + d1 + '|' + d2;
+      if (!d1 && !d2) sig += '|' + spans(correct) + '|' + q.options.map(function(o){ return spans(o.html); }).sort().join(',');
+      return hashStr('math|' + sig);
+    }
+    return hashStr((q.speak || '') + '|' + (q.prompt || '') + '|' + correct);
+  }
+  function recordRight(skill, level, q){
+    if (!stats.right) stats.right = {};
+    var k = skill + '|' + level;
+    var arr = stats.right[k] || (stats.right[k] = []);
+    var h = qKey(q, STATE.stationId);
+    if (arr.length < 600 && arr.indexOf(h) === -1) arr.push(h);
+  }
+  var COVERAGE_RUNS = 400;
+  var totalsCache = {};
+  function enumerateTotals(stations, name){
+    var out = {}, savedName = STATE.userName, savedCustom = STATE.hasCustomName;
+    try{
+      if (name){ STATE.userName = name; STATE.hasCustomName = true; }
+      stations.forEach(function(st){
+        LEVELS.forEach(function(lv){
+          for (var r = 0; r < COVERAGE_RUNS; r++){
+            var qs;
+            try{ qs = st.build(lv.id); }catch(e){ break; }
+            (qs || []).forEach(function(q){
+              var k = (q.skill || st.name) + '|' + lv.id;
+              (out[k] || (out[k] = {}))[qKey(q, st.id)] = 1;
+            });
+          }
+        });
+      });
+    } finally { STATE.userName = savedName; STATE.hasCustomName = savedCustom; }
+    return out;
+  }
+  function skillTotalsFor(userName){
+    if (!totalsCache._base) totalsCache._base = enumerateTotals(STATIONS.filter(function(s){ return !s.requiresName; }), null);
+    var all = Object.assign({}, totalsCache._base);
+    if (userName){
+      var nk = 'n:' + userName;
+      if (!totalsCache[nk]) totalsCache[nk] = enumerateTotals(STATIONS.filter(function(s){ return s.requiresName; }), userName);
+      Object.assign(all, totalsCache[nk]);
+    }
+    return all;
+  }
+  /* "right / total" for one area, summed over the grades that area belongs to where the child has
+     answers (always including their current grade). */
+  function coverageText(skill, st, level, totals){
+    var right = 0, total = 0;
+    LEVELS.forEach(function(l){
+      var tot = totals[skill + '|' + l.id];
+      if (!tot) return;
+      var seen = ((st && st.right) || {})[skill + '|' + l.id] || [];
+      if (l.id !== level && !seen.length) return;
+      var set = {};
+      Object.keys(tot).forEach(function(k){ set[k] = 1; });
+      seen.forEach(function(k){ set[k] = 1; });
+      total += Object.keys(set).length;
+      right += seen.length;
+    });
+    return total ? (right + ' / ' + total) : '—';
+  }
+
   function recordAnswer(stationId, skill, wasCorrect){
     if (!stats.tally) stats.tally = {};
     if (!stats.skillTally) stats.skillTally = {};
@@ -3220,7 +3305,7 @@
       STATE.roundSkillTally[skill].correct++;
       STATE.roundLog.push({ skill:skill, label:(q.isRepeat ? '(again) ' : '') + (q.prompt || q.speak), correct: !STATE.wrongOnCurrent });
       try{
-        if (firstTry){ removeFromMissedBank(STATE.stationId, STATE.level, q); }
+        if (firstTry){ removeFromMissedBank(STATE.stationId, STATE.level, q); recordRight(skill, STATE.level, q); }
         else if ((q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
           var again = cloneQuestion(q); again.reps = (q.reps || 0) + 1; again.isRepeat = true; again.fromBank = false;
           STATE.round.splice(Math.min(STATE.qIndex + 3, STATE.round.length), 0, again);
@@ -3416,6 +3501,7 @@
     if (!stats.skillTally) stats.skillTally = {};
     if (!stats.weekly) stats.weekly = {};
     if (!stats.missed) stats.missed = {};
+    if (!stats.right) stats.right = {};
     progress = stats.stars;
     STATE.userSlug = 'explorer';
     STATE.userName = 'Explorer';
