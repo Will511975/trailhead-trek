@@ -2889,6 +2889,9 @@
     if (!voices || !voices.length) return;
     var enVoices = voices.filter(function(v){ return /^en/i.test(v.lang); });
     var pool = enVoices.length ? enVoices : voices;
+    /* prefer on-device voices: network voices stay silent on tablets that are offline or throttled */
+    var localPool = pool.filter(function(v){ return v.localService; });
+    if (localPool.length) pool = localPool;
     var femaleNames = /female|samantha|victoria|karen|moira|tessa|fiona|zira|susan|aria|jenny|michelle|joanna|salli|kimberly|ava|allison|serena|kate|amy|emma|zoe|nicky|shelley/i;
     var maleNames = /male|david|alex|daniel|fred|george|james|mark|tom|guy|ryan|matthew|justin|kevin|brian|eric|arthur/i;
     chosenVoice =
@@ -2900,16 +2903,50 @@
     pickVoice();
     try{ window.speechSynthesis.onvoiceschanged = pickVoice; } catch(e){}
   }
+  /* Tablets (iPad Safari/Chrome especially) refuse to speak until speech has been started from a real
+     touch. Unlock it silently on the very first tap, then speak normally afterwards. */
+  var speechUnlocked = false, activeUtter = null, speakTimer = null;
+  function unlockSpeech(){
+    if (speechUnlocked) return;
+    try{
+      if (!('speechSynthesis' in window)) return;
+      var u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+      speechUnlocked = true;
+    } catch(e){}
+    if (speechUnlocked){
+      ['touchstart','pointerdown','click','keydown'].forEach(function(ev){ document.removeEventListener(ev, unlockSpeech, true); });
+    }
+  }
+  ['touchstart','pointerdown','click','keydown'].forEach(function(ev){ document.addEventListener(ev, unlockSpeech, true); });
+  function sayNow(text, useVoice){
+    try{
+      var ss = window.speechSynthesis;
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = (useVoice && chosenVoice && chosenVoice.lang) || 'en-US';
+      if (useVoice && chosenVoice) u.voice = chosenVoice;
+      u.rate = 0.9; u.pitch = 1.08; u.volume = 1;
+      /* if that voice fails, retry once with the tablet's default voice */
+      u.onerror = function(ev){
+        var er = ev && ev.error;
+        if (useVoice && er !== 'canceled' && er !== 'interrupted') sayNow(text, false);
+      };
+      activeUtter = u; /* keep a reference: some browsers drop an utterance that gets garbage-collected */
+      if (ss.paused) ss.resume();
+      ss.speak(u);
+    } catch(e){}
+  }
   function speak(text, force){
     if (!soundOn && !force) return;
     try{
-      if (!('speechSynthesis' in window)) return;
+      var ss = window.speechSynthesis;
+      if (!ss) return;
       if (!chosenVoice) pickVoice();
-      window.speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(text);
-      if (chosenVoice) u.voice = chosenVoice;
-      u.rate = 0.9; u.pitch = 1.08;
-      window.speechSynthesis.speak(u);
+      clearTimeout(speakTimer);
+      if (ss.speaking || ss.pending) ss.cancel();
+      /* a short pause after cancel() — speaking in the same instant is silently dropped on many tablets */
+      speakTimer = setTimeout(function(){ sayNow(text, true); }, 80);
     } catch(e){}
   }
   var PRAISE = ['Awesome!','You got it!','Super job!','Way to go, explorer!','Nice work!','Great job!'];
