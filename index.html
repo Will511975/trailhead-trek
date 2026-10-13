@@ -798,19 +798,6 @@
   .footer-voice{ margin:6px 0 12px; }
   .footer-voice span{ margin-left:8px; font-weight:700; }
 
-  /* ---- Trace Trail ---- */
-  .trace-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-  .trace-board{
-    position:relative; width:100%; max-width:520px; border-radius:22px; overflow:hidden;
-    border:4px solid var(--stop-accent, var(--forest)); background:var(--bg-soft);
-    background-image:linear-gradient(to bottom, transparent 49.2%, color-mix(in srgb, var(--stop-accent, var(--forest)) 35%, transparent) 49.5%, transparent 50.2%);
-    touch-action:none;
-  }
-  .trace-board canvas{ position:absolute; inset:0; display:block; }
-  #traceInk{ touch-action:none; cursor:crosshair; }
-  .trace-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-  .trace-msg{ min-height:1.4em; font-weight:700; color:var(--ink-soft); }
-
   /* ---- Keyboard Camp ---- */
   .type-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
   .type-pic{ font-size:3.4rem; line-height:1; }
@@ -1102,9 +1089,7 @@
           <br><br>
           <strong>Daily campfire.</strong> Finishing a trek (a round of 6 questions) adds a log to today's campfire;
           the daily goal (3 treks by default, adjustable in the dashboard) lights the fire, and playing on
-          consecutive days builds a streak. <strong>Trace Trail</strong> practices forming letters, words and the
-          child's name with a finger, and <strong>Keyboard Camp</strong> builds first typing skills — finding letter
-          keys at Preschool, typing short words at Kindergarten, and typing words and their own name in 1st Grade.
+          consecutive days builds a streak. <strong>Keyboard Camp</strong> builds first typing skills — and says each letter out loud as it is typed — finding letter keys at Preschool, typing short words at Kindergarten, and typing words and their own name in 1st Grade.
           Questions answered right on the first try are held back for a while so practice keeps moving on to fresh
           ones, while missed questions keep coming back until they are right.
           <br><br>
@@ -1290,7 +1275,6 @@
     health: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7.5-4.6-9.6-9.3C1.2 7.8 3 4.8 6.2 4.4c1.9-.2 3.6.8 5.8 3 2.2-2.2 3.9-3.2 5.8-3 3.2.4 5 3.4 3.8 6.5-2.1 4.7-9.6 9.3-9.6 9.3Z"/><path d="M8.5 12.2h2l1-2 1.5 4 1-2h2"/></svg>'
   };
 
-  STOP_ICONS.trace = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/><path d="M14 7l3 3"/><path d="M4 21.5h16" opacity=".6"/></svg>';
   STOP_ICONS.typing = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>';
 
   /* ---------------- content pools ---------------- */
@@ -2254,39 +2238,15 @@
      words (Word Spring) — see the "for grown-ups" note for sourcing. Math (counting, patterns,
      shapes, adding), color naming, and science stops follow. */
 
-  /* -- Trace Trail (writing practice) & Keyboard Camp (typing): "custom" questions that are not
+  /* -- Keyboard Camp (typing): a "custom" question that is not
      multiple choice. They still carry one hidden "correct option" holding their text so the same
      bookkeeping used everywhere else (stable question identity, practice-again list, Right / Total)
      works unchanged. -- */
-  var TRACE_WORDS = ['cat','dog','sun','hat','pig','bug','fox','cup','bed','mom','dad','red','big','yes','the','and','can','see','look','play','blue','go','me','we','my','in','it','up','run','fun'];
   var ALPHA_UP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   function cleanName(){
     var n = String(STATE.userName || '').replace(/[^A-Za-z]/g, '');
     if (!STATE.includeName || n.length < 2 || n.length > 9) return '';
     return n.charAt(0).toUpperCase() + n.slice(1).toLowerCase();
-  }
-  function traceQ(text, speak, skill){
-    return { kind:'trace', text:text, speak:speak, prompt:speak.replace(/\.$/, ''), visual:'', skill:skill, options:[{ html:text, correct:true }] };
-  }
-  function buildTrace(level){
-    var out = [];
-    if (level === 'preschool'){
-      sample(ALPHA_UP, 6).forEach(function(l){ out.push(traceQ(l, 'Trace the letter ' + l + '.', 'Tracing Letters')); });
-      return out;
-    }
-    if (level === 'kindergarten'){
-      sample(ALPHA_UP, 6).forEach(function(l, i){
-        if (i < 3) out.push(traceQ(l, 'Trace the big letter ' + l + '.', 'Tracing Letters'));
-        else out.push(traceQ(l.toLowerCase(), 'Trace the little letter ' + l.toLowerCase() + '.', 'Tracing Letters'));
-      });
-      return shuffle(out);
-    }
-    var words = sample(TRACE_WORDS, 6), nm = cleanName();
-    words.forEach(function(w, i){
-      if (i === 5 && nm) out.push(traceQ(nm, 'Trace your name, ' + nm + '.', 'Tracing My Name'));
-      else out.push(traceQ(w, 'Trace the word ' + w + '.', 'Tracing Words'));
-    });
-    return out;
   }
   function typeQ(target, speak, prompt, emoji, skill){
     return { kind:'type', target:target, emoji:emoji || '', speak:speak, prompt:prompt, visual:'', skill:skill, options:[{ html:target, correct:true }] };
@@ -2336,9 +2296,7 @@
       desc:{preschool:'Weather & living things', kindergarten:'Weather & living things', first:'Seasons & habitats'}, build:buildNature },
     { id:'health', accent:'--lime', accentInk:'--lime-ink', name:'Health Hollow', stop:'Stop 12',
       desc:{preschool:'Point to body parts', kindergarten:'What each part does', first:'Senses & body systems'}, build:buildHealth },
-    { id:'trace', accent:'--magenta', accentInk:'--magenta-ink', name:'Trace Trail', stop:'Stop 13',
-      desc:{preschool:'Trace big letters', kindergarten:'Trace big & little letters', first:'Trace words & my name'}, build:buildTrace },
-    { id:'typing', accent:'--slate', accentInk:'--slate-ink', name:'Keyboard Camp', stop:'Stop 14',
+    { id:'typing', accent:'--slate', accentInk:'--slate-ink', name:'Keyboard Camp', stop:'Stop 13',
       desc:{preschool:'Find the letter key', kindergarten:'Type short words', first:'Type words & my name'}, build:buildTyping }
   ];
   function visibleStations(){
@@ -2933,7 +2891,7 @@
     var last = st.lastActive ? new Date(st.lastActive).toLocaleString() : 'Never';
     var totals = {};
     try{ totals = skillTotalsFor(u.name); }catch(e){ totals = {}; }
-    var skillEntries = Object.keys(st.skillTally || {}).map(function(skill){
+    var skillEntries = Object.keys(st.skillTally || {}).filter(function(k){ return !/^Tracing /.test(k); }).map(function(skill){
       var r = skillStatusFor(st.skillTally[skill]);
       return { skill:skill, status:r.status, acc:r.acc, attempts:r.attempts, cover:coverageText(skill, st, normLevel(u.level), totals) };
     }).sort(function(a,b){ return SKILL_STATUS_WEIGHT[a.status] - SKILL_STATUS_WEIGHT[b.status]; });
@@ -2943,7 +2901,7 @@
         '<td style="font-weight:800;white-space:nowrap;">'+e.cover+'</td>'+
         '<td style="color:var(--ink-soft);font-size:0.82rem;">'+e.acc+'% · '+e.attempts+' tries</td></tr>';
     }).join('');
-    var byStationRows = Object.keys(st.tally || {}).map(function(sid){
+    var byStationRows = Object.keys(st.tally || {}).filter(function(sid){ return !!stationById(sid); }).map(function(sid){
       var t = st.tally[sid];
       var name = (stationById(sid) || {}).name || sid;
       return '<tr><td>'+name+'</td><td>'+t.correct+'</td><td>'+t.wrong+'</td></tr>';
@@ -3598,16 +3556,18 @@
     var q = STATE.round[STATE.qIndex];
     STATE.wrongOnCurrent = false;
     clearCustom();
+    STATE.typedAny = false;
     elStage.innerHTML = q.visual || '';
     elPromptText.textContent = q.prompt || q.speak;
     elFeedback.textContent = '';
-    if (q.kind === 'trace' || q.kind === 'type'){
+    if (q.kind === 'type'){
       elOptions.innerHTML = '';
       elOptions.hidden = true;
       elCustom.hidden = false;
       renderDots();
-      if (q.kind === 'trace') renderTrace(q); else renderTypeQ(q);
-      setTimeout(function(){ speak(q.speak); }, 300);
+      renderTypeQ(q);
+      /* read the question aloud -- unless the child has already started typing (their letters take priority) */
+      setTimeout(function(){ if (!STATE.typedAny) speak(q.speak); }, 300);
       return;
     }
     var cls = 'options' + (q.options.length === 2 ? ' opts-2' : (q.options.length === 4 ? ' opts-4' : '')) + (q.stack ? ' opts-stack' : '');
@@ -3794,6 +3754,7 @@
     var out = [];
     Object.keys((st && st.missed) || {}).forEach(function(k){
       var sid = k.split(':')[0], station = stationById(sid);
+      if (!station) return;
       (st.missed[k] || []).forEach(function(e){
         if (!e || !e.q) return;
         out.push({ station:station ? station.name : sid, text:stripTags(e.q.speak || e.q.prompt), n:e.n || 1 });
@@ -3878,7 +3839,7 @@
       try{ totals = skillTotalsFor(u.name); }catch(e){}
       var streak = computeStreak(st.daily || {}), best = Math.max(st.bestStreak || 0, streak);
       var last = st.lastActive ? new Date(st.lastActive).toLocaleDateString() : '';
-      var areas = Object.keys(st.skillTally || {});
+      var areas = Object.keys(st.skillTally || {}).filter(function(k){ return !/^Tracing /.test(k); });
       if (!areas.length) rows.push([u.name, levelInfo(u.level).label, '', '', '', '', '', '', streak, best, goalOf(st), last]);
       areas.forEach(function(skill){
         var r = skillStatusFor(st.skillTally[skill]);
@@ -3996,8 +3957,11 @@
       }
     }, ms);
   }
-  /* A tracing/typing question was finished. firstTry = no miss on it along the way. */
-  function completeCustom(q, firstTry){
+  /* A typing question was finished. firstTry = no miss on it along the way.
+     opts: { prefix, delay, advance } -- what to say before the praise, how long to wait, and how long
+     to stay on the question. */
+  function completeCustom(q, firstTry, opts){
+    opts = opts || {};
     var skill = currentSkill(q);
     if (!STATE.roundSkillTally[skill]) STATE.roundSkillTally[skill] = { correct:0, wrong:0 };
     if (firstTry && !q.isRepeat) STATE.correctFirstTry++;
@@ -4012,12 +3976,17 @@
         STATE.extraCount = (STATE.extraCount || 0) + 1;
       }
     }catch(e){}
-    advanceAfter(1100);
+    advanceAfter(opts.advance || 1100);
     try{ recordAnswer(STATE.stationId, skill, true); }catch(e){}
-    try{ elFeedback.textContent = PRAISE[randInt(0, PRAISE.length - 1)]; speak(elFeedback.textContent); }catch(e){}
+    try{
+      var praise = PRAISE[randInt(0, PRAISE.length - 1)];
+      elFeedback.textContent = praise;
+      var line = (opts.prefix || '') + praise;
+      if (opts.delay) setTimeout(function(){ speak(line); }, opts.delay); else speak(line);
+    }catch(e){}
     try{ popStar(); }catch(e){}
   }
-  /* A miss (a wrong key, or a trace that wasn't close enough). Only the first miss on a question counts. */
+  /* A miss (a wrong key). Only the first miss on a question counts. */
   function missCustom(q){
     var skill = currentSkill(q);
     if (!STATE.roundSkillTally[skill]) STATE.roundSkillTally[skill] = { correct:0, wrong:0 };
@@ -4028,139 +3997,11 @@
     try{ recordAnswer(STATE.stationId, skill, false); }catch(e){}
   }
 
-  /* ---------- tracing ---------- */
-  var TRACE_FONT = '800 {S}px "Baloo 2","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif';
-  function traceFont(size){ return TRACE_FONT.replace('{S}', Math.round(size)); }
-  function fitTraceText(ctx, text, W, H){
-    var size = H * 0.82;
-    ctx.font = traceFont(size);
-    var w = ctx.measureText(text).width;
-    if (w > W * 0.9) size = size * (W * 0.9) / w;
-    return Math.max(24, size);
-  }
-  var traceApi = null;
-  function renderTrace(q){
-    var station = stationById(STATE.stationId) || {};
-    var accent = getComputedStyle(document.documentElement).getPropertyValue(station.accent || '--forest').trim() || '#17A863';
-    elCustom.innerHTML =
-      '<div class="trace-wrap">' +
-        '<div class="trace-board" id="traceBoard"><canvas id="traceGhost"></canvas><canvas id="traceInk" aria-label="Drawing area: trace the ' + (q.text.length > 1 ? 'word ' : 'letter ') + q.text + ' with your finger"></canvas></div>' +
-        '<div class="trace-actions">' +
-          '<button type="button" class="btn secondary" id="traceClear">↺ Start over</button>' +
-          '<button type="button" class="btn" id="traceDone">✓ I’m done</button>' +
-          '<button type="button" class="btn secondary" id="traceSkip" hidden>Skip ➜</button>' +
-        '</div>' +
-        '<div class="trace-msg" id="traceMsg" aria-live="polite">Use your finger to trace the ' + (q.text.length > 1 ? 'word' : 'letter') + '.</div>' +
-      '</div>';
-    var board = document.getElementById('traceBoard'), ghost = document.getElementById('traceGhost'), ink = document.getElementById('traceInk');
-    var msg = document.getElementById('traceMsg'), clearBtn = document.getElementById('traceClear'), doneBtn = document.getElementById('traceDone'), skipBtn = document.getElementById('traceSkip');
-    var cssW = Math.max(240, Math.min(board.clientWidth || 440, 520)), cssH = Math.round(cssW * (q.text.length > 3 ? 0.5 : 0.7));
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    board.style.height = cssH + 'px';
-    [ghost, ink].forEach(function(c){ c.width = Math.round(cssW * dpr); c.height = Math.round(cssH * dpr); c.style.width = cssW + 'px'; c.style.height = cssH + 'px'; });
-    var W = ghost.width, H = ghost.height, brush = Math.max(14, H * 0.072);
-    var gctx = ghost.getContext('2d'), ictx = ink.getContext('2d');
-    var mask = null, allowed = null, fails = 0, done = false, drawing = false, last = null, inked = false;
-
-    function paintGhost(){
-      gctx.clearRect(0, 0, W, H);
-      gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
-      var size = fitTraceText(gctx, q.text, W, H);
-      gctx.font = traceFont(size);
-      var y = H * 0.54;
-      gctx.globalAlpha = 0.2; gctx.fillStyle = accent; gctx.fillText(q.text, W / 2, y);
-      gctx.globalAlpha = 0.85; gctx.strokeStyle = accent; gctx.lineWidth = Math.max(2, H * 0.012); gctx.setLineDash([H * 0.035, H * 0.03]);
-      gctx.strokeText(q.text, W / 2, y);
-      gctx.setLineDash([]); gctx.globalAlpha = 1;
-      /* masks: the letter itself, and the letter grown by half a brush (how far a trace may wander) */
-      var m = document.createElement('canvas'); m.width = W; m.height = H;
-      var mc = m.getContext('2d'); mc.textAlign = 'center'; mc.textBaseline = 'middle'; mc.font = traceFont(size);
-      mc.fillStyle = '#000'; mc.fillText(q.text, W / 2, y);
-      mask = mc.getImageData(0, 0, W, H).data;
-      mc.lineJoin = 'round'; mc.lineWidth = brush * 1.15; mc.strokeStyle = '#000'; mc.strokeText(q.text, W / 2, y); mc.fillText(q.text, W / 2, y);
-      allowed = mc.getImageData(0, 0, W, H).data;
-    }
-    function measure(){
-      if (!mask) return { cover:0, outside:1, amount:0 };
-      var data = ictx.getImageData(0, 0, W, H).data, step = 2, maskN = 0, hit = 0, inkN = 0, out = 0;
-      for (var y = 0; y < H; y += step){
-        for (var x = 0; x < W; x += step){
-          var i = (y * W + x) * 4 + 3, isInk = data[i] > 40, inMask = mask[i] > 128;
-          if (inMask){ maskN++; if (isInk) hit++; }
-          if (isInk){ inkN++; if (allowed[i] <= 128) out++; }
-        }
-      }
-      return { cover: maskN ? hit / maskN : 0, outside: inkN ? out / inkN : 1, amount: inkN };
-    }
-    function clearInk(){ ictx.clearRect(0, 0, W, H); inked = false; }
-    function pass(){
-      if (done) return;
-      done = true;
-      msg.textContent = 'Great tracing!';
-      clearBtn.disabled = true; doneBtn.disabled = true; skipBtn.hidden = true;
-      var firstTry = !STATE.wrongOnCurrent;
-      completeCustom(q, firstTry);
-    }
-    function tryEvaluate(strict){
-      if (done || !inked) return;
-      var r = measure();
-      var okCover = strict ? r.cover >= 0.72 : r.cover >= 0.82;
-      if (okCover && r.outside <= 0.32){ pass(); return; }
-      if (!strict) return;
-      fails++;
-      missCustom(q);
-      msg.textContent = r.cover >= 0.5 ? 'Almost! Stay right on the dotted letter.' : 'Try again — trace right on top of the dots.';
-      speak('Try again!');
-      setTimeout(function(){ if (!done) clearInk(); }, 700);
-      if (fails >= 2) skipBtn.hidden = false;
-    }
-    function pos(e){
-      var rect = ink.getBoundingClientRect();
-      return { x:(e.clientX - rect.left) * (W / rect.width), y:(e.clientY - rect.top) * (H / rect.height) };
-    }
-    ictx.lineCap = 'round'; ictx.lineJoin = 'round'; ictx.lineWidth = brush; ictx.strokeStyle = accent; ictx.fillStyle = accent;
-    ink.addEventListener('pointerdown', function(e){
-      if (done) return;
-      e.preventDefault();
-      try{ ink.setPointerCapture(e.pointerId); }catch(_){}
-      drawing = true; last = pos(e); inked = true;
-      ictx.beginPath(); ictx.arc(last.x, last.y, brush / 2, 0, Math.PI * 2); ictx.fill();
-    });
-    ink.addEventListener('pointermove', function(e){
-      if (!drawing || done) return;
-      e.preventDefault();
-      var p = pos(e);
-      ictx.beginPath(); ictx.moveTo(last.x, last.y); ictx.lineTo(p.x, p.y); ictx.stroke();
-      last = p;
-    });
-    function lift(e){ if (!drawing) return; drawing = false; last = null; tryEvaluate(false); }
-    ink.addEventListener('pointerup', lift);
-    ink.addEventListener('pointercancel', lift);
-    ink.addEventListener('pointerleave', function(){ if (drawing) lift(); });
-    clearBtn.addEventListener('click', function(){ if (!done){ clearInk(); msg.textContent = 'Fresh start! Trace the dotted letter.'; } });
-    doneBtn.addEventListener('click', function(){
-      if (done) return;
-      if (!inked){ msg.textContent = 'Trace the letter with your finger first.'; return; }
-      tryEvaluate(true);
-    });
-    skipBtn.addEventListener('click', function(){
-      if (done) return;
-      done = true; skipBtn.hidden = true; clearBtn.disabled = true; doneBtn.disabled = true;
-      msg.textContent = 'That’s okay — we’ll try it again later!';
-      completeCustom(q, false);
-    });
-    traceApi = { measure:measure, getMask:function(){ return { mask:mask, W:W, H:H, dpr:dpr, cssW:cssW, cssH:cssH }; }, isDone:function(){ return done; } };
-    var go = function(){ paintGhost(); };
-    var fontReady = Promise.race([
-      (document.fonts && document.fonts.load) ? document.fonts.load('800 80px "Baloo 2"').catch(function(){}) : Promise.resolve(),
-      new Promise(function(r){ setTimeout(r, 700); })
-    ]);
-    paintGhost();
-    fontReady.then(function(){ if (!inked && !done) paintGhost(); });
-  }
-
   /* ---------- typing ---------- */
   var KBD_ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+  /* how each letter is spoken (a lone "A" can come out as the word "uh") */
+  var LETTER_SAY = { A:'ay', B:'bee', C:'see', D:'dee', E:'ee', F:'eff', G:'jee', H:'aitch', I:'eye', J:'jay', K:'kay', L:'ell', M:'em',
+    N:'en', O:'oh', P:'pee', Q:'cue', R:'ar', S:'ess', T:'tee', U:'you', V:'vee', W:'double you', X:'ex', Y:'why', Z:'zee' };
   function renderTypeQ(q){
     var target = q.target, idx = 0, misses = 0, done = false;
     var slots = '';
@@ -4182,6 +4023,8 @@
       if (done) return;
       letter = String(letter).toUpperCase();
       var want = target.charAt(idx).toUpperCase(), el = keyEl(letter);
+      STATE.typedAny = true;
+      try{ speak(LETTER_SAY[letter] || letter); }catch(e){}
       if (letter === want){
         var slot = slotEls[idx];
         slot.classList.remove('now'); slot.classList.add('got');
@@ -4191,7 +4034,7 @@
         if (idx >= target.length){
           done = true;
           msg.textContent = 'You typed it!';
-          completeCustom(q, !STATE.wrongOnCurrent);
+          completeCustom(q, !STATE.wrongOnCurrent, { delay:850, advance:(target.length > 1 ? 2800 : 2100), prefix:(target.length > 1 ? target.toLowerCase() + '! ' : '') });
           return;
         }
         slotEls[idx].classList.add('now');
