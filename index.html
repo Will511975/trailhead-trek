@@ -797,6 +797,10 @@
   .voice-test-btn{ padding:6px 14px; font-size:0.85rem; }
   .footer-voice{ margin:6px 0 12px; }
   .footer-voice span{ margin-left:8px; font-weight:700; }
+  .voice-row{ display:flex; align-items:center; gap:10px; margin:6px 0; flex-wrap:wrap; }
+  .voice-row label{ min-width:52px; font-weight:800; font-size:0.85rem; color:var(--ink-soft); }
+  .voice-row select{ flex:1; min-width:180px; max-width:360px; padding:8px 10px; border-radius:12px; border:2px solid var(--line); background:var(--surface); color:var(--ink); font:inherit; font-weight:700; }
+  .voice-row input[type=range]{ flex:1; min-width:140px; max-width:260px; }
 
   /* ---- Keyboard Camp ---- */
   .type-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
@@ -1107,7 +1111,12 @@
           1st grade life science introduces structure and function in the body.
 
           <br><br>
-          <div class="footer-voice"><button type="button" class="btn secondary voice-test-btn">🔊 Test the tablet's voice</button><span id="voiceStatus"></span></div>
+          <div class="footer-voice">
+            <div class="voice-row"><label for="voiceSelect">Voice</label><select id="voiceSelect"></select></div>
+            <div class="voice-row"><label for="voiceRate">Speed</label><input type="range" id="voiceRate" min="0.7" max="1.2" step="0.05" value="0.95"><span id="voiceRateLbl"></span></div>
+            <button type="button" class="btn secondary voice-test-btn">🔊 Test voice</button><span id="voiceStatus"></span>
+            <div class="grade-note">Voices come from this tablet, so this is saved on this tablet only.</div>
+          </div>
         </div>
       </details>
     </footer>
@@ -3224,25 +3233,69 @@
 
   /* ---------------- speech ---------------- */
   var chosenVoice = null;
+  /* Per-tablet voice settings (voices differ on every device, so this is saved on the tablet itself). */
+  var VKEY = 'trailhead-trek-voice-v1';
+  var voicePref = { name:'', rate:0.95 };
+  try{
+    var rawV = localStorage.getItem(VKEY);
+    if (rawV){ var pv = JSON.parse(rawV); if (pv && typeof pv === 'object'){ voicePref.name = String(pv.name || ''); var r0 = parseFloat(pv.rate); if (r0 >= 0.6 && r0 <= 1.3) voicePref.rate = r0; } }
+  }catch(e){}
+  function saveVoicePref(){ try{ localStorage.setItem(VKEY, JSON.stringify(voicePref)); }catch(e){} }
+  /* How natural a voice is likely to sound: "enhanced / premium / natural / neural" voices first,
+     then well-known good ones, then any on-device English voice. */
+  function voiceScore(v){
+    var n = v.name || '', score = 0;
+    if (/enhanced|premium|natural|neural|siri/i.test(n)) score += 50;
+    if (/samantha|ava|allison|susan|karen|moira|tessa|serena|kate|zoe|aria|jenny|michelle|google us english|google uk english female/i.test(n)) score += 25;
+    if (v.localService) score += 10;
+    if (/^en[-_]US/i.test(v.lang)) score += 6; else if (/^en/i.test(v.lang)) score += 3;
+    if (/novelty|whisper|bad news|bells|boing|bubbles|cellos|deranged|good news|hysterical|jester|organ|trinoids|zarvox|albert|bahh|superstar|wobble|fred|junior|ralph/i.test(n)) score -= 100;
+    return score;
+  }
+  function englishVoices(){
+    try{
+      var all = window.speechSynthesis.getVoices() || [];
+      var en = all.filter(function(v){ return /^en/i.test(v.lang); });
+      return en.length ? en : all;
+    }catch(e){ return []; }
+  }
   function pickVoice(){
     if (!('speechSynthesis' in window)) return;
-    var voices = window.speechSynthesis.getVoices();
-    if (!voices || !voices.length) return;
-    var enVoices = voices.filter(function(v){ return /^en/i.test(v.lang); });
-    var pool = enVoices.length ? enVoices : voices;
-    /* prefer on-device voices: network voices stay silent on tablets that are offline or throttled */
-    var localPool = pool.filter(function(v){ return v.localService; });
-    if (localPool.length) pool = localPool;
-    var femaleNames = /female|samantha|victoria|karen|moira|tessa|fiona|zira|susan|aria|jenny|michelle|joanna|salli|kimberly|ava|allison|serena|kate|amy|emma|zoe|nicky|shelley/i;
-    var maleNames = /male|david|alex|daniel|fred|george|james|mark|tom|guy|ryan|matthew|justin|kevin|brian|eric|arthur/i;
-    chosenVoice =
-      pool.filter(function(v){ return femaleNames.test(v.name); })[0] ||
-      pool.filter(function(v){ return !maleNames.test(v.name); })[0] ||
-      pool[0];
+    var pool = englishVoices();
+    if (!pool.length) return;
+    if (voicePref.name){
+      var saved = pool.filter(function(v){ return v.name === voicePref.name; })[0];
+      if (saved){ chosenVoice = saved; return; }
+    }
+    var ranked = pool.slice().sort(function(a, b){ return voiceScore(b) - voiceScore(a); });
+    chosenVoice = ranked[0];
+  }
+  function renderVoicePicker(){
+    var sel = document.getElementById('voiceSelect'), rate = document.getElementById('voiceRate'), lbl = document.getElementById('voiceRateLbl');
+    if (!sel) return;
+    var pool = englishVoices().slice().sort(function(a, b){ return voiceScore(b) - voiceScore(a); });
+    var html = '<option value="">Automatic (best available)</option>' + pool.map(function(v){
+      return '<option value="' + String(v.name).replace(/"/g, '&quot;') + '">' + String(v.name).replace(/</g, '&lt;') + ' (' + v.lang + ')</option>';
+    }).join('');
+    if (sel.getAttribute('data-sig') !== html){ sel.innerHTML = html; sel.setAttribute('data-sig', html); }
+    sel.value = voicePref.name && pool.some(function(v){ return v.name === voicePref.name; }) ? voicePref.name : '';
+    if (rate){ rate.value = voicePref.rate; }
+    if (lbl) lbl.textContent = voicePref.rate.toFixed(2) + '×';
+  }
+  var voiceUiWired = false;
+  function wireVoicePicker(){
+    renderVoicePicker();
+    if (voiceUiWired) return;
+    var sel = document.getElementById('voiceSelect'), rate = document.getElementById('voiceRate');
+    if (!sel || !rate) return;
+    voiceUiWired = true;
+    sel.addEventListener('change', function(){ voicePref.name = sel.value; saveVoicePref(); pickVoice(); testVoice(document.getElementById('voiceStatus')); });
+    rate.addEventListener('input', function(){ voicePref.rate = parseFloat(rate.value) || 0.95; var l = document.getElementById('voiceRateLbl'); if (l) l.textContent = voicePref.rate.toFixed(2) + '×'; });
+    rate.addEventListener('change', function(){ saveVoicePref(); testVoice(document.getElementById('voiceStatus')); });
   }
   if ('speechSynthesis' in window) {
     pickVoice();
-    try{ window.speechSynthesis.onvoiceschanged = pickVoice; } catch(e){}
+    try{ window.speechSynthesis.onvoiceschanged = function(){ pickVoice(); try{ renderVoicePicker(); }catch(e){} }; } catch(e){}
   }
   /* Tablets (iPad Safari/Chrome especially) refuse to speak until speech has been started from a real
      touch. Unlock it silently on the very first tap, then speak normally afterwards. */
@@ -3267,7 +3320,7 @@
       var u = new SpeechSynthesisUtterance(text);
       u.lang = (useVoice && chosenVoice && chosenVoice.lang) || 'en-US';
       if (useVoice && chosenVoice) u.voice = chosenVoice;
-      u.rate = 0.9; u.pitch = 1.08; u.volume = 1;
+      u.rate = voicePref.rate; u.pitch = 1.0; u.volume = 1;
       /* if that voice fails, retry once with the tablet's default voice */
       u.onerror = function(ev){
         var er = ev && ev.error;
@@ -3386,7 +3439,7 @@
   function renderTrail(){
     elStarTotal.textContent = '⭐ ' + totalStars() + ' / ' + maxStars();
     try{ renderGoalCard(); }catch(e){}
-    try{ checkVoice(); wireVoiceTest(); }catch(e){}
+    try{ checkVoice(); wireVoiceTest(); wireVoicePicker(); }catch(e){}
     /* "Up next" is just the first stop (in trail order) that hasn't been fully mastered yet -- a
        gentle visual nudge, never a gate: every other stop stays just as clickable. */
     var nextId = null;
@@ -3900,7 +3953,9 @@
     try{
       unlockSpeech();
       var u = new SpeechSynthesisUtterance('Hello explorer! Can you hear me?');
-      u.rate = 0.9; u.lang = 'en-US';
+      if (!chosenVoice) pickVoice();
+      if (chosenVoice) u.voice = chosenVoice;
+      u.rate = voicePref.rate; u.pitch = 1.0; u.lang = (chosenVoice && chosenVoice.lang) || 'en-US';
       u.onstart = function(){ set('Speaking… if you can’t hear it, turn the volume up (and check the iPad silent switch).'); };
       u.onerror = function(e){ set('The voice hit a problem (' + ((e && e.error) || 'unknown') + '). Check Settings → Text-to-speech.'); };
       activeUtter = u;
@@ -3912,7 +3967,7 @@
   function wireVoiceTest(){
     Array.prototype.forEach.call(document.querySelectorAll('.voice-test-btn'), function(b){
       if (b._wired) return; b._wired = true;
-      b.addEventListener('click', function(){ testVoice(b.parentNode.querySelector('span') || document.getElementById('voiceStatus')); });
+      b.addEventListener('click', function(){ testVoice(b.closest('#voiceNote') ? b.parentNode.querySelector('span') : document.getElementById('voiceStatus')); });
     });
   }
 
