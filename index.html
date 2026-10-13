@@ -35,6 +35,10 @@
     --cyan-ink:#EAFBFF;
     --lime:#65A30D;
     --lime-ink:#F7FFEA;
+    --magenta:#C026D3;
+    --magenta-ink:#FDF2FF;
+    --slate:#475569;
+    --slate-ink:#F1F5F9;
     --shadow: 4px 6px 0 rgba(58,43,18,0.25);
     --focus: #1C5C9C;
     --outline-strong:#3A2B12;
@@ -92,6 +96,10 @@
       --cyan-ink:#062A30;
       --lime:#B7E85C;
       --lime-ink:#1B2B02;
+      --magenta:#E879F9;
+      --magenta-ink:#3B0A44;
+      --slate:#94A3B8;
+      --slate-ink:#0F172A;
       --shadow: 4px 6px 0 rgba(0,0,0,0.55);
       --focus: #8FD0F0;
       --outline-strong:#F0D9A8;
@@ -149,6 +157,10 @@
     --cyan-ink:#062A30;
     --lime:#B7E85C;
     --lime-ink:#1B2B02;
+    --magenta:#E879F9;
+    --magenta-ink:#3B0A44;
+    --slate:#94A3B8;
+    --slate-ink:#0F172A;
     --shadow: 4px 6px 0 rgba(0,0,0,0.55);
     --focus: #8FD0F0;
     --outline-strong:#F0D9A8;
@@ -762,6 +774,94 @@
   .skill-status.great{ background:var(--forest); color:var(--forest-ink); }
   .skill-status.new{ background:var(--sky); color:var(--sky-ink); }
   .admin-delete-btn{ font-size:0.8rem; padding:6px 12px; }
+
+  /* ---- daily campfire goal ---- */
+  .goal-card{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    background:var(--surface); border:3px solid var(--outline-strong); border-radius:18px;
+    box-shadow:var(--shadow); padding:8px 14px; margin:6px 0 10px;
+  }
+  .goal-fire{ line-height:1; filter:grayscale(.2); transition:font-size .3s ease; }
+  .goal-fire.lit{ animation:goal-flicker 1.4s ease-in-out infinite; filter:none; }
+  .goal-text{ flex:1; min-width:150px; }
+  .goal-title{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.05rem; line-height:1.1; }
+  .goal-sub{ color:var(--ink-soft); font-weight:700; font-size:0.82rem; }
+  .goal-logs{ display:flex; gap:4px; font-size:1.3rem; }
+  .goal-log{ opacity:.55; } .goal-log.on{ opacity:1; }
+  .results-goal{ font-weight:800; color:var(--sunset); min-height:1.2em; }
+  @keyframes goal-flicker{ 0%,100%{ transform:scale(1) rotate(-2deg); } 50%{ transform:scale(1.06) rotate(2deg); } }
+  .voice-note{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:6px 0 10px; padding:10px 14px;
+    border-radius:16px; background:var(--surface-2); border:3px solid var(--clay); font-weight:700; font-size:0.9rem;
+  }
+  .voice-test-btn{ padding:6px 14px; font-size:0.85rem; }
+  .footer-voice{ margin:6px 0 12px; }
+  .footer-voice span{ margin-left:8px; font-weight:700; }
+
+  /* ---- Trace Trail ---- */
+  .trace-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .trace-board{
+    position:relative; width:100%; max-width:520px; border-radius:22px; overflow:hidden;
+    border:4px solid var(--stop-accent, var(--forest)); background:var(--bg-soft);
+    background-image:linear-gradient(to bottom, transparent 49.2%, color-mix(in srgb, var(--stop-accent, var(--forest)) 35%, transparent) 49.5%, transparent 50.2%);
+    touch-action:none;
+  }
+  .trace-board canvas{ position:absolute; inset:0; display:block; }
+  #traceInk{ touch-action:none; cursor:crosshair; }
+  .trace-actions{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .trace-msg{ min-height:1.4em; font-weight:700; color:var(--ink-soft); }
+
+  /* ---- Keyboard Camp ---- */
+  .type-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .type-pic{ font-size:3.4rem; line-height:1; }
+  .type-target{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .type-slot{
+    position:relative; min-width:54px; height:68px; padding:0 8px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    border:3px dashed var(--line); background:var(--surface-2);
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:2.4rem; color:var(--ink);
+  }
+  .type-target.single .type-slot{ min-width:96px; height:110px; font-size:4.4rem; }
+  .type-ghost{ opacity:.18; }
+  .type-slot.now{ border-color:var(--stop-accent, var(--forest)); border-style:solid; }
+  .type-slot.now .type-ghost{ opacity:.45; }
+  .type-slot.got{ border-style:solid; border-color:var(--forest); background:color-mix(in srgb, var(--forest) 16%, var(--surface)); }
+  .type-slot.got .type-ghost{ display:none; }
+  .type-letter{ color:var(--forest); }
+  .type-msg{ min-height:1.4em; font-weight:700; color:var(--ink-soft); }
+  .kbd{ display:flex; flex-direction:column; gap:6px; width:100%; max-width:560px; margin-top:4px; }
+  .kbd-row{ display:flex; gap:5px; justify-content:center; }
+  .kbd-key{
+    flex:1 1 0; max-width:54px; min-width:0; height:54px; border-radius:12px; cursor:pointer;
+    border:3px solid var(--outline-strong); background:var(--surface); color:var(--ink);
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.25rem; padding:0; box-shadow:0 3px 0 rgba(58,43,18,.25);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .kbd-key:active{ transform:translateY(2px); box-shadow:none; }
+  .kbd-key.ok{ background:var(--forest); color:var(--forest-ink); border-color:var(--forest); }
+  .kbd-key.bad{ background:color-mix(in srgb, var(--berry) 30%, var(--surface)); border-color:var(--berry); animation:shake-wrong .35s ease; }
+  .kbd-key.hint{ border-color:var(--gold); background:color-mix(in srgb, var(--gold) 45%, var(--surface)); animation:next-pulse 1.2s ease-in-out infinite; }
+  @media (max-width:420px){ .kbd-key{ height:46px; font-size:1.05rem; border-radius:9px; } .kbd-row{ gap:3px; } }
+
+  /* ---- Parent summary ---- */
+  .summary-box{ margin:4px 0 12px; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:2px solid var(--line); }
+  .summary-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .sum-chip{ padding:4px 12px; border-radius:999px; background:var(--surface); border:2px solid var(--line); font-weight:800; font-size:0.82rem; white-space:nowrap; }
+  .summary-goal{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px; }
+  .summary-goal .level-switch{ margin:0; gap:6px; }
+  .goal-btn{ padding:5px 14px; min-width:40px; align-items:center; }
+  .suggest-box{ margin:8px 0; padding:10px 12px; border-radius:12px; background:color-mix(in srgb, var(--forest) 14%, var(--surface)); border:2px solid var(--forest); font-weight:700; }
+  .suggest-box .btn{ margin-top:6px; padding:8px 16px; font-size:0.9rem; }
+  .summary-list{ margin:6px 0 0; padding-left:18px; font-size:0.9rem; line-height:1.5; }
+  .summary-list ul{ margin:2px 0 0; padding-left:18px; color:var(--ink-soft); font-weight:600; }
+  .admin-toolbar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .admin-toolbar .btn{ padding:9px 18px; font-size:0.9rem; }
+  @media print{
+    body{ background:#fff !important; color:#000; padding:0; }
+    .app-header, #adminLogoutBtn, .admin-toolbar, .grade-row .level-switch, .summary-goal, .suggest-box .btn, .admin-delete-btn, #addExplorerBtn, .reset-confirm{ display:none !important; }
+    .admin-card{ box-shadow:none !important; break-inside:avoid; border-width:1px; }
+    .app-shell > *:not(#view-admin){ display:none !important; }
+  }
+  @media (prefers-reduced-motion: reduce){ .goal-fire.lit, .kbd-key.hint, .kbd-key.bad{ animation:none !important; } }
 </style>
 
 <div class="app-shell">
@@ -971,6 +1071,8 @@
       </div>
       <p>Tap Sasquatch to work a Random game.</p>
     </div>
+    <div class="voice-note" id="voiceNote" hidden></div>
+    <div class="goal-card" id="goalCard" hidden></div>
     <div class="level-switch" id="levelSwitch" aria-live="polite"></div>
     <ul class="trail" id="trailList"></ul>
     <footer class="notes">
@@ -991,12 +1093,20 @@
           graders read a short two-sentence passage and answer a comprehension question. That's the actual point of
           the earlier phonics work, so it gets its own stop instead of stopping at single letters and words.
           <br><br>
-          <strong>Why some letters wait.</strong> Reading researcher Tim Shanahan notes there's no single
+          <strong>Look-alike letters.</strong> Reading researcher Tim Shanahan notes there's no single
           research-proven "best" order for teaching letters — but there is broad agreement on a few things: teach
           frequent letters before rare ones, mix consonants and vowels early, and keep visually or phonetically
-          similar letters (like <em>b</em> and <em>d</em>) apart at first. The Preschool letter-matching game now
-          uses a curated set of ten visually distinct letters and holds "D" back so it isn't confused with "B" on a
-          child's very first pass; both appear together once matching moves to sounds at Kindergarten.
+          similar letters (like <em>b</em> and <em>d</em>, or <em>p</em> and <em>q</em>) apart at first. All 26 letters
+          now appear in the letter games, but at Preschool look-alike letters are never shown next to each other as
+          choices.
+          <br><br>
+          <strong>Daily campfire.</strong> Finishing a trek (a round of 6 questions) adds a log to today's campfire;
+          the daily goal (3 treks by default, adjustable in the dashboard) lights the fire, and playing on
+          consecutive days builds a streak. <strong>Trace Trail</strong> practices forming letters, words and the
+          child's name with a finger, and <strong>Keyboard Camp</strong> builds first typing skills — finding letter
+          keys at Preschool, typing short words at Kindergarten, and typing words and their own name in 1st Grade.
+          Questions answered right on the first try are held back for a while so practice keeps moving on to fresh
+          ones, while missed questions keep coming back until they are right.
           <br><br>
           <strong>Color Canyon.</strong> Utah's Core Standards for Early Learning list "recognize and name multiple
           colors" as a Fine Arts skill for 4-year-olds, so it earned its own stop. Preschool is pure color
@@ -1010,6 +1120,9 @@
           than labeling alone. 1st Grade formalizes that into the five senses (sight, hearing, smell, taste, touch)
           plus a first look at simple body systems — the heart, lungs, brain, and bones — matching how NGSS-aligned
           1st grade life science introduces structure and function in the body.
+
+          <br><br>
+          <div class="footer-voice"><button type="button" class="btn secondary voice-test-btn">🔊 Test the tablet's voice</button><span id="voiceStatus"></span></div>
         </div>
       </details>
     </footer>
@@ -1033,6 +1146,7 @@
         <div class="prompt-text" id="promptText"></div>
       </div>
       <div class="options" id="options"></div>
+      <div id="customArea" hidden></div>
       <div class="feedback-line" id="feedbackLine" aria-live="polite"></div>
     </div>
 
@@ -1040,6 +1154,7 @@
       <div class="results-stars" id="resultsStars"></div>
       <div class="results-line" id="resultsLine"></div>
       <div class="results-sub" id="resultsSub"></div>
+      <div class="results-goal" id="resultsGoal" aria-live="polite"></div>
       <div class="results-review" id="resultsReview"></div>
       <div class="read-check" id="readCheck" hidden>
         <div class="read-check-label">👪 Parent check-in</div>
@@ -1175,6 +1290,9 @@
     health: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7.5-4.6-9.6-9.3C1.2 7.8 3 4.8 6.2 4.4c1.9-.2 3.6.8 5.8 3 2.2-2.2 3.9-3.2 5.8-3 3.2.4 5 3.4 3.8 6.5-2.1 4.7-9.6 9.3-9.6 9.3Z"/><path d="M8.5 12.2h2l1-2 1.5 4 1-2h2"/></svg>'
   };
 
+  STOP_ICONS.trace = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19z"/><path d="M14 7l3 3"/><path d="M4 21.5h16" opacity=".6"/></svg>';
+  STOP_ICONS.typing = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>';
+
   /* ---------------- content pools ---------------- */
   var LEVELS = [
     {id:'preschool', label:'Preschool', sub:'Ages 3–4'},
@@ -1184,18 +1302,30 @@
   var LETTER_POOL = [
     {letter:'A', word:'Apple', emoji:'🍎'}, {letter:'B', word:'Ball', emoji:'⚽'},
     {letter:'C', word:'Cat', emoji:'🐱'}, {letter:'D', word:'Dog', emoji:'🐶'},
-    {letter:'F', word:'Fish', emoji:'🐟'}, {letter:'G', word:'Goat', emoji:'🐐'},
-    {letter:'H', word:'Hat', emoji:'🎩'}, {letter:'J', word:'Jar', emoji:'🫙'},
+    {letter:'E', word:'Elephant', emoji:'🐘'}, {letter:'F', word:'Fish', emoji:'🐟'},
+    {letter:'G', word:'Goat', emoji:'🐐'}, {letter:'H', word:'Hat', emoji:'🎩'},
+    {letter:'I', word:'Ice cream', emoji:'🍦'}, {letter:'J', word:'Jar', emoji:'🫙'},
     {letter:'K', word:'Kite', emoji:'🪁'}, {letter:'L', word:'Lion', emoji:'🦁'},
-    {letter:'M', word:'Moon', emoji:'🌙'}, {letter:'O', word:'Orange', emoji:'🍊'},
-    {letter:'P', word:'Pig', emoji:'🐷'}, {letter:'R', word:'Rainbow', emoji:'🌈'},
+    {letter:'M', word:'Moon', emoji:'🌙'}, {letter:'N', word:'Nose', emoji:'👃'},
+    {letter:'O', word:'Orange', emoji:'🍊'}, {letter:'P', word:'Pig', emoji:'🐷'},
+    {letter:'Q', word:'Queen', emoji:'👑'}, {letter:'R', word:'Rainbow', emoji:'🌈'},
     {letter:'S', word:'Sun', emoji:'☀️'}, {letter:'T', word:'Turtle', emoji:'🐢'},
-    {letter:'W', word:'Watermelon', emoji:'🍉'}, {letter:'Z', word:'Zebra', emoji:'🦓'}
+    {letter:'U', word:'Umbrella', emoji:'☔'}, {letter:'V', word:'Violin', emoji:'🎻'},
+    {letter:'W', word:'Watermelon', emoji:'🍉'}, {letter:'X', word:'Xylophone', emoji:'<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="6" width="7" height="32" rx="2" fill="#E63946"/><rect x="14" y="10" width="7" height="28" rx="2" fill="#F2A900"/><rect x="23" y="14" width="7" height="24" rx="2" fill="#17A863"/><rect x="32" y="18" width="7" height="20" rx="2" fill="#0EA5E9"/><path d="M4 44 L42 44" stroke="#8B5E34" stroke-width="3" stroke-linecap="round"/></svg>'},
+    {letter:'Y', word:'Yarn', emoji:'🧶'}, {letter:'Z', word:'Zebra', emoji:'🦓'}
   ];
-  // A first-exposure subset for visual letter recognition: high-frequency, visually distinct
-  // shapes, with 'D' held back so it isn't introduced alongside its look-alike 'B' (a common
-  // structured-literacy guideline — see the "for grown-ups" note for the source).
-  var PRESCHOOL_LETTERS = ['A','C','H','K','L','O','P','S','T','Z'];
+  // All 26 letters are in every letter game. To stay kind to first-time learners, look-alike letters
+  // (B/D, P/Q, M/W, N/Z, I/L, E/F, O/Q, U/V) are never shown side by side as choices in the preschool
+  // letter games -- a common structured-literacy guideline (see the "for grown-ups" note).
+  var PRESCHOOL_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  var LOOKALIKES = [['B','D'],['P','Q'],['M','W'],['N','Z'],['I','L'],['E','F'],['O','Q'],['U','V'],['b','d'],['p','q']];
+  function lookalike(a, b){
+    for (var i=0;i<LOOKALIKES.length;i++){
+      var g = LOOKALIKES[i];
+      if ((g[0] === a && g[1] === b) || (g[0] === b && g[1] === a)) return true;
+    }
+    return false;
+  }
   var FIRST_WORD_POOL = [
     {word:'CAT', emoji:'🐱'}, {word:'DOG', emoji:'🐶'}, {word:'SUN', emoji:'☀️'},
     {word:'HAT', emoji:'🎩'}, {word:'PIG', emoji:'🐷'}, {word:'BUG', emoji:'🐛'},
@@ -1217,7 +1347,7 @@
     {word:'Snake', emoji:'🐍', rhyme:'Cake', rhymeEmoji:'🎂'}
   ];
   var SHAPES = ['Circle','Square','Triangle','Rectangle','Star','Heart','Oval','Diamond'];
-  var BASIC_SHAPES = ['Circle','Square','Triangle'];
+  var BASIC_SHAPES = ['Circle','Square','Triangle','Rectangle'];
   var SHAPES_3D = ['Cube','Sphere','Cone','Cylinder','Pyramid'];
   var COUNT_EMOJI = ['🍎','⭐','🐝','🎈','🐸','🌸','🍪','🐞'];
   var ADD_OBJECTS = [
@@ -1256,11 +1386,19 @@
      each returns 6 normalized questions: {speak, visual, options:[{html,correct}]} */
 
   /* -- letters: preschool=letter recognition + case matching, kindergarten=letter sound, first=simple words -- */
+  /* two wrong choices that don't look like the right letter -- or like each other */
+  function pickLetterDistractors(pool, item, n){
+    var chosen = [];
+    shuffle(pool.filter(function(p){ return p.letter !== item.letter && !lookalike(p.letter, item.letter); })).forEach(function(c){
+      if (chosen.length < n && !chosen.some(function(x){ return lookalike(x.letter, c.letter); })) chosen.push(c);
+    });
+    return chosen;
+  }
   function buildLettersRecognition(n){
     n = n || 6;
     var pool = LETTER_POOL.filter(function(p){ return PRESCHOOL_LETTERS.indexOf(p.letter) !== -1; });
     return sample(pool, Math.min(n, pool.length)).map(function(item){
-      var distractors = sample(pool.filter(function(p){ return p.letter !== item.letter; }), 2);
+      var distractors = pickLetterDistractors(pool, item, 2);
       var letters = shuffle([item.letter].concat(distractors.map(function(d){ return d.letter; })));
       var opts = letters.map(function(l){
         return { html:'<span class="opt-big-letter">'+l+'</span>', correct: l === item.letter };
@@ -1280,7 +1418,7 @@
     n = n || 6;
     var pool = LETTER_POOL.filter(function(p){ return PRESCHOOL_LETTERS.indexOf(p.letter) !== -1; });
     return sample(pool, Math.min(n, pool.length)).map(function(item){
-      var distractors = sample(pool.filter(function(p){ return p.letter !== item.letter; }), 2);
+      var distractors = pickLetterDistractors(pool, item, 2);
       var letters = shuffle([item.letter].concat(distractors.map(function(d){ return d.letter; })));
       var opts = letters.map(function(l){
         return { html:'<span class="opt-big-letter">'+l.toLowerCase()+'</span>', correct: l === item.letter };
@@ -1457,11 +1595,40 @@
     }
     return out;
   }
+  /* "Which shape is a clock?" -- connecting a flat or solid shape to an everyday object. */
+  var SHAPE_OBJECTS_PRE = [
+    {emoji:'🕐', name:'a clock', shape:'Circle'}, {emoji:'🍪', name:'a cookie', shape:'Circle'},
+    {emoji:'🪟', name:'a window', shape:'Square'}, {emoji:'🍕', name:'a slice of pizza', shape:'Triangle'},
+    {emoji:'🚪', name:'a door', shape:'Rectangle'}, {emoji:'📱', name:'a phone', shape:'Rectangle'}
+  ];
+  var SHAPE_OBJECTS_K = [
+    {emoji:'🥚', name:'an egg', shape:'Oval'}, {emoji:'🪁', name:'a kite', shape:'Diamond'},
+    {emoji:'💗', name:'a valentine', shape:'Heart'}, {emoji:'🍕', name:'a slice of pizza', shape:'Triangle'},
+    {emoji:'🚪', name:'a door', shape:'Rectangle'}, {emoji:'🕐', name:'a clock', shape:'Circle'},
+    {emoji:'🪟', name:'a window', shape:'Square'}, {emoji:'🌟', name:'a shiny star', shape:'Star'}
+  ];
+  var SHAPE_OBJECTS_1 = [
+    {emoji:'⚽', name:'a soccer ball', shape:'Sphere'}, {emoji:'🎲', name:'a dice', shape:'Cube'},
+    {emoji:'🍦', name:'an ice cream cone', shape:'Cone'}, {emoji:'🥫', name:'a soup can', shape:'Cylinder'}
+  ];
+  function buildShapeObjects(objects, list, distractorCount, n){
+    return sample(objects, Math.min(n, objects.length)).map(function(item){
+      var distractors = sample(list.filter(function(s){ return s !== item.shape; }), distractorCount);
+      var opts = shuffle([item.shape].concat(distractors)).map(function(s){
+        return { html: shapeSVG(s) + '<span class="opt-label">'+s+'</span>', correct: s === item.shape };
+      });
+      return {
+        speak:'Which shape is ' + item.name + '?',
+        visual:'<div class="rhyme-target"><span class="opt-emoji big">'+item.emoji+'</span></div>',
+        options: opts
+      };
+    });
+  }
   function buildShapes(level){
     var oc = optionCountForLevel(level);
-    if (level === 'preschool') return tagSkill(buildShapesFromList(BASIC_SHAPES, oc-1), 'Shapes');
-    if (level === 'first') return tagSkill(buildShapesFromList(SHAPES_3D, oc-1), 'Shapes');
-    return tagSkill(buildShapesFromList(SHAPES, oc-1), 'Shapes');
+    if (level === 'preschool') return shuffle(tagSkill(buildShapesFromList(BASIC_SHAPES, oc-1).slice(0,3).concat(buildShapeObjects(SHAPE_OBJECTS_PRE, BASIC_SHAPES, oc-1, 3)), 'Shapes'));
+    if (level === 'first') return shuffle(tagSkill(buildShapesFromList(SHAPES_3D, oc-1).slice(0,3).concat(buildShapeObjects(SHAPE_OBJECTS_1, SHAPES_3D, oc-1, 3)), 'Shapes'));
+    return shuffle(tagSkill(buildShapesFromList(SHAPES, oc-1).slice(0,3).concat(buildShapeObjects(SHAPE_OBJECTS_K, SHAPES, oc-1, 3)), 'Shapes'));
   }
 
   /* -- adding: preschool=compare quantities, kindergarten=add to 10, first=add/subtract to 20 -- */
@@ -1609,6 +1776,94 @@
     {prompt:'Which body part sends messages so you can move and think?', correct:{emoji:'🧠',label:'Brain'}, distract:[{emoji:'🫀',label:'Heart'},{emoji:'🦷',label:'Teeth'}]},
     {prompt:'What gives your body its shape and helps you stand up tall?', correct:{emoji:'🦴',label:'Bones'}, distract:[{emoji:'🫁',label:'Lungs'},{emoji:'🧠',label:'Brain'}]}
   ];
+  /* ---- more questions (kept in one place so the pools are easy to grow) ---- */
+  RHYME_POOL.push(
+    {word:'Hen', emoji:'🐔', rhyme:'Pen', rhymeEmoji:'🖊️'},
+    {word:'Bug', emoji:'🐛', rhyme:'Hug', rhymeEmoji:'🤗'},
+    {word:'Boat', emoji:'🚤', rhyme:'Coat', rhymeEmoji:'🧥'},
+    {word:'Bed', emoji:'🛏️', rhyme:'Sled', rhymeEmoji:'🛷'},
+    {word:'Ship', emoji:'🚢', rhyme:'Lip', rhymeEmoji:'👄'},
+    {word:'Clock', emoji:'🕐', rhyme:'Sock', rhymeEmoji:'🧦'},
+    {word:'Bell', emoji:'🔔', rhyme:'Shell', rhymeEmoji:'🐚'},
+    {word:'Pig', emoji:'🐷', rhyme:'Dig', rhymeEmoji:'⛏️'},
+    {word:'Fox', emoji:'🦊', rhyme:'Box', rhymeEmoji:'📦'},
+    {word:'Rain', emoji:'🌧️', rhyme:'Train', rhymeEmoji:'🚂'},
+    {word:'Whale', emoji:'🐋', rhyme:'Snail', rhymeEmoji:'🐌'},
+    {word:'Nut', emoji:'🥜', rhyme:'Cut', rhymeEmoji:'✂️'},
+    {word:'Mice', emoji:'🐭', rhyme:'Rice', rhymeEmoji:'🍚'},
+    {word:'Pan', emoji:'🍳', rhyme:'Van', rhymeEmoji:'🚐'},
+    {word:'Kite', emoji:'🪁', rhyme:'Light', rhymeEmoji:'💡'},
+    {word:'Ball', emoji:'⚽', rhyme:'Wall', rhymeEmoji:'🧱'},
+    {word:'Duck', emoji:'🦆', rhyme:'Truck', rhymeEmoji:'🚚'},
+    {word:'Cap', emoji:'🧢', rhyme:'Map', rhymeEmoji:'🗺️'}
+  );
+  function natQ(prompt, right, wrong1, wrong2){
+    var o = [{emoji:right[0], label:right[1], correct:true}, {emoji:wrong1[0], label:wrong1[1], correct:false}];
+    if (wrong2) o.push({emoji:wrong2[0], label:wrong2[1], correct:false});
+    return {prompt:prompt, opts:o};
+  }
+  NATURE_POOL.push(
+    natQ('Which one is alive?', ['🐟','Fish'], ['🧸','Toy'], ['🥄','Spoon']),
+    natQ('Which one is alive?', ['🌻','Flower'], ['🧱','Brick'], ['🪑','Chair']),
+    natQ('Which one is NOT alive?', ['⚽','Ball'], ['🐸','Frog'], ['🌲','Pine tree']),
+    natQ('Which one is NOT alive?', ['🚲','Bike'], ['🐝','Bee'], ['🌿','Plant']),
+    natQ('It is very windy outside. Which picture matches?', ['🌬️','Windy'], ['☀️','Sunny'], ['❄️','Snowy']),
+    natQ('The sun is shining bright. Which picture matches?', ['☀️','Sunny'], ['🌧️','Rainy'], ['❄️','Snowy']),
+    natQ('Which one keeps you dry in the rain?', ['☔','Umbrella'], ['🕶️','Sunglasses'], ['🧢','Cap']),
+    natQ('What do you wear on your hands when it snows?', ['🧤','Mittens'], ['🕶️','Sunglasses'], ['🧢','Cap']),
+    natQ('What does a puppy need to grow?', ['🍖','Food'], ['🚗','Car'], ['🪑','Chair']),
+    natQ('Which animal can fly?', ['🦅','Eagle'], ['🐢','Turtle'], ['🐄','Cow']),
+    natQ('Which animal lives in the water?', ['🐬','Dolphin'], ['🐘','Elephant'], ['🦒','Giraffe']),
+    natQ('Which one grows from a seed?', ['🌱','Plant'], ['🪨','Rock'], ['🚗','Car']),
+    natQ('Someone is kicking a ball. Is that a push or a pull?', ['👐','Push'], ['🤏','Pull']),
+    natQ('Someone is pulling open a door. Is that a push or a pull?', ['🤏','Pull'], ['👐','Push'])
+  );
+  NATURE_POOL_1.push(
+    natQ('Where does a polar bear live?', ['❄️','Snowy ice'], ['🏜️','Desert'], ['🌴','Jungle']),
+    natQ('Where does a camel live?', ['🏜️','Desert'], ['🌊','Ocean'], ['❄️','Snowy ice']),
+    natQ('Where does a monkey live?', ['🌴','Jungle'], ['🏜️','Desert'], ['🏔️','Mountain']),
+    natQ('What do bees make?', ['🍯','Honey'], ['🥛','Milk'], ['🧀','Cheese']),
+    natQ('What do cows give us?', ['🥛','Milk'], ['🍯','Honey'], ['🥚','Eggs']),
+    natQ('What do hens give us?', ['🥚','Eggs'], ['🥛','Milk'], ['🍞','Bread']),
+    natQ('A tadpole grows into what?', ['🐸','A Frog'], ['🦋','A Butterfly'], ['🐟','A Fish']),
+    natQ('In which season do many trees lose their leaves?', ['🍂','Fall'], ['🌷','Spring'], ['☀️','Summer']),
+    natQ('What happens to water when it gets very, very cold?', ['🧊','It freezes'], ['🔥','It burns'], ['🎈','It floats away']),
+    natQ('What do we sometimes see after rain when the sun comes out?', ['🌈','A Rainbow'], ['⭐','A Star'], ['🌙','The Moon']),
+    natQ('Which tool helps you see tiny things up close?', ['🔍','Magnifying glass'], ['🔨','Hammer'], ['🧲','Magnet']),
+    natQ('Which one will a magnet stick to?', ['🔩','Metal nail'], ['🧸','Toy bear'], ['🪵','Wood log'])
+  );
+  BODY_POOL_PRE.push(
+    {emoji:'☝️', label:'Finger'}, {emoji:'👅', label:'Tongue'}, {emoji:'🧠', label:'Brain'}, {emoji:'🫀', label:'Heart'}
+  );
+  function bodyQ(prompt, right, w1, w2){ return {prompt:prompt, correct:{emoji:right[0],label:right[1]}, distract:[{emoji:w1[0],label:w1[1]},{emoji:w2[0],label:w2[1]}]}; }
+  BODY_FUNCTION_POOL_K.push(
+    bodyQ('What do you use to hold a pencil?', ['✋','Hands'], ['🦶','Feet'], ['👂','Ears']),
+    bodyQ('What do you use to kick a ball?', ['🦶','Feet'], ['✋','Hands'], ['👀','Eyes']),
+    bodyQ('What do you use to talk and sing?', ['👄','Mouth'], ['👂','Ears'], ['👃','Nose']),
+    bodyQ('What do you use to bite an apple?', ['🦷','Teeth'], ['👂','Ears'], ['👀','Eyes']),
+    bodyQ('What do you use to listen to music?', ['👂','Ears'], ['👃','Nose'], ['🦶','Feet']),
+    bodyQ('What do you use to read a book?', ['👀','Eyes'], ['👃','Nose'], ['🦷','Teeth']),
+    bodyQ('What do you use to breathe air?', ['🫁','Lungs'], ['🦴','Bones'], ['🧠','Brain']),
+    bodyQ('What helps you stand up and move?', ['🦴','Bones'], ['🫁','Lungs'], ['👄','Mouth']),
+    bodyQ('What do you use to smell a flower?', ['👃','Nose'], ['👂','Ears'], ['🦷','Teeth']),
+    bodyQ('What do you use to clap?', ['✋','Hands'], ['🦵','Legs'], ['👃','Nose'])
+  );
+  SENSES_POOL_1.push(
+    bodyQ('Which body part lets you taste a yummy cookie?', ['👅','Tongue'], ['👂','Ears'], ['✋','Hands']),
+    bodyQ('Which body part do you use to see a rainbow?', ['👀','Eyes'], ['👃','Nose'], ['👅','Tongue']),
+    bodyQ('Which body part lets you hear a bird sing?', ['👂','Ears'], ['👀','Eyes'], ['✋','Hands']),
+    bodyQ('Which body part do you use to smell fresh bread?', ['👃','Nose'], ['👂','Ears'], ['👀','Eyes']),
+    bodyQ('Which body part feels if the water is hot or cold?', ['✋','Hands'], ['👂','Ears'], ['👃','Nose']),
+    bodyQ('Which body part tells you a lemon is sour?', ['👅','Tongue'], ['👀','Eyes'], ['👂','Ears'])
+  );
+  BODY_SYSTEMS_POOL_1.push(
+    bodyQ('Which body part pushes air out when you blow out a candle?', ['🫁','Lungs'], ['🫀','Heart'], ['🦴','Bones']),
+    bodyQ('Which body part do you think with?', ['🧠','Brain'], ['🫁','Lungs'], ['🦷','Teeth']),
+    bodyQ('Which body part beats thump-thump in your chest?', ['🫀','Heart'], ['🧠','Brain'], ['🫁','Lungs']),
+    bodyQ('Which body part grows strong when you drink milk?', ['🦴','Bones'], ['🧠','Brain'], ['🫀','Heart']),
+    bodyQ('Which body part helps you breathe in fresh air?', ['🫁','Lungs'], ['🦴','Bones'], ['🧠','Brain'])
+  );
+
   function buildBodyPreschool(optionCount){
     optionCount = optionCount || 3;
     return sample(BODY_POOL_PRE, 6).map(function(target){
@@ -1683,6 +1938,50 @@
     {sentence:'The frog sat on a lily pad. Then it jumped into the pond with a splash.', question:'Where did the frog jump?', options:[{label:'Into the pond',correct:true},{label:'Onto a rock',correct:false},{label:'Into a tree',correct:false}]},
     {sentence:'The pig ran to the pond. The pig had fun all afternoon.', question:'Where did the pig go?', options:[{label:'To the pond',correct:true},{label:'To school',correct:false},{label:'To bed',correct:false}]}
   ];
+  STORY_POOL_PRE.push(
+    {phrase:'The pink pig', correct:'🐷', distract:['🐘','🐟']},
+    {phrase:'The yellow duck', correct:'🦆', distract:['🐸','🐱']},
+    {phrase:'The hot soup', correct:'🍲', distract:['🧊','⛄']},
+    {phrase:'The cold ice', correct:'🧊', distract:['🔥','☀️']},
+    {phrase:'The round ball', correct:'⚽', distract:['🔺','📦']},
+    {phrase:'The sleepy cat', correct:'🐱', distract:['🐶','🦁']},
+    {phrase:'The tiny bug', correct:'🐛', distract:['🐘','🐳']},
+    {phrase:'The yellow banana', correct:'🍌', distract:['🍎','🍇']},
+    {phrase:'The shiny star', correct:'⭐', distract:['🌙','☀️']},
+    {phrase:'The big whale', correct:'🐳', distract:['🐟','🐜']},
+    {phrase:'The purple grapes', correct:'🍇', distract:['🍌','🍊']}
+  );
+  function storyQ(sentence, question, right, w1, w2){
+    return {sentence:sentence, question:question, options:[{label:right,correct:true},{label:w1,correct:false},{label:w2,correct:false}]};
+  }
+  STORY_POOL_K.push(
+    storyQ('The red hen sat on a nest.', 'What sat on the nest?', 'The hen', 'The dog', 'The fox'),
+    storyQ('Tom has a big red ball.', 'What does Tom have?', 'A big ball', 'A small cat', 'A blue hat'),
+    storyQ('The bug is on the log.', 'Where is the bug?', 'On the log', 'In the pond', 'In the cup'),
+    storyQ('I can see a bus.', 'What can I see?', 'A bus', 'A cat', 'A fish'),
+    storyQ('Mom has a big pot.', 'What does Mom have?', 'A big pot', 'A small pen', 'A red cap'),
+    storyQ('The sun is up. It is a nice day.', 'What is up in the sky?', 'The sun', 'The bus', 'The pig'),
+    storyQ('The ducks can swim in the lake.', 'What can the ducks do?', 'Swim', 'Climb a tree', 'Drive a car'),
+    storyQ('Dad and I sit on the bed.', 'Who sits with me?', 'Dad', 'Mom', 'The dog'),
+    storyQ('The frog hops on a rock.', 'What does the frog do?', 'Hops', 'Swims fast', 'Flies'),
+    storyQ('We eat a big red apple.', 'What do we eat?', 'An apple', 'A shoe', 'A pie'),
+    storyQ('The bell rings. It is time for school.', 'What is it time for?', 'School', 'Bed', 'Lunch'),
+    storyQ('A bat can fly at night.', 'When can a bat fly?', 'At night', 'Never', 'Only in snow')
+  );
+  STORY_POOL_1.push(
+    storyQ('Mia put on her coat. It was cold outside.', 'Why did Mia put on her coat?', 'It was cold', 'It was hot', 'It was night'),
+    storyQ('The bee flew to a flower. It drank sweet nectar.', 'What did the bee drink?', 'Nectar', 'Milk', 'Juice'),
+    storyQ('Jack had a pet dog. The dog loved to fetch sticks.', 'What did the dog love to fetch?', 'Sticks', 'Balloons', 'Shoes'),
+    storyQ('The sky got dark. Big drops began to fall.', 'What was falling?', 'Rain', 'Snow', 'Leaves'),
+    storyQ('Lily read a book at bedtime. Then she fell asleep.', 'When did Lily read?', 'At bedtime', 'At lunch', 'At recess'),
+    storyQ('The bakery smelled so good. Ana bought a warm loaf of bread.', 'What did Ana buy?', 'Bread', 'A toy', 'A hat'),
+    storyQ('Our class went on a trip to the farm. We saw a cow and a pig.', 'Where did the class go?', 'To a farm', 'To a zoo', 'To the moon'),
+    storyQ('The turtle walked slowly. The rabbit ran fast.', 'Which animal was fast?', 'The rabbit', 'The turtle', 'The snail'),
+    storyQ('Sara dropped her ice cream. She felt sad.', 'How did Sara feel?', 'Sad', 'Happy', 'Sleepy'),
+    storyQ('Leo can jump high. He can reach the top shelf.', 'What can Leo reach?', 'The top shelf', 'The sky', 'The roof'),
+    storyQ('Mom planted a tree. It will grow tall.', 'What will the tree do?', 'Grow tall', 'Fly away', 'Turn into a rock')
+  );
+
   function buildStoryPreschool(){
     return sample(STORY_POOL_PRE, 6).map(function(item){
       var opts = shuffle([{emoji:item.correct, correct:true}].concat(item.distract.map(function(d){ return {emoji:d, correct:false}; })));
@@ -1748,7 +2047,13 @@
     {a:'Red', aHex:'#D8432A', b:'Yellow', bHex:'#EFC23A', result:'Orange', resultHex:'#EF8330'},
     {a:'Blue', aHex:'#2F6FE0', b:'Red', bHex:'#D8432A', result:'Purple', resultHex:'#8B5FC0'},
     {a:'Yellow', aHex:'#EFC23A', b:'Blue', bHex:'#2F6FE0', result:'Green', resultHex:'#3FA34D'},
-    {a:'Yellow', aHex:'#EFC23A', b:'Red', bHex:'#D8432A', result:'Orange', resultHex:'#EF8330'}
+    {a:'Yellow', aHex:'#EFC23A', b:'Red', bHex:'#D8432A', result:'Orange', resultHex:'#EF8330'},
+    {a:'Red', aHex:'#D8432A', b:'White', bHex:'#FFFFFF', result:'Pink', resultHex:'#EF7AA6'},
+    {a:'White', aHex:'#FFFFFF', b:'Red', bHex:'#D8432A', result:'Pink', resultHex:'#EF7AA6'},
+    {a:'Black', aHex:'#2B2016', b:'White', bHex:'#FFFFFF', result:'Grey', resultHex:'#8C8C8C'},
+    {a:'White', aHex:'#FFFFFF', b:'Black', bHex:'#2B2016', result:'Grey', resultHex:'#8C8C8C'},
+    {a:'Red', aHex:'#D8432A', b:'Green', bHex:'#3FA34D', result:'Brown', resultHex:'#8B5A2B'},
+    {a:'Green', aHex:'#3FA34D', b:'Red', bHex:'#D8432A', result:'Brown', resultHex:'#8B5A2B'}
   ];
   function buildColorsPreschool(optionCount){
     optionCount = optionCount || 3;
@@ -1772,7 +2077,7 @@
   }
   function buildColorsMix(optionCount){
     optionCount = optionCount || 3;
-    return shuffle(COLOR_MIX).map(function(m){
+    return shuffle(COLOR_MIX).slice(0, 6).map(function(m){
       var distractors = sample(COLOR_POOL.filter(function(c){ return c.name !== m.result && c.name !== m.a && c.name !== m.b; }), optionCount-1);
       var opts = shuffle([{name:m.result, hex:m.resultHex}].concat(distractors)).map(function(c){
         return { html:'<span class="opt-swatch" style="background:'+c.hex+';" data-color-label="'+c.name+'"></span>', correct: c.name === m.result };
@@ -1948,6 +2253,64 @@
      phonics (ABC Trailhead), before applying both to connected text (Story Cove) and high-frequency
      words (Word Spring) — see the "for grown-ups" note for sourcing. Math (counting, patterns,
      shapes, adding), color naming, and science stops follow. */
+
+  /* -- Trace Trail (writing practice) & Keyboard Camp (typing): "custom" questions that are not
+     multiple choice. They still carry one hidden "correct option" holding their text so the same
+     bookkeeping used everywhere else (stable question identity, practice-again list, Right / Total)
+     works unchanged. -- */
+  var TRACE_WORDS = ['cat','dog','sun','hat','pig','bug','fox','cup','bed','mom','dad','red','big','yes','the','and','can','see','look','play','blue','go','me','we','my','in','it','up','run','fun'];
+  var ALPHA_UP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  function cleanName(){
+    var n = String(STATE.userName || '').replace(/[^A-Za-z]/g, '');
+    if (!STATE.includeName || n.length < 2 || n.length > 9) return '';
+    return n.charAt(0).toUpperCase() + n.slice(1).toLowerCase();
+  }
+  function traceQ(text, speak, skill){
+    return { kind:'trace', text:text, speak:speak, prompt:speak.replace(/\.$/, ''), visual:'', skill:skill, options:[{ html:text, correct:true }] };
+  }
+  function buildTrace(level){
+    var out = [];
+    if (level === 'preschool'){
+      sample(ALPHA_UP, 6).forEach(function(l){ out.push(traceQ(l, 'Trace the letter ' + l + '.', 'Tracing Letters')); });
+      return out;
+    }
+    if (level === 'kindergarten'){
+      sample(ALPHA_UP, 6).forEach(function(l, i){
+        if (i < 3) out.push(traceQ(l, 'Trace the big letter ' + l + '.', 'Tracing Letters'));
+        else out.push(traceQ(l.toLowerCase(), 'Trace the little letter ' + l.toLowerCase() + '.', 'Tracing Letters'));
+      });
+      return shuffle(out);
+    }
+    var words = sample(TRACE_WORDS, 6), nm = cleanName();
+    words.forEach(function(w, i){
+      if (i === 5 && nm) out.push(traceQ(nm, 'Trace your name, ' + nm + '.', 'Tracing My Name'));
+      else out.push(traceQ(w, 'Trace the word ' + w + '.', 'Tracing Words'));
+    });
+    return out;
+  }
+  function typeQ(target, speak, prompt, emoji, skill){
+    return { kind:'type', target:target, emoji:emoji || '', speak:speak, prompt:prompt, visual:'', skill:skill, options:[{ html:target, correct:true }] };
+  }
+  function buildTyping(level){
+    var out = [];
+    if (level === 'preschool'){
+      sample(ALPHA_UP, 6).forEach(function(l){ out.push(typeQ(l, 'Find the letter ' + l + ' on the keyboard.', 'Find the letter ' + l + ' on the keyboard', '', 'Typing Letters')); });
+      return out;
+    }
+    if (level === 'kindergarten'){
+      var short = FIRST_WORD_POOL.filter(function(w){ return w.word.length <= 4; });
+      sample(short, 6).forEach(function(w){ out.push(typeQ(w.word, 'Type the word ' + w.word.toLowerCase() + '.', 'Type the word ' + w.word.toLowerCase(), w.emoji, 'Typing Short Words')); });
+      return out;
+    }
+    var pool = FIRST_WORD_POOL.filter(function(w){ return w.word.length >= 4 && w.word.length <= 6; });
+    var sight = SIGHT_WORDS_1.filter(function(w){ return w.length >= 3 && w.length <= 6; });
+    var nm = cleanName();
+    sample(pool, 3).forEach(function(w){ out.push(typeQ(w.word.toLowerCase(), 'Type the word ' + w.word.toLowerCase() + '.', 'Type the word ' + w.word.toLowerCase(), w.emoji, 'Typing Words')); });
+    sample(sight, 3).forEach(function(w){ out.push(typeQ(w.toLowerCase(), 'Type the word ' + w + '.', 'Type the word ' + w, '', 'Typing Words')); });
+    if (nm) out[out.length - 1] = typeQ(nm.toLowerCase(), 'Type your name, ' + nm + '.', 'Type your name, ' + nm, '', 'Typing My Name');
+    return shuffle(out);
+  }
+
   var STATIONS = [
     { id:'myname', accent:'--cyan', accentInk:'--cyan-ink', name:'My Trail Sign', stop:'Stop 1', requiresName:true,
       desc:{preschool:'Letters in my name', kindergarten:'Match my letters', first:'Spell my name'}, build:buildMyName },
@@ -1972,7 +2335,11 @@
     { id:'nature', accent:'--plum', accentInk:'--plum-ink', name:'Nature Notebook', stop:'Stop 11',
       desc:{preschool:'Weather & living things', kindergarten:'Weather & living things', first:'Seasons & habitats'}, build:buildNature },
     { id:'health', accent:'--lime', accentInk:'--lime-ink', name:'Health Hollow', stop:'Stop 12',
-      desc:{preschool:'Point to body parts', kindergarten:'What each part does', first:'Senses & body systems'}, build:buildHealth }
+      desc:{preschool:'Point to body parts', kindergarten:'What each part does', first:'Senses & body systems'}, build:buildHealth },
+    { id:'trace', accent:'--magenta', accentInk:'--magenta-ink', name:'Trace Trail', stop:'Stop 13',
+      desc:{preschool:'Trace big letters', kindergarten:'Trace big & little letters', first:'Trace words & my name'}, build:buildTrace },
+    { id:'typing', accent:'--slate', accentInk:'--slate-ink', name:'Keyboard Camp', stop:'Stop 14',
+      desc:{preschool:'Find the letter key', kindergarten:'Type short words', first:'Type words & my name'}, build:buildTyping }
   ];
   function visibleStations(){
     return STATIONS.filter(function(s){ return !s.requiresName || (STATE.hasCustomName && STATE.userName); });
@@ -2090,7 +2457,13 @@
   }
 
   function defaultStats(){
-    return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[], weekly:{}, missed:{}, right:{} };
+    return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[], weekly:{}, missed:{}, right:{}, daily:{}, recent:{}, goal:3, bestStreak:0 };
+  }
+  function normalizeStats(){
+    if (!stats.daily) stats.daily = {};
+    if (!stats.recent) stats.recent = {};
+    if (!stats.goal) stats.goal = 3;
+    if (typeof stats.bestStreak !== 'number') stats.bestStreak = 0;
   }
 
   /* On claude.ai this app uses the Artifact db capability. This GitHub Pages copy has no
@@ -2575,6 +2948,8 @@
       var name = (stationById(sid) || {}).name || sid;
       return '<tr><td>'+name+'</td><td>'+t.correct+'</td><td>'+t.wrong+'</td></tr>';
     }).join('');
+    var summaryBlock = '';
+    try{ summaryBlock = renderSummaryBlock(u, st, skillEntries); }catch(e){ summaryBlock = ''; }
     var lvl = levelInfo(u.level);
     var gradeBlock = '<div class="grade-row"><div class="grade-label">Grade level</div>'+
           '<div class="level-switch" data-grade-for="'+u.slug+'">'+
@@ -2590,6 +2965,7 @@
         '<div style="font-size:0.8rem;color:var(--ink-soft);">Last active: '+last+'</div></div>'+
       '</div>'+
       gradeBlock+
+      summaryBlock+
       '<div style="display:flex;gap:18px;flex-wrap:wrap;font-size:0.9rem;font-weight:700;margin-bottom:10px;">'+
         '<span>✅ '+correct+' correct</span><span>❌ '+wrong+' wrong</span>'+
         '<span>'+(acc===null?'—':acc+'%')+' accuracy</span><span>⏱ '+minutes+' min total</span>'+
@@ -2727,8 +3103,11 @@
     if (scopeSlug){
       var mine = { slug:scopeSlug, name:STATE.userName || scopeSlug, avatar:STATE.userAvatar || '🥾', level:STATE.level };
       if (elAdminDashboardTitle) elAdminDashboardTitle.textContent = mine.name + '’s Dashboard';
-      elAdminContent.innerHTML = renderUserCard(mine, stats, false);
+      lastReport = [{ u:mine, st:stats }];
+      elAdminContent.innerHTML = '<div class="admin-toolbar"><button type="button" class="btn secondary" id="exportCsvBtn">⬇ Download report</button><button type="button" class="btn secondary" id="printBtn">🖨 Print</button></div>' + renderUserCard(mine, stats, false);
       wireGradeButtons();
+      wireSummaryButtons();
+      wireReportButtons();
       wireResetTaps();
       return;
     }
@@ -2744,11 +3123,14 @@
       results[1].docs.forEach(function(d){ statsById[d.id] = d.data() || {}; });
       var addBtnHtml = '<div style="margin-bottom:14px;"><button type="button" class="btn" id="addExplorerBtn">➕ Add Explorer</button></div>';
       var rows = users.map(function(u){ return renderUserCard(u, statsById[u.slug], true); }).join('');
-      elAdminContent.innerHTML = addBtnHtml + (rows || '<p class="admin-empty">No explorer profiles yet.</p>');
+      lastReport = users.map(function(u){ return { u:u, st:statsById[u.slug] || {} }; });
+      elAdminContent.innerHTML = addBtnHtml + '<div class="admin-toolbar"><button type="button" class="btn secondary" id="exportCsvBtn">⬇ Download report</button><button type="button" class="btn secondary" id="printBtn">🖨 Print</button></div>' + (rows || '<p class="admin-empty">No explorer profiles yet.</p>');
       var addBtn = document.getElementById('addExplorerBtn');
       if (addBtn) addBtn.addEventListener('click', openNewProfileCard);
       wireDeleteButtons();
       wireGradeButtons();
+      wireSummaryButtons();
+      wireReportButtons();
       wireResetTaps();
     }).catch(function(){ elAdminContent.innerHTML = '<p class="admin-empty">Could not load stats.</p>'; });
   }
@@ -2790,6 +3172,7 @@
       if (!stats.weekly) stats.weekly = {};
       if (!stats.missed) stats.missed = {};
       if (!stats.right) stats.right = {};
+      normalizeStats();
       progress = stats.stars;
       loadSound();
       elSoundToggle.textContent = soundOn ? '🔊' : '🔇';
@@ -2818,7 +3201,7 @@
     var slug = STATE.userSlug;
     pendingSave = pendingSave.then(function(){
       pruneWeekly();
-      var payload = { totalCorrect: stats.totalCorrect, totalWrong: stats.totalWrong, totalTimeSec: stats.totalTimeSec, lastActive: stats.lastActive, sessions: stats.sessions, stars: stats.stars, tally: stats.tally, skillTally: stats.skillTally, weekly: stats.weekly, missed: stats.missed || {}, right: stats.right || {} };
+      var payload = { totalCorrect: stats.totalCorrect, totalWrong: stats.totalWrong, totalTimeSec: stats.totalTimeSec, lastActive: stats.lastActive, sessions: stats.sessions, stars: stats.stars, tally: stats.tally, skillTally: stats.skillTally, weekly: stats.weekly, missed: stats.missed || {}, right: stats.right || {}, daily: stats.daily || {}, recent: stats.recent || {}, goal: stats.goal || 3, bestStreak: stats.bestStreak || 0 };
       /* Building a db path/doc reference can throw SYNCHRONOUSLY (not just reject) if anything about
          it is ever malformed -- and this now runs on every single answered question via
          recordAnswer(), inside the same call stack as the correct-answer feedback. An uncaught throw
@@ -3020,6 +3403,7 @@
   var elResultsStars = document.getElementById('resultsStars');
   var elResultsLine = document.getElementById('resultsLine');
   var elResultsSub = document.getElementById('resultsSub');
+  var elResultsGoal = document.getElementById('resultsGoal');
   var elResultsReview = document.getElementById('resultsReview');
   var elReadCheck = document.getElementById('readCheck');
   var elReadCheckName = document.getElementById('readCheckName');
@@ -3043,6 +3427,8 @@
 
   function renderTrail(){
     elStarTotal.textContent = '⭐ ' + totalStars() + ' / ' + maxStars();
+    try{ renderGoalCard(); }catch(e){}
+    try{ checkVoice(); wireVoiceTest(); }catch(e){}
     /* "Up next" is just the first stop (in trail order) that hasn't been fully mastered yet -- a
        gentle visual nudge, never a gate: every other stop stays just as clickable. */
     var nextId = null;
@@ -3073,6 +3459,7 @@
 
   function showView(name){
     STATE.view = name;
+    if (name !== 'station'){ try{ clearCustom(); }catch(e){} }
     elViewLogin.hidden = name !== 'login';
     elViewAdmin.hidden = name !== 'admin';
     elViewTrail.hidden = name !== 'trail';
@@ -3178,8 +3565,11 @@
     STATE.roundTally = { correct:0, wrong:0 };
     STATE.roundSkillTally = {};
     STATE.roundLog = [];
+    STATE.includeName = true; /* tracing/typing may add the child's own name to a round */
     STATE.round = station.build(STATE.level);
+    try{ STATE.round = spaceOutRepeats(STATE.round, station, STATE.level); }catch(e){}
     try{ STATE.round = injectMissedQuestions(STATE.round, id, STATE.level); }catch(e){}
+    STATE.includeName = false;
     STATE.extraCount = 0;
     STATE.qIndex = 0;
     STATE.correctFirstTry = 0;
@@ -3207,9 +3597,19 @@
   function renderQuestion(){
     var q = STATE.round[STATE.qIndex];
     STATE.wrongOnCurrent = false;
+    clearCustom();
     elStage.innerHTML = q.visual || '';
     elPromptText.textContent = q.prompt || q.speak;
     elFeedback.textContent = '';
+    if (q.kind === 'trace' || q.kind === 'type'){
+      elOptions.innerHTML = '';
+      elOptions.hidden = true;
+      elCustom.hidden = false;
+      renderDots();
+      if (q.kind === 'trace') renderTrace(q); else renderTypeQ(q);
+      setTimeout(function(){ speak(q.speak); }, 300);
+      return;
+    }
     var cls = 'options' + (q.options.length === 2 ? ' opts-2' : (q.options.length === 4 ? ' opts-4' : '')) + (q.stack ? ' opts-stack' : '');
     elOptions.className = cls;
     elOptions.innerHTML = q.options.map(function(o,i){
@@ -3256,6 +3656,7 @@
     var arr = stats.right[k] || (stats.right[k] = []);
     var h = qKey(q, STATE.stationId);
     if (arr.length < 600 && arr.indexOf(h) === -1) arr.push(h);
+    try{ pushRecent(STATE.stationId, level, q); }catch(e){}
   }
   var COVERAGE_RUNS = 400;
   var totalsCache = {};
@@ -3306,6 +3707,254 @@
     return total ? (right + ' / ' + total) : '—';
   }
 
+
+  /* ---- daily goal & streaks ----
+     A "trek" = one finished round. The goal is how many treks to finish each day (default 3, the
+     parent can change it); a streak is the number of days in a row with at least one finished trek. */
+  function pad2(n){ return (n < 10 ? '0' : '') + n; }
+  function dayKey(d){ d = d || new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+  function roundsOn(daily, key){ var e = daily && daily[key]; return (e && e.rounds) || 0; }
+  function computeStreak(daily){
+    var d = new Date(), n = 0;
+    if (!roundsOn(daily, dayKey(d))) d.setDate(d.getDate() - 1);
+    while (roundsOn(daily, dayKey(d)) > 0 && n < 400){ n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+  function daysPlayedInLast(daily, n){
+    var d = new Date(), c = 0;
+    for (var i = 0; i < n; i++){ if (roundsOn(daily, dayKey(d)) > 0) c++; d.setDate(d.getDate() - 1); }
+    return c;
+  }
+  function goalOf(st){ var g = parseInt((st || {}).goal, 10); return (g >= 1 && g <= 10) ? g : 3; }
+  function recordRoundDone(){
+    if (!stats.daily) stats.daily = {};
+    var k = dayKey(), e = stats.daily[k] || (stats.daily[k] = { rounds:0 });
+    e.rounds = (e.rounds || 0) + 1;
+    var keys = Object.keys(stats.daily).sort();
+    while (keys.length > 120) delete stats.daily[keys.shift()];
+    var streak = computeStreak(stats.daily);
+    if (streak > (stats.bestStreak || 0)) stats.bestStreak = streak;
+    return { rounds:e.rounds, goal:goalOf(stats), streak:streak };
+  }
+  var elGoalCard = document.getElementById('goalCard');
+  function renderGoalCard(){
+    if (!elGoalCard) return;
+    var goal = goalOf(stats), today = roundsOn(stats.daily, dayKey()), streak = computeStreak(stats.daily || {});
+    var lit = today >= goal, logs = '';
+    for (var i = 0; i < goal; i++) logs += '<span class="goal-log' + (i < today ? ' on' : '') + '">' + (i < today ? '🔥' : '🪵') + '</span>';
+    var size = 1.8 + Math.min(streak, 10) * 0.16;
+    elGoalCard.innerHTML =
+      '<div class="goal-fire' + (lit ? ' lit' : '') + '" style="font-size:' + size.toFixed(2) + 'rem" aria-hidden="true">' + (lit ? '🔥' : '🪵') + '</div>' +
+      '<div class="goal-text"><div class="goal-title">' + (lit ? 'Your campfire is lit!' : 'Light today’s campfire') + '</div>' +
+      '<div class="goal-sub">' + Math.min(today, goal) + ' of ' + goal + ' treks today · ' +
+        (streak ? ('🔥 ' + streak + (streak === 1 ? ' day' : ' days') + ' in a row') : 'Play today to start a streak') + '</div></div>' +
+      '<div class="goal-logs" aria-hidden="true">' + logs + '</div>';
+    elGoalCard.hidden = false;
+  }
+
+  /* ---- smarter practice: don't re-ask a question the child just got right ----
+     The last RECENT_CAP questions answered right on the first try (per area + grade) are kept in
+     stats.recent; when a new round is built, any of them are swapped for fresh questions (if the
+     area has enough different questions to do that). */
+  var RECENT_CAP = 14;
+  function recentKey(stationId, level){ return stationId + ':' + level; }
+  function pushRecent(stationId, level, q){
+    if (!stats.recent) stats.recent = {};
+    var k = recentKey(stationId, level), arr = stats.recent[k] || (stats.recent[k] = []);
+    var h = qKey(q, stationId), at = arr.indexOf(h);
+    if (at !== -1) arr.splice(at, 1);
+    arr.push(h);
+    while (arr.length > RECENT_CAP) arr.shift();
+  }
+  function spaceOutRepeats(round, station, level){
+    var recent = (stats.recent && stats.recent[recentKey(station.id, level)]) || [];
+    if (!recent.length) return round;
+    var used = {};
+    round.forEach(function(q){ used[qKey(q, station.id)] = 1; });
+    for (var i = 0; i < round.length; i++){
+      if (recent.indexOf(qKey(round[i], station.id)) === -1) continue;
+      for (var t = 0; t < 8; t++){
+        var fresh;
+        try{ fresh = station.build(level); }catch(e){ break; }
+        var pick = null;
+        for (var j = 0; j < fresh.length; j++){
+          var kk = qKey(fresh[j], station.id);
+          if (recent.indexOf(kk) === -1 && !used[kk]){ pick = fresh[j]; used[kk] = 1; break; }
+        }
+        if (pick){ round[i] = pick; break; }
+      }
+    }
+    return round;
+  }
+
+  /* ---- Parent summary ---- */
+  function stripTags(t){ return String(t == null ? '' : t).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(); }
+  function nextLevelOf(id){ return id === 'preschool' ? 'kindergarten' : (id === 'kindergarten' ? 'first' : null); }
+  function stillWorkingOn(st){
+    var out = [];
+    Object.keys((st && st.missed) || {}).forEach(function(k){
+      var sid = k.split(':')[0], station = stationById(sid);
+      (st.missed[k] || []).forEach(function(e){
+        if (!e || !e.q) return;
+        out.push({ station:station ? station.name : sid, text:stripTags(e.q.speak || e.q.prompt), n:e.n || 1 });
+      });
+    });
+    out.sort(function(a, b){ return b.n - a.n; });
+    return out.slice(0, 6);
+  }
+  function summaryFor(u, st, skillEntries){
+    var big = skillEntries.filter(function(e){ return e.attempts >= 10; });
+    var ready = big.filter(function(e){ return e.status === 'great'; });
+    var needs = skillEntries.filter(function(e){ return e.status === 'needs-work'; });
+    var lv = normLevel(u.level), nxt = nextLevelOf(lv);
+    var suggest = !!(nxt && big.length >= 5 && ready.length / big.length >= 0.75 && needs.length === 0);
+    return { ready:ready, needs:needs, suggest:suggest, next:nxt, working:stillWorkingOn(st) };
+  }
+  function renderSummaryBlock(u, st, skillEntries){
+    var sm = summaryFor(u, st, skillEntries);
+    var daily = st.daily || {}, goal = goalOf(st), today = roundsOn(daily, dayKey());
+    var streak = computeStreak(daily), best = Math.max(st.bestStreak || 0, streak);
+    var chips = '<span class="sum-chip">🔥 Streak: ' + streak + (streak === 1 ? ' day' : ' days') + '</span>' +
+      '<span class="sum-chip">🏆 Best: ' + best + (best === 1 ? ' day' : ' days') + '</span>' +
+      '<span class="sum-chip">🪵 Today: ' + today + ' / ' + goal + ' treks</span>' +
+      '<span class="sum-chip">📅 Played ' + daysPlayedInLast(daily, 7) + ' of the last 7 days</span>';
+    var goalBtns = '';
+    for (var g = 1; g <= 6; g++) goalBtns += '<button type="button" class="level-btn goal-btn' + (g === goal ? ' active' : '') + '" data-slug="' + u.slug + '" data-goal="' + g + '" aria-pressed="' + (g === goal) + '">' + g + '</button>';
+    var suggestHtml = sm.suggest
+      ? '<div class="suggest-box"><strong>🎉 Ready for a challenge?</strong> ' + u.name + ' is doing great in most areas. Try ' + levelInfo(sm.next).label + ' next. ' +
+        '<button type="button" class="btn suggest-up" data-slug="' + u.slug + '" data-level="' + sm.next + '">Move up to ' + levelInfo(sm.next).label + '</button></div>'
+      : '';
+    function names(list){ return list.map(function(e){ return e.skill; }).join(', '); }
+    var items = '';
+    items += '<li><strong>' + (sm.next ? 'Ready for the next grade' : 'Doing great in') + ':</strong> ' + (sm.ready.length ? names(sm.ready) : 'Not yet — keep practicing') + '</li>';
+    items += '<li><strong>Needs practice:</strong> ' + (sm.needs.length ? names(sm.needs) : 'Nothing right now') + '</li>';
+    if (sm.working.length){
+      items += '<li><strong>Still working on:</strong><ul>' + sm.working.map(function(w){
+        return '<li>' + w.station + ' — “' + w.text + '”' + (w.n > 1 ? ' (missed ' + w.n + '×)' : '') + '</li>';
+      }).join('') + '</ul></li>';
+    }
+    return '<div class="summary-box"><div class="grade-label">Parent summary</div>' +
+      '<div class="summary-chips">' + chips + '</div>' +
+      '<div class="summary-goal"><span class="grade-label" style="margin:0;">Daily goal (treks)</span><div class="level-switch" data-goal-for="' + u.slug + '">' + goalBtns + '</div></div>' +
+      suggestHtml + '<ul class="summary-list">' + items + '</ul></div>';
+  }
+  function wireSummaryButtons(){
+    Array.prototype.forEach.call(elAdminContent.querySelectorAll('.goal-btn'), function(btn){
+      btn.addEventListener('click', function(){
+        var slug = btn.getAttribute('data-slug'), g = parseInt(btn.getAttribute('data-goal'), 10);
+        var group = btn.parentNode;
+        var applied = function(){
+          Array.prototype.forEach.call(group.querySelectorAll('.goal-btn'), function(b){
+            var on = parseInt(b.getAttribute('data-goal'), 10) === g;
+            b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          });
+        };
+        if (slug === STATE.userSlug){ stats.goal = g; saveStats(); applied(); return; }
+        if (!db) return;
+        db.collection('stats').doc(slug).update({ goal:g }).then(applied).catch(function(){
+          var seed = defaultStats(); seed.goal = g;
+          db.collection('stats').doc(slug).set(seed).then(applied).catch(function(){});
+        });
+      });
+    });
+    Array.prototype.forEach.call(elAdminContent.querySelectorAll('.suggest-up'), function(btn){
+      btn.addEventListener('click', function(){
+        var sel = '.grade-btn[data-slug="' + btn.getAttribute('data-slug') + '"][data-level="' + btn.getAttribute('data-level') + '"]';
+        var target = elAdminContent.querySelector(sel);
+        if (target) target.click();
+        btn.disabled = true; btn.textContent = 'Moved up ✓';
+      });
+    });
+  }
+
+  /* ---- download / print a progress report ---- */
+  var lastReport = [];
+  function csvCell(v){ v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+  function buildReportCsv(list){
+    var head = ['Explorer','Grade','Area','Status','Right questions','Total questions','Accuracy %','Tries','Current streak (days)','Best streak (days)','Daily goal (treks)','Last active'];
+    var rows = [head];
+    list.forEach(function(item){
+      var u = item.u, st = item.st || {}, totals = {};
+      try{ totals = skillTotalsFor(u.name); }catch(e){}
+      var streak = computeStreak(st.daily || {}), best = Math.max(st.bestStreak || 0, streak);
+      var last = st.lastActive ? new Date(st.lastActive).toLocaleDateString() : '';
+      var areas = Object.keys(st.skillTally || {});
+      if (!areas.length) rows.push([u.name, levelInfo(u.level).label, '', '', '', '', '', '', streak, best, goalOf(st), last]);
+      areas.forEach(function(skill){
+        var r = skillStatusFor(st.skillTally[skill]);
+        var m = /^(\d+) \/ (\d+)$/.exec(coverageText(skill, st, normLevel(u.level), totals));
+        rows.push([u.name, levelInfo(u.level).label, skill, SKILL_STATUS_LABEL[r.status], m ? m[1] : '', m ? m[2] : '', r.acc, r.attempts, streak, best, goalOf(st), last]);
+      });
+    });
+    return rows.map(function(r){ return r.map(csvCell).join(','); }).join('\r\n');
+  }
+  function saveTextFile(filename, text){
+    var anchor = function(){
+      try{
+        var blob = new Blob([text], { type:'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob), a = document.createElement('a');
+        a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+        setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 1500);
+      }catch(e){}
+    };
+    try{
+      if (window.claude && window.claude.use){
+        window.claude.use('downloads').then(function(dl){
+          if (dl && dl.save) dl.save({ filename:filename, data:text }).catch(function(){});
+          else anchor();
+        }).catch(anchor);
+        return;
+      }
+    }catch(e){}
+    anchor();
+  }
+  function wireReportButtons(){
+    var csvBtn = document.getElementById('exportCsvBtn'), printBtn = document.getElementById('printBtn');
+    if (csvBtn) csvBtn.addEventListener('click', function(){
+      saveTextFile('trailhead-trek-progress-' + dayKey() + '.csv', buildReportCsv(lastReport));
+    });
+    if (printBtn) printBtn.addEventListener('click', function(){ try{ window.print(); }catch(e){} });
+  }
+
+  /* ---- sound check (tablets sometimes have no voice installed) ---- */
+  var elVoiceNote = document.getElementById('voiceNote');
+  function checkVoice(){
+    if (!elVoiceNote) return;
+    var show = function(msg){ elVoiceNote.innerHTML = '<span>🔇 ' + msg + '</span> <button type="button" class="btn secondary voice-test-btn">🔊 Test voice</button>'; elVoiceNote.hidden = false; wireVoiceTest(); };
+    if (!('speechSynthesis' in window)){
+      show('This browser can’t talk. On an iPad use Safari; on Android or Fire tablets use Chrome, and make sure text-to-speech is installed in Settings.');
+      return;
+    }
+    setTimeout(function(){
+      try{
+        var v = window.speechSynthesis.getVoices();
+        if (!v || !v.length) show('No voice found yet on this tablet. Check the volume and (on iPad) the silent switch, then tap Test.');
+        else elVoiceNote.hidden = true;
+      }catch(e){}
+    }, 2500);
+  }
+  function testVoice(statusEl){
+    var set = function(t){ if (statusEl) statusEl.textContent = t; };
+    if (!('speechSynthesis' in window)){ set('This browser can’t talk. Try Chrome or Safari.'); return; }
+    try{
+      unlockSpeech();
+      var u = new SpeechSynthesisUtterance('Hello explorer! Can you hear me?');
+      u.rate = 0.9; u.lang = 'en-US';
+      u.onstart = function(){ set('Speaking… if you can’t hear it, turn the volume up (and check the iPad silent switch).'); };
+      u.onerror = function(e){ set('The voice hit a problem (' + ((e && e.error) || 'unknown') + '). Check Settings → Text-to-speech.'); };
+      activeUtter = u;
+      window.speechSynthesis.cancel();
+      setTimeout(function(){ window.speechSynthesis.speak(u); }, 80);
+      set('Testing…');
+    }catch(e){ set('Could not start the voice.'); }
+  }
+  function wireVoiceTest(){
+    Array.prototype.forEach.call(document.querySelectorAll('.voice-test-btn'), function(b){
+      if (b._wired) return; b._wired = true;
+      b.addEventListener('click', function(){ testVoice(b.parentNode.querySelector('span') || document.getElementById('voiceStatus')); });
+    });
+  }
+
   function recordAnswer(stationId, skill, wasCorrect){
     if (!stats.tally) stats.tally = {};
     if (!stats.skillTally) stats.skillTally = {};
@@ -3325,6 +3974,243 @@
     }
     stats.lastActive = new Date().toISOString();
     saveStats();
+  }
+
+
+  /* ---- custom (non multiple-choice) questions: tracing & typing ---- */
+  var elCustom = document.getElementById('customArea');
+  var typeKeyHandler = null;
+  function clearCustom(){
+    if (typeKeyHandler){ document.removeEventListener('keydown', typeKeyHandler, true); typeKeyHandler = null; }
+    if (elCustom){ elCustom.innerHTML = ''; elCustom.hidden = true; }
+    elOptions.hidden = false;
+  }
+  function currentSkill(q){ return q.skill || (stationById(STATE.stationId) || {}).name || STATE.stationId; }
+  function advanceAfter(ms){
+    setTimeout(function(){
+      STATE.qIndex++;
+      try{
+        if (STATE.qIndex < STATE.round.length) renderQuestion(); else showResults();
+      }catch(e){
+        try{ showResults(); }catch(e2){ try{ renderTrail(); showView('trail'); }catch(e3){} }
+      }
+    }, ms);
+  }
+  /* A tracing/typing question was finished. firstTry = no miss on it along the way. */
+  function completeCustom(q, firstTry){
+    var skill = currentSkill(q);
+    if (!STATE.roundSkillTally[skill]) STATE.roundSkillTally[skill] = { correct:0, wrong:0 };
+    if (firstTry && !q.isRepeat) STATE.correctFirstTry++;
+    STATE.roundTally.correct++;
+    STATE.roundSkillTally[skill].correct++;
+    STATE.roundLog.push({ skill:skill, label:(q.isRepeat ? '(again) ' : '') + (q.prompt || q.speak), correct:!STATE.wrongOnCurrent });
+    try{
+      if (firstTry){ removeFromMissedBank(STATE.stationId, STATE.level, q); recordRight(skill, STATE.level, q); }
+      else if ((q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
+        var again = cloneQuestion(q); again.reps = (q.reps || 0) + 1; again.isRepeat = true; again.fromBank = false;
+        STATE.round.splice(Math.min(STATE.qIndex + 3, STATE.round.length), 0, again);
+        STATE.extraCount = (STATE.extraCount || 0) + 1;
+      }
+    }catch(e){}
+    advanceAfter(1100);
+    try{ recordAnswer(STATE.stationId, skill, true); }catch(e){}
+    try{ elFeedback.textContent = PRAISE[randInt(0, PRAISE.length - 1)]; speak(elFeedback.textContent); }catch(e){}
+    try{ popStar(); }catch(e){}
+  }
+  /* A miss (a wrong key, or a trace that wasn't close enough). Only the first miss on a question counts. */
+  function missCustom(q){
+    var skill = currentSkill(q);
+    if (!STATE.roundSkillTally[skill]) STATE.roundSkillTally[skill] = { correct:0, wrong:0 };
+    if (!STATE.wrongOnCurrent){ try{ addToMissedBank(STATE.stationId, STATE.level, q); }catch(e){} }
+    STATE.wrongOnCurrent = true;
+    STATE.roundTally.wrong++;
+    STATE.roundSkillTally[skill].wrong++;
+    try{ recordAnswer(STATE.stationId, skill, false); }catch(e){}
+  }
+
+  /* ---------- tracing ---------- */
+  var TRACE_FONT = '800 {S}px "Baloo 2","Arial Rounded MT Bold","Trebuchet MS",Arial,sans-serif';
+  function traceFont(size){ return TRACE_FONT.replace('{S}', Math.round(size)); }
+  function fitTraceText(ctx, text, W, H){
+    var size = H * 0.82;
+    ctx.font = traceFont(size);
+    var w = ctx.measureText(text).width;
+    if (w > W * 0.9) size = size * (W * 0.9) / w;
+    return Math.max(24, size);
+  }
+  var traceApi = null;
+  function renderTrace(q){
+    var station = stationById(STATE.stationId) || {};
+    var accent = getComputedStyle(document.documentElement).getPropertyValue(station.accent || '--forest').trim() || '#17A863';
+    elCustom.innerHTML =
+      '<div class="trace-wrap">' +
+        '<div class="trace-board" id="traceBoard"><canvas id="traceGhost"></canvas><canvas id="traceInk" aria-label="Drawing area: trace the ' + (q.text.length > 1 ? 'word ' : 'letter ') + q.text + ' with your finger"></canvas></div>' +
+        '<div class="trace-actions">' +
+          '<button type="button" class="btn secondary" id="traceClear">↺ Start over</button>' +
+          '<button type="button" class="btn" id="traceDone">✓ I’m done</button>' +
+          '<button type="button" class="btn secondary" id="traceSkip" hidden>Skip ➜</button>' +
+        '</div>' +
+        '<div class="trace-msg" id="traceMsg" aria-live="polite">Use your finger to trace the ' + (q.text.length > 1 ? 'word' : 'letter') + '.</div>' +
+      '</div>';
+    var board = document.getElementById('traceBoard'), ghost = document.getElementById('traceGhost'), ink = document.getElementById('traceInk');
+    var msg = document.getElementById('traceMsg'), clearBtn = document.getElementById('traceClear'), doneBtn = document.getElementById('traceDone'), skipBtn = document.getElementById('traceSkip');
+    var cssW = Math.max(240, Math.min(board.clientWidth || 440, 520)), cssH = Math.round(cssW * (q.text.length > 3 ? 0.5 : 0.7));
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    board.style.height = cssH + 'px';
+    [ghost, ink].forEach(function(c){ c.width = Math.round(cssW * dpr); c.height = Math.round(cssH * dpr); c.style.width = cssW + 'px'; c.style.height = cssH + 'px'; });
+    var W = ghost.width, H = ghost.height, brush = Math.max(14, H * 0.072);
+    var gctx = ghost.getContext('2d'), ictx = ink.getContext('2d');
+    var mask = null, allowed = null, fails = 0, done = false, drawing = false, last = null, inked = false;
+
+    function paintGhost(){
+      gctx.clearRect(0, 0, W, H);
+      gctx.textAlign = 'center'; gctx.textBaseline = 'middle';
+      var size = fitTraceText(gctx, q.text, W, H);
+      gctx.font = traceFont(size);
+      var y = H * 0.54;
+      gctx.globalAlpha = 0.2; gctx.fillStyle = accent; gctx.fillText(q.text, W / 2, y);
+      gctx.globalAlpha = 0.85; gctx.strokeStyle = accent; gctx.lineWidth = Math.max(2, H * 0.012); gctx.setLineDash([H * 0.035, H * 0.03]);
+      gctx.strokeText(q.text, W / 2, y);
+      gctx.setLineDash([]); gctx.globalAlpha = 1;
+      /* masks: the letter itself, and the letter grown by half a brush (how far a trace may wander) */
+      var m = document.createElement('canvas'); m.width = W; m.height = H;
+      var mc = m.getContext('2d'); mc.textAlign = 'center'; mc.textBaseline = 'middle'; mc.font = traceFont(size);
+      mc.fillStyle = '#000'; mc.fillText(q.text, W / 2, y);
+      mask = mc.getImageData(0, 0, W, H).data;
+      mc.lineJoin = 'round'; mc.lineWidth = brush * 1.15; mc.strokeStyle = '#000'; mc.strokeText(q.text, W / 2, y); mc.fillText(q.text, W / 2, y);
+      allowed = mc.getImageData(0, 0, W, H).data;
+    }
+    function measure(){
+      if (!mask) return { cover:0, outside:1, amount:0 };
+      var data = ictx.getImageData(0, 0, W, H).data, step = 2, maskN = 0, hit = 0, inkN = 0, out = 0;
+      for (var y = 0; y < H; y += step){
+        for (var x = 0; x < W; x += step){
+          var i = (y * W + x) * 4 + 3, isInk = data[i] > 40, inMask = mask[i] > 128;
+          if (inMask){ maskN++; if (isInk) hit++; }
+          if (isInk){ inkN++; if (allowed[i] <= 128) out++; }
+        }
+      }
+      return { cover: maskN ? hit / maskN : 0, outside: inkN ? out / inkN : 1, amount: inkN };
+    }
+    function clearInk(){ ictx.clearRect(0, 0, W, H); inked = false; }
+    function pass(){
+      if (done) return;
+      done = true;
+      msg.textContent = 'Great tracing!';
+      clearBtn.disabled = true; doneBtn.disabled = true; skipBtn.hidden = true;
+      var firstTry = !STATE.wrongOnCurrent;
+      completeCustom(q, firstTry);
+    }
+    function tryEvaluate(strict){
+      if (done || !inked) return;
+      var r = measure();
+      var okCover = strict ? r.cover >= 0.72 : r.cover >= 0.82;
+      if (okCover && r.outside <= 0.32){ pass(); return; }
+      if (!strict) return;
+      fails++;
+      missCustom(q);
+      msg.textContent = r.cover >= 0.5 ? 'Almost! Stay right on the dotted letter.' : 'Try again — trace right on top of the dots.';
+      speak('Try again!');
+      setTimeout(function(){ if (!done) clearInk(); }, 700);
+      if (fails >= 2) skipBtn.hidden = false;
+    }
+    function pos(e){
+      var rect = ink.getBoundingClientRect();
+      return { x:(e.clientX - rect.left) * (W / rect.width), y:(e.clientY - rect.top) * (H / rect.height) };
+    }
+    ictx.lineCap = 'round'; ictx.lineJoin = 'round'; ictx.lineWidth = brush; ictx.strokeStyle = accent; ictx.fillStyle = accent;
+    ink.addEventListener('pointerdown', function(e){
+      if (done) return;
+      e.preventDefault();
+      try{ ink.setPointerCapture(e.pointerId); }catch(_){}
+      drawing = true; last = pos(e); inked = true;
+      ictx.beginPath(); ictx.arc(last.x, last.y, brush / 2, 0, Math.PI * 2); ictx.fill();
+    });
+    ink.addEventListener('pointermove', function(e){
+      if (!drawing || done) return;
+      e.preventDefault();
+      var p = pos(e);
+      ictx.beginPath(); ictx.moveTo(last.x, last.y); ictx.lineTo(p.x, p.y); ictx.stroke();
+      last = p;
+    });
+    function lift(e){ if (!drawing) return; drawing = false; last = null; tryEvaluate(false); }
+    ink.addEventListener('pointerup', lift);
+    ink.addEventListener('pointercancel', lift);
+    ink.addEventListener('pointerleave', function(){ if (drawing) lift(); });
+    clearBtn.addEventListener('click', function(){ if (!done){ clearInk(); msg.textContent = 'Fresh start! Trace the dotted letter.'; } });
+    doneBtn.addEventListener('click', function(){
+      if (done) return;
+      if (!inked){ msg.textContent = 'Trace the letter with your finger first.'; return; }
+      tryEvaluate(true);
+    });
+    skipBtn.addEventListener('click', function(){
+      if (done) return;
+      done = true; skipBtn.hidden = true; clearBtn.disabled = true; doneBtn.disabled = true;
+      msg.textContent = 'That’s okay — we’ll try it again later!';
+      completeCustom(q, false);
+    });
+    traceApi = { measure:measure, getMask:function(){ return { mask:mask, W:W, H:H, dpr:dpr, cssW:cssW, cssH:cssH }; }, isDone:function(){ return done; } };
+    var go = function(){ paintGhost(); };
+    var fontReady = Promise.race([
+      (document.fonts && document.fonts.load) ? document.fonts.load('800 80px "Baloo 2"').catch(function(){}) : Promise.resolve(),
+      new Promise(function(r){ setTimeout(r, 700); })
+    ]);
+    paintGhost();
+    fontReady.then(function(){ if (!inked && !done) paintGhost(); });
+  }
+
+  /* ---------- typing ---------- */
+  var KBD_ROWS = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'];
+  function renderTypeQ(q){
+    var target = q.target, idx = 0, misses = 0, done = false;
+    var slots = '';
+    for (var i = 0; i < target.length; i++) slots += '<span class="type-slot' + (i === 0 ? ' now' : '') + '" data-i="' + i + '"><span class="type-ghost">' + target.charAt(i) + '</span></span>';
+    var kbd = KBD_ROWS.map(function(row){
+      return '<div class="kbd-row">' + row.split('').map(function(k){ return '<button type="button" class="kbd-key" data-key="' + k + '">' + k + '</button>'; }).join('') + '</div>';
+    }).join('');
+    elCustom.innerHTML =
+      '<div class="type-wrap">' +
+        (q.emoji ? '<div class="type-pic">' + q.emoji + '</div>' : '') +
+        '<div class="type-target' + (target.length === 1 ? ' single' : '') + '" id="typeTarget" aria-label="' + target + '">' + slots + '</div>' +
+        '<div class="type-msg" id="typeMsg" aria-live="polite">' + (target.length === 1 ? 'Press the matching key.' : 'Type the letters, one at a time.') + '</div>' +
+        '<div class="kbd" id="kbd">' + kbd + '</div>' +
+      '</div>';
+    var kb = document.getElementById('kbd'), msg = document.getElementById('typeMsg'), slotEls = document.querySelectorAll('#typeTarget .type-slot');
+    function keyEl(k){ return kb.querySelector('.kbd-key[data-key="' + k + '"]'); }
+    function clearHints(){ Array.prototype.forEach.call(kb.querySelectorAll('.hint'), function(h){ h.classList.remove('hint'); }); }
+    function press(letter){
+      if (done) return;
+      letter = String(letter).toUpperCase();
+      var want = target.charAt(idx).toUpperCase(), el = keyEl(letter);
+      if (letter === want){
+        var slot = slotEls[idx];
+        slot.classList.remove('now'); slot.classList.add('got');
+        slot.insertAdjacentHTML('beforeend', '<span class="type-letter">' + target.charAt(idx) + '</span>');
+        if (el){ el.classList.add('ok'); setTimeout(function(){ el.classList.remove('ok'); }, 220); }
+        clearHints(); misses = 0; idx++;
+        if (idx >= target.length){
+          done = true;
+          msg.textContent = 'You typed it!';
+          completeCustom(q, !STATE.wrongOnCurrent);
+          return;
+        }
+        slotEls[idx].classList.add('now');
+      } else {
+        misses++;
+        if (el){ el.classList.remove('bad'); void el.offsetWidth; el.classList.add('bad'); setTimeout(function(){ el.classList.remove('bad'); }, 350); }
+        missCustom(q);
+        msg.textContent = 'Not that one — look for ' + want + '.';
+        if (misses >= 2){ var h = keyEl(want); if (h) h.classList.add('hint'); }
+      }
+    }
+    Array.prototype.forEach.call(kb.querySelectorAll('.kbd-key'), function(b){
+      b.addEventListener('click', function(){ press(b.getAttribute('data-key')); });
+    });
+    typeKeyHandler = function(e){
+      if (STATE.view !== 'station' || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key && e.key.length === 1 && /[a-zA-Z]/.test(e.key)){ e.preventDefault(); press(e.key); }
+    };
+    document.addEventListener('keydown', typeKeyHandler, true);
   }
 
   function pickOption(idx, btn){
@@ -3420,8 +4306,11 @@
        computation below, which is wrapped in its own try/catch. That way, even if something
        unexpected goes wrong finishing up the round, the child still lands on a screen with
        working buttons instead of staying stuck looking at the last answered question forever. */
+    try{ clearCustom(); }catch(e){}
     elQuestionCard.hidden = true;
     elResultsCard.hidden = false;
+    var goalInfo = null;
+    try{ goalInfo = recordRoundDone(); }catch(e){}
     try{
       var stars = STATE.correctFirstTry === 6 ? 3 : (STATE.correctFirstTry >= 4 ? 2 : 1);
       setBestStars(STATE.stationId, stars);
@@ -3445,6 +4334,15 @@
       if (stars === 3){ try{ popConfetti(); }catch(e){} }
       elResultsLine.textContent = stars === 3 ? 'Trail Master!' : (stars === 2 ? 'Great hiking!' : 'Nice try, explorer!');
       elResultsSub.textContent = 'You got ' + STATE.correctFirstTry + ' of 6 right on the first try.';
+      try{
+        if (goalInfo){
+          var lit = goalInfo.rounds >= goalInfo.goal;
+          elResultsGoal.textContent = lit
+            ? ('🔥 Campfire lit! ' + goalInfo.streak + (goalInfo.streak === 1 ? ' day' : ' days') + ' in a row.')
+            : ('🪵 Trek ' + goalInfo.rounds + ' of ' + goalInfo.goal + ' for today’s campfire!');
+          if (goalInfo.rounds === goalInfo.goal){ popConfetti(); setTimeout(function(){ speak('Your campfire is lit!'); }, 1200); }
+        }
+      }catch(e){}
       speak(elResultsLine.textContent);
       elStarTotal.textContent = '⭐ ' + totalStars() + ' / ' + maxStars();
       showReadCheck();
@@ -3539,6 +4437,7 @@
     if (!stats.weekly) stats.weekly = {};
     if (!stats.missed) stats.missed = {};
     if (!stats.right) stats.right = {};
+    normalizeStats();
     progress = stats.stars;
     STATE.userSlug = 'explorer';
     STATE.userName = 'Explorer';
