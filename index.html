@@ -39,6 +39,8 @@
     --magenta-ink:#FDF2FF;
     --slate:#475569;
     --slate-ink:#F1F5F9;
+    --rose:#DB2777;
+    --rose-ink:#FFF1F7;
     --shadow: 4px 6px 0 rgba(58,43,18,0.25);
     --focus: #1C5C9C;
     --outline-strong:#3A2B12;
@@ -100,6 +102,8 @@
       --magenta-ink:#3B0A44;
       --slate:#94A3B8;
       --slate-ink:#0F172A;
+      --rose:#F9A8D4;
+      --rose-ink:#500724;
       --shadow: 4px 6px 0 rgba(0,0,0,0.55);
       --focus: #8FD0F0;
       --outline-strong:#F0D9A8;
@@ -161,6 +165,8 @@
     --magenta-ink:#3B0A44;
     --slate:#94A3B8;
     --slate-ink:#0F172A;
+    --rose:#F9A8D4;
+    --rose-ink:#500724;
     --shadow: 4px 6px 0 rgba(0,0,0,0.55);
     --focus: #8FD0F0;
     --outline-strong:#F0D9A8;
@@ -380,6 +386,9 @@
   .big-letter{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:4.2rem; color:var(--stop-accent); line-height:1; display:flex; align-items:baseline; gap:6px; }
   .big-letter-lower{ font-size:2.6rem; opacity:.85; }
   .rhyme-target{ display:flex; align-items:center; gap:12px; }
+  .scene{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  .scene-col{ flex-direction:column; }
+  .scene span{ font-size:3rem; line-height:1.05; }
   .rhyme-target .opt-emoji.big{ font-size:3.6rem; }
   .rhyme-word{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:1.6rem; }
   .count-stage span, .add-group span{ font-size:2rem; }
@@ -1097,6 +1106,12 @@
           Questions answered right on the first try are held back for a while so practice keeps moving on to fresh
           ones, while missed questions keep coming back until they are right.
           <br><br>
+          <strong>Campfire Circle &amp; Compare Ridge.</strong> Two newer stops follow the school's family handouts: Campfire Circle
+          covers feelings, family members and relatives, staying safe, and the weekly vocabulary words; Compare Ridge covers big/small
+          and bigger/longer/heavier, position words (top, bottom, left, right, between), open and closed shapes, and the sides and
+          corners of shapes. My Trail Sign now also asks the first letter, last letter and number of letters in the explorer's name,
+          and Health Hollow adds a body map (head, shoulders, knees and feet) and texture words.
+          <br><br>
           <strong>Color Canyon.</strong> Utah's Core Standards for Early Learning list "recognize and name multiple
           colors" as a Fine Arts skill for 4-year-olds, so it earned its own stop. Preschool is pure color
           recognition (matching a color swatch, no words to lean on); Kindergarten connects a color name to a
@@ -1284,6 +1299,8 @@
     health: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7.5-4.6-9.6-9.3C1.2 7.8 3 4.8 6.2 4.4c1.9-.2 3.6.8 5.8 3 2.2-2.2 3.9-3.2 5.8-3 3.2.4 5 3.4 3.8 6.5-2.1 4.7-9.6 9.3-9.6 9.3Z"/><path d="M8.5 12.2h2l1-2 1.5 4 1-2h2"/></svg>'
   };
 
+  STOP_ICONS.feelings = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.6 2.5 2.4 4 2.4s3-.8 4-2.4M9 9.5h.01M15 9.5h.01"/></svg>';
+  STOP_ICONS.compare = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-8M12 20V5M19 20v-5M3 20h18"/></svg>';
   STOP_ICONS.typing = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>';
 
   /* ---------------- content pools ---------------- */
@@ -1763,6 +1780,13 @@
     {prompt:'Which body part gives you your sense of taste?', correct:{emoji:'👅',label:'Tongue'}, distract:[{emoji:'👃',label:'Nose'},{emoji:'🦶',label:'Feet'}]},
     {prompt:'Which body part gives you most of your sense of touch?', correct:{emoji:'✋',label:'Hands'}, distract:[{emoji:'👀',label:'Eyes'},{emoji:'👅',label:'Tongue'}]}
   ];
+  SENSES_POOL_1.push(
+    {prompt:'Which one feels smooth?', correct:{emoji:'🥚',label:'Egg'}, distract:[{emoji:'🌵',label:'Cactus'},{emoji:'🪨',label:'Rock'},{emoji:'🍍',label:'Pineapple'},{emoji:'🦔',label:'Hedgehog'}]},
+    {prompt:'Which one feels prickly?', correct:{emoji:'🌵',label:'Cactus'}, distract:[{emoji:'🥚',label:'Egg'},{emoji:'☁️',label:'Cloud'},{emoji:'🧈',label:'Butter'},{emoji:'🪶',label:'Feather'}]},
+    {prompt:'Which one feels rough?', correct:{emoji:'🪨',label:'Rock'}, distract:[{emoji:'🧈',label:'Butter'},{emoji:'🪶',label:'Feather'},{emoji:'🥚',label:'Egg'},{emoji:'☁️',label:'Cloud'}]},
+    {prompt:'Which one feels soft and fluffy?', correct:{emoji:'🧸',label:'Teddy bear'}, distract:[{emoji:'🪨',label:'Rock'},{emoji:'🧱',label:'Brick'},{emoji:'🌵',label:'Cactus'},{emoji:'🔨',label:'Hammer'}]},
+    {prompt:'Which one feels bumpy?', correct:{emoji:'🍊',label:'Orange'}, distract:[{emoji:'🥚',label:'Egg'},{emoji:'🪞',label:'Mirror'},{emoji:'🧈',label:'Butter'},{emoji:'🪟',label:'Window'}]}
+  );
   var BODY_SYSTEMS_POOL_1 = [
     {prompt:'Which body part pumps blood all through your body?', correct:{emoji:'🫀',label:'Heart'}, distract:[{emoji:'🧠',label:'Brain'},{emoji:'🫁',label:'Lungs'}]},
     {prompt:'Which body part helps you breathe air in and out?', correct:{emoji:'🫁',label:'Lungs'}, distract:[{emoji:'🫀',label:'Heart'},{emoji:'🦴',label:'Bones'}]},
@@ -1894,7 +1918,8 @@
       tagSkill(sample(SENSES_POOL_1, 3).map(function(q){ return mapBodyQ(q, oc); }), 'Five Senses')
         .concat(tagSkill(sample(BODY_SYSTEMS_POOL_1, 3).map(function(q){ return mapBodyQ(q, oc); }), 'Body Systems'))
     );
-    return tagSkill(sample(BODY_FUNCTION_POOL_K, 6).map(function(q){ return mapBodyQ(q, oc); }), 'Body Part Functions');
+    return shuffle(tagSkill(sample(BODY_FUNCTION_POOL_K, 4).map(function(q){ return mapBodyQ(q, oc); }), 'Body Part Functions')
+      .concat(tagSkill([bodyMapQ(oc), bodyMapQ(oc)], 'Body Map')));
   }
 
   /* -- story cove: fluency + comprehension, the pillar that sits after phonemic awareness & phonics -- */
@@ -2233,12 +2258,19 @@
   function buildMyName(level){
     var name = (STATE.userName || 'FRIEND').toUpperCase().replace(/[^A-Z]/g,'') || 'FRIEND';
     var oc = optionCountForLevel(level);
-    if (level === 'preschool') return tagSkill(buildNameRecognition(name, 6, oc), 'Name Recognition');
-    if (level === 'first') return shuffle(
-      tagSkill(buildNameOrder(name, 4, oc), 'Name Spelling Order')
-        .concat(tagSkill(buildNameRecognition(name, 2, oc), 'Name Recognition'))
+    if (level === 'preschool') return shuffle(
+      tagSkill(buildNameRecognition(name, 5, oc), 'Name Recognition')
+        .concat(tagSkill(buildNameFacts(name, 1, oc, ['first','count']), 'Name Facts'))
     );
-    return tagSkill(buildNameCaseMatch(name, 6, oc), 'Name Letter Case Match');
+    if (level === 'first') return shuffle(
+      tagSkill(buildNameOrder(name, 3, oc), 'Name Spelling Order')
+        .concat(tagSkill(buildNameRecognition(name, 1, oc), 'Name Recognition'))
+        .concat(tagSkill(buildNameFacts(name, 2, oc, ['first','last','count']), 'Name Facts'))
+    );
+    return shuffle(
+      tagSkill(buildNameCaseMatch(name, 4, oc), 'Name Letter Case Match')
+        .concat(tagSkill(buildNameFacts(name, 2, oc, ['first','last','count']), 'Name Facts'))
+    );
   }
 
   /* Trail order: recognizing your own name comes first (a common pre-K first step, ahead of general
@@ -2280,6 +2312,376 @@
     return shuffle(out);
   }
 
+  /* ======================================================================================
+     Campfire Circle (feelings, family, staying safe, word of the week) and Compare Ridge (size,
+     comparing, position words, open/closed shapes, shape parts). Built from the school's Frog Street
+     Pre-K family handouts (My Family, My Relatives, My Feelings, My Body, My Senses, the math and
+     reading letters). Every pool is fixed-size so Right / Total stays meaningful.
+     ====================================================================================== */
+  function emoHtml(o){ return '<span class="opt-emoji">' + o.emoji + '</span><span class="opt-label">' + o.label + '</span>'; }
+  function labelPick(correct, pool, oc, htmlFn){
+    htmlFn = htmlFn || emoHtml;
+    var others = shuffle(pool.filter(function(p){ return p.label !== correct.label; })).slice(0, Math.max(1, oc - 1));
+    return shuffle([{ html: htmlFn(correct), correct:true }].concat(others.map(function(o){ return { html: htmlFn(o), correct:false }; })));
+  }
+  function plainQ(speak, correct, pool, oc, htmlFn){
+    return { speak:speak, prompt:speak, visual:'', options: labelPick(correct, pool, oc, htmlFn) };
+  }
+
+  /* ---- feelings ---- */
+  var FACES = {
+    happy:{emoji:'😀',label:'Happy'}, sad:{emoji:'😢',label:'Sad'}, angry:{emoji:'😠',label:'Angry'},
+    surprised:{emoji:'😲',label:'Surprised'}, scared:{emoji:'😨',label:'Scared'}, bored:{emoji:'🥱',label:'Bored'},
+    proud:{emoji:'😊',label:'Proud'}, disappointed:{emoji:'😞',label:'Disappointed'}, frustrated:{emoji:'😤',label:'Frustrated'},
+    excited:{emoji:'🤩',label:'Excited'}, worried:{emoji:'😟',label:'Worried'}, lonely:{emoji:'🥺',label:'Lonely'}
+  };
+  function faceList(keys){ return keys.map(function(k){ return FACES[k]; }); }
+  var FACE_KEYS_PRE = ['happy','sad','angry','surprised','scared','bored'];
+  var FACE_KEYS_K = ['happy','sad','angry','surprised','scared','bored','proud','disappointed'];
+  var FACE_KEYS_1 = Object.keys(FACES);
+  var FEEL_SCEN_K = [
+    ['sad', 'Your balloon floats away into the sky. How do you feel?'],
+    ['happy', 'Your friend shares a toy with you. How do you feel?'],
+    ['scared', 'A big dog barks loudly at you. How do you feel?'],
+    ['angry', 'Someone knocks down your tower on purpose. How do you feel?'],
+    ['surprised', 'Your family jumps out and shouts surprise! How do you feel?'],
+    ['bored', 'You have nothing to do and nothing to play with. How do you feel?'],
+    ['proud', 'You tied your shoes all by yourself. How do you feel?'],
+    ['disappointed', 'It rains, so you cannot go to the park. How do you feel?'],
+    ['sad', 'Your best friend moves far away. How do you feel?'],
+    ['happy', 'You get to play outside with your cousin. How do you feel?'],
+    ['proud', 'You finished a hard puzzle. How do you feel?'],
+    ['scared', 'You hear loud thunder at night. How do you feel?']
+  ];
+  var FEEL_SCEN_1 = [
+    ['frustrated', 'You try and try to zip your coat, but it will not zip. How do you feel?'],
+    ['disappointed', 'You wanted to go to the zoo, but it is closed today. How do you feel?'],
+    ['excited', 'Tomorrow is your birthday party! How do you feel?'],
+    ['worried', 'Your pet is sick and you are waiting to see the doctor. How do you feel?'],
+    ['lonely', 'Everyone went outside to play and you are all alone inside. How do you feel?'],
+    ['proud', 'You read a whole book by yourself. How do you feel?'],
+    ['frustrated', 'Your block tower keeps falling down. How do you feel?'],
+    ['angry', 'Your brother broke your favorite toy. How do you feel?'],
+    ['surprised', 'You open a box and a puppy jumps out! How do you feel?'],
+    ['scared', 'You are lost in a big store. How do you feel?']
+  ];
+  var FEEL_COPE_1 = [
+    ['What can you do when you feel angry?', {emoji:'😮‍💨',label:'Take deep breaths'}, [{emoji:'😡',label:'Yell at a friend'},{emoji:'🧸',label:'Throw your toys'},{emoji:'🚪',label:'Slam the door'},{emoji:'👊',label:'Push someone'}]],
+    ['What can you do when you feel sad?', {emoji:'🤗',label:'Talk to a grown-up'}, [{emoji:'🤫',label:'Keep it a secret'},{emoji:'🛏️',label:'Hide under the bed'},{emoji:'😤',label:'Be mean to others'},{emoji:'🚫',label:'Never tell anyone'}]],
+    ['What can you do when you feel scared?', {emoji:'🧑‍🧒',label:'Tell a grown-up'}, [{emoji:'🏃',label:'Run away alone'},{emoji:'🙈',label:'Hide and say nothing'},{emoji:'😡',label:'Yell at everyone'},{emoji:'🎮',label:'Ignore it forever'}]],
+    ['What can you do when you feel frustrated?', {emoji:'🔁',label:'Take a break and try again'}, [{emoji:'💥',label:'Break the toy'},{emoji:'🚫',label:'Never try again'},{emoji:'😡',label:'Yell loudly'},{emoji:'🗑️',label:'Throw it away'}]],
+    ['What can you do when you feel bored?', {emoji:'🎨',label:'Find something fun to do'}, [{emoji:'😠',label:'Bother your sister'},{emoji:'😴',label:'Do nothing all day'},{emoji:'💥',label:'Make a mess on purpose'},{emoji:'🚫',label:'Complain loudly'}]]
+  ];
+  function feelFaceQ(key, oc){
+    var f = FACES[key];
+    var opts = labelPick(f, faceList(FACE_KEYS_PRE), oc, function(o){ return '<span class="opt-emoji">' + o.emoji + '</span>'; });
+    var speak = 'Find the ' + f.label.toLowerCase() + ' face.';
+    return { speak:speak, prompt:speak, visual:'', options: opts };
+  }
+  function feelScenQ(item, oc, keys){
+    return { speak:item[1], prompt:'How do you feel?', visual:'', options: labelPick(FACES[item[0]], faceList(keys), oc) };
+  }
+  function copeQ(item, oc){
+    var correct = item[1], pool = item[2];
+    var others = shuffle(pool).slice(0, Math.max(1, oc - 1));
+    return { speak:item[0], prompt:item[0], visual:'', options: shuffle([{ html:emoHtml(correct), correct:true }].concat(others.map(function(o){ return { html:emoHtml(o), correct:false }; }))) };
+  }
+
+  /* ---- family ---- */
+  var FAM = {
+    mom:{emoji:'👩',label:'Mom'}, dad:{emoji:'👨',label:'Dad'}, baby:{emoji:'👶',label:'Baby'}, sister:{emoji:'👧',label:'Sister'},
+    brother:{emoji:'👦',label:'Brother'}, grandma:{emoji:'👵',label:'Grandmother'}, grandpa:{emoji:'👴',label:'Grandfather'},
+    aunt:{emoji:'👩‍🦰',label:'Aunt'}, uncle:{emoji:'👨‍🦱',label:'Uncle'}, cousin:{emoji:'🧒',label:'Cousin'}
+  };
+  function famList(keys){ return keys.map(function(k){ return FAM[k]; }); }
+  var FAM_PRE = ['mom','dad','baby','sister','brother','grandma','grandpa'];
+  var FAM_ALL = Object.keys(FAM);
+  var FAM_RIDDLES_K = [
+    ["Who is your mom's mom?", 'grandma'], ["Who is your dad's dad?", 'grandpa'], ["Who is your mom's sister?", 'aunt'],
+    ["Who is your dad's brother?", 'uncle'], ["Who is your aunt's daughter?", 'cousin'], ["Who is your dad's mom?", 'grandma'],
+    ["Who is your mom's brother?", 'uncle'], ["Who is your uncle's son?", 'cousin'], ["Who is your mom's dad?", 'grandpa'],
+    ["Who is your dad's sister?", 'aunt'], ["Who is your parents' other daughter?", 'sister'], ["Who is your parents' other son?", 'brother']
+  ];
+  var REL_YES = famList(['aunt','uncle','cousin','grandma','grandpa']);
+  var REL_NO = [{emoji:'🧑‍🏫',label:'Teacher'},{emoji:'📮',label:'Mail carrier'},{emoji:'🚌',label:'Bus driver'},{emoji:'🧑‍⚕️',label:'Doctor'},{emoji:'🏘️',label:'Neighbor'}];
+  var JOB_YES = [{emoji:'🍽️',label:'Setting the table'},{emoji:'🐕',label:'Feeding the pet'},{emoji:'🧸',label:'Picking up toys'},{emoji:'🧺',label:'Folding laundry'},{emoji:'🪴',label:'Watering plants'}];
+  var JOB_NO = [{emoji:'✈️',label:'Flying an airplane'},{emoji:'🚒',label:'Fighting a fire'},{emoji:'🏫',label:'Teaching a class'},{emoji:'🚧',label:'Fixing a road'},{emoji:'🚚',label:'Driving a big truck'}];
+  function famFindQ(key, oc){
+    var f = FAM[key], word = f.label.toLowerCase();
+    return plainQ('Find the ' + word + '.', f, famList(FAM_PRE), oc);
+  }
+  function famRiddleQ(item, oc){ return plainQ(item[0], FAM[item[1]], famList(FAM_ALL), oc); }
+  function relativeQ(oc){
+    var yes = Math.random() < 0.5;
+    if (yes){
+      var c = REL_YES[randInt(0, REL_YES.length - 1)];
+      return plainQ('Relatives are family members beyond mom, dad, brothers and sisters. Which one is a relative?', c, REL_NO.concat([c]), oc);
+    }
+    var n = REL_NO[randInt(0, REL_NO.length - 1)];
+    return plainQ('Which one is NOT a relative?', n, REL_YES.concat([n]), oc);
+  }
+  function jobQ(oc){
+    var c = JOB_YES[randInt(0, JOB_YES.length - 1)];
+    return plainQ('Which one is a job a child can help with at home?', c, JOB_NO.concat([c]), oc);
+  }
+
+  /* ---- staying safe ---- */
+  var SAFE_K = [
+    ['Before you cross the street, what should you do?', {emoji:'🛑',label:'Stop, look and listen'}, [{emoji:'🏃',label:'Run across fast'},{emoji:'🙈',label:'Close your eyes'},{emoji:'📱',label:'Look at a phone'},{emoji:'🎈',label:'Play in the road'}]],
+    ['What do you use to look for cars?', {emoji:'👀',label:'Eyes'}, [{emoji:'👂',label:'Ears'},{emoji:'👃',label:'Nose'},{emoji:'🦶',label:'Feet'},{emoji:'✋',label:'Hands'}]],
+    ['What do you use to listen for cars?', {emoji:'👂',label:'Ears'}, [{emoji:'👀',label:'Eyes'},{emoji:'👃',label:'Nose'},{emoji:'🦶',label:'Feet'},{emoji:'✋',label:'Hands'}]],
+    ['Where is the safe place to cross the street?', {emoji:'🚸',label:'At the crosswalk'}, [{emoji:'🚗',label:'Between parked cars'},{emoji:'🛣️',label:'In the middle of the road'},{emoji:'🌳',label:'Behind a bush'},{emoji:'🏃',label:'Anywhere you like'}]],
+    ['Who should you hold hands with to cross a busy street?', {emoji:'🧑‍🧒',label:'A grown-up'}, [{emoji:'🐕',label:'A puppy'},{emoji:'🧸',label:'A teddy bear'},{emoji:'🎈',label:'A balloon'},{emoji:'🚲',label:'A bicycle'}]],
+    ['After you stop, look and listen, what do you use to cross the street?', {emoji:'🦶',label:'Your feet'}, [{emoji:'👂',label:'Your ears'},{emoji:'👀',label:'Your eyes'},{emoji:'👃',label:'Your nose'},{emoji:'✋',label:'Your hands'}]]
+  ];
+
+  /* ---- word of the week (1st grade) ---- */
+  var WOW = [
+    ['What does fabulous mean?', 'Wonderful and special', '✨'],
+    ['What does awesome mean?', 'Extremely good', '🌟'],
+    ['What are emotions?', 'Feelings', '❤️'],
+    ['What are relatives?', 'Family beyond mom, dad, brothers and sisters', '👪'],
+    ['What does compare mean?', 'Look at how things are alike and different', '⚖️'],
+    ['What are senses?', 'Ways your body learns about the world', '👀'],
+    ['What does predict mean?', 'Guess what will happen next', '🔮'],
+    ['What does alike mean?', 'The same', '🟰'],
+    ['What does different mean?', 'Not the same', '↔️'],
+    ['What does smooth mean?', 'Flat and even, with no bumps', '🥚'],
+    ['What does prickly mean?', 'Covered in sharp little points', '🌵']
+  ];
+  var WOW_WRONG = [{emoji:'🔊',label:'Very loud'},{emoji:'🍽️',label:'A kind of food'},{emoji:'👕',label:'Something you wear'},{emoji:'🐛',label:'A tiny bug'},{emoji:'❄️',label:'Very cold weather'},{emoji:'🏃',label:'Very fast'},{emoji:'😴',label:'Fast asleep'},{emoji:'🎵',label:'A song'}];
+  function wowQ(item, oc){ return plainQ(item[0], {emoji:item[2],label:item[1]}, WOW_WRONG, oc); }
+
+  function buildCircle(level){
+    var oc = optionCountForLevel(level), out = [];
+    if (level === 'preschool'){
+      out = tagSkill(sample(FACE_KEYS_PRE, 3).map(function(k){ return feelFaceQ(k, oc); }), 'Feelings')
+        .concat(tagSkill(sample(FAM_PRE, 3).map(function(k){ return famFindQ(k, oc); }), 'Family'));
+      return shuffle(out);
+    }
+    if (level === 'kindergarten'){
+      out = tagSkill(sample(FEEL_SCEN_K, 2).map(function(s){ return feelScenQ(s, oc, FACE_KEYS_K); }), 'Feelings')
+        .concat(tagSkill(sample(FAM_RIDDLES_K, 2).map(function(r){ return famRiddleQ(r, oc); }), 'Family'))
+        .concat(tagSkill(sample(SAFE_K, 2).map(function(s){ return copeQ(s, oc); }), 'Staying Safe'));
+      return shuffle(out);
+    }
+    var feel = [feelScenQ(sample(FEEL_SCEN_1, 1)[0], oc, FACE_KEYS_1), copeQ(sample(FEEL_COPE_1, 1)[0], oc)];
+    var fam = [relativeQ(oc), jobQ(oc)];
+    out = tagSkill(feel, 'Feelings').concat(tagSkill(fam, 'Family'))
+      .concat(tagSkill(sample(WOW, 2).map(function(w){ return wowQ(w, oc); }), 'Word of the Week'));
+    return shuffle(out);
+  }
+
+  /* ---- Compare Ridge: size, comparing, position, open/closed, shape parts ---- */
+  function sizeSpan(e, rem){ return '<span class="opt-emoji" style="font-size:' + rem + 'rem;line-height:1">' + e + '</span>'; }
+  var SIZE_OBJ = [{e:'🐻',n:'bear'},{e:'🌳',n:'tree'},{e:'🐟',n:'fish'},{e:'🏠',n:'house'},{e:'🐶',n:'dog'},{e:'⚽',n:'ball'},{e:'🍎',n:'apple'},{e:'⭐',n:'star'}];
+  var SIZE_REM = { big:3.4, medium:2.3, small:1.3 };
+  function sizeQ(words){
+    var o = SIZE_OBJ[randInt(0, SIZE_OBJ.length - 1)], w = words[randInt(0, words.length - 1)];
+    var speak = 'Find the ' + w + ' ' + o.n + '.';
+    var opts = shuffle(['big','medium','small'].map(function(s){ return { html: sizeSpan(o.e, SIZE_REM[s]), correct: s === w }; }));
+    return { speak:speak, prompt:speak, visual:'', options: opts };
+  }
+  var CMP_PAIRS = [
+    {dim:'heavy', big:{emoji:'🐘',label:'Elephant'}, small:{emoji:'🐭',label:'Mouse'}},
+    {dim:'heavy', big:{emoji:'🪨',label:'Rock'}, small:{emoji:'🪶',label:'Feather'}},
+    {dim:'heavy', big:{emoji:'🚚',label:'Truck'}, small:{emoji:'🚲',label:'Bike'}},
+    {dim:'heavy', big:{emoji:'🍉',label:'Watermelon'}, small:{emoji:'🍓',label:'Strawberry'}},
+    {dim:'heavy', big:{emoji:'🧱',label:'Brick'}, small:{emoji:'🎈',label:'Balloon'}},
+    {dim:'tall', big:{emoji:'🌳',label:'Tree'}, small:{emoji:'🌱',label:'Sprout'}},
+    {dim:'tall', big:{emoji:'🦒',label:'Giraffe'}, small:{emoji:'🐶',label:'Dog'}},
+    {dim:'tall', big:{emoji:'🏢',label:'Building'}, small:{emoji:'🏠',label:'House'}},
+    {dim:'tall', big:{emoji:'🗼',label:'Tower'}, small:{emoji:'⛺',label:'Tent'}},
+    {dim:'size', big:{emoji:'🐋',label:'Whale'}, small:{emoji:'🐟',label:'Fish'}},
+    {dim:'size', big:{emoji:'🏀',label:'Basketball'}, small:{emoji:'🎾',label:'Tennis ball'}},
+    {dim:'size', big:{emoji:'🍎',label:'Apple'}, small:{emoji:'🫐',label:'Blueberry'}},
+    {dim:'size', big:{emoji:'🐻',label:'Bear'}, small:{emoji:'🐜',label:'Ant'}}
+  ];
+  var CMP_WORDS = { heavy:['heavier','lighter'], tall:['taller','shorter'], size:['bigger','smaller'] };
+  var CMP_SUPER = { heavy:['heaviest','lightest'], tall:['tallest','shortest'], size:['biggest','smallest'] };
+  var CMP_TRIPLES = [
+    {dim:'heavy', items:[{emoji:'🐜',label:'Ant'},{emoji:'🐶',label:'Dog'},{emoji:'🐘',label:'Elephant'}]},
+    {dim:'heavy', items:[{emoji:'🎈',label:'Balloon'},{emoji:'🍎',label:'Apple'},{emoji:'🪨',label:'Big rock'}]},
+    {dim:'tall', items:[{emoji:'🌱',label:'Sprout'},{emoji:'🌷',label:'Flower'},{emoji:'🌳',label:'Tree'}]},
+    {dim:'tall', items:[{emoji:'🐜',label:'Ant'},{emoji:'🐶',label:'Dog'},{emoji:'🦒',label:'Giraffe'}]},
+    {dim:'size', items:[{emoji:'🐜',label:'Ant'},{emoji:'🐶',label:'Dog'},{emoji:'🐋',label:'Whale'}]},
+    {dim:'size', items:[{emoji:'🍒',label:'Cherry'},{emoji:'🍎',label:'Apple'},{emoji:'🍉',label:'Watermelon'}]}
+  ];
+  var LONG_ITEMS = ['ribbon','rope','pencil','scarf','string','stick'];
+  function barHtml(w){ return '<span style="display:block;width:' + w + 'px;height:16px;border-radius:8px;background:var(--stop-accent)"></span>'; }
+  function longQ(three){
+    var item = LONG_ITEMS[randInt(0, LONG_ITEMS.length - 1)];
+    if (three){
+      var longest = Math.random() < 0.5;
+      var speak3 = 'Which ' + item + ' is the ' + (longest ? 'longest' : 'shortest') + '?';
+      var ws = [60, 105, 150];
+      return { speak:speak3, prompt:speak3, visual:'', options: shuffle(ws.map(function(w){ return { html:barHtml(w), correct: w === (longest ? 150 : 60) }; })) };
+    }
+    var longer = Math.random() < 0.5;
+    var speak = 'Which ' + item + ' is ' + (longer ? 'longer' : 'shorter') + '?';
+    return { speak:speak, prompt:speak, visual:'', options: shuffle([130, 70].map(function(w){ return { html:barHtml(w), correct: w === (longer ? 130 : 70) }; })) };
+  }
+  function pairQ(){
+    if (Math.random() < 0.22) return longQ(false);
+    var p = CMP_PAIRS[randInt(0, CMP_PAIRS.length - 1)], hi = Math.random() < 0.5;
+    var w = CMP_WORDS[p.dim][hi ? 0 : 1];
+    var speak = 'Which is ' + w + ', the ' + p.big.label.toLowerCase() + ' or the ' + p.small.label.toLowerCase() + '?';
+    return { speak:speak, prompt:'Which is ' + w + '?', visual:'', options: shuffle([{ html:emoHtml(p.big), correct: hi }, { html:emoHtml(p.small), correct: !hi }]) };
+  }
+  function tripleQ(){
+    if (Math.random() < 0.22) return longQ(true);
+    var t = CMP_TRIPLES[randInt(0, CMP_TRIPLES.length - 1)], hi = Math.random() < 0.5;
+    var w = CMP_SUPER[t.dim][hi ? 0 : 1], target = hi ? t.items[2] : t.items[0];
+    var speak = 'Which one is the ' + w + '?';
+    return { speak:speak, prompt:speak, visual:'', options: shuffle(t.items.map(function(o){ return { html:emoHtml(o), correct: o.label === target.label }; })) };
+  }
+
+  var SCENE_V = [
+    [['☁️','Cloud'],['🐦','Bird'],['🐛','Worm']], [['🌈','Rainbow'],['🏠','House'],['🌷','Flower']], [['🎈','Balloon'],['🐱','Cat'],['📦','Box']],
+    [['🦋','Butterfly'],['🌳','Tree'],['🍄','Mushroom']], [['☀️','Sun'],['⛺','Tent'],['🔥','Fire']], [['✈️','Airplane'],['🚌','Bus'],['🚲','Bike']],
+    [['🍒','Cherry'],['🍎','Apple'],['🍌','Banana']], [['🐻','Bear'],['🐰','Rabbit'],['🐭','Mouse']]
+  ];
+  var SCENE_H = [
+    [['🐶','Dog'],['🐱','Cat'],['🐭','Mouse']], [['🚗','Car'],['🚌','Bus'],['🚲','Bike']], [['🍎','Apple'],['🍌','Banana'],['🍇','Grapes']],
+    [['🌳','Tree'],['🏠','House'],['🌷','Flower']], [['⚽','Soccer ball'],['🏀','Basketball'],['🎾','Tennis ball']], [['🐸','Frog'],['🦆','Duck'],['🐟','Fish']],
+    [['🍦','Ice cream'],['🍰','Cake'],['🍪','Cookie']], [['👟','Shoe'],['🧦','Sock'],['🧢','Cap']]
+  ];
+  var SCENE_EXTRA = [['🐢','Turtle'],['🍓','Strawberry'],['🚀','Rocket'],['🎸','Guitar'],['🍕','Pizza'],['🦁','Lion'],['🌻','Sunflower'],['🧸','Teddy bear']];
+  function sceneItems(arr){ return arr.map(function(p){ return {emoji:p[0], label:p[1]}; }); }
+  function positionQ(level){
+    var vertical = Math.random() < 0.5;
+    var scene = (vertical ? SCENE_V : SCENE_H)[randInt(0, 7)], items = sceneItems(scene);
+    var kinds = vertical ? ['top','bottom'] : ['left','right'];
+    if (level !== 'preschool') kinds.push('middle');
+    if (level !== 'preschool' && vertical) kinds.push('above','below');
+    if (level === 'first') kinds.push('between');
+    var kind = kinds[randInt(0, kinds.length - 1)], speak, ans;
+    if (kind === 'top'){ speak = 'Which one is on top?'; ans = items[0]; }
+    else if (kind === 'bottom'){ speak = 'Which one is on the bottom?'; ans = items[2]; }
+    else if (kind === 'left'){ speak = 'Which one is on the left?'; ans = items[0]; }
+    else if (kind === 'right'){ speak = 'Which one is on the right?'; ans = items[2]; }
+    else if (kind === 'middle'){ speak = 'Which one is in the middle?'; ans = items[1]; }
+    else if (kind === 'above'){ speak = 'What is above the ' + items[1].label.toLowerCase() + '?'; ans = items[0]; }
+    else if (kind === 'below'){ speak = 'What is below the ' + items[1].label.toLowerCase() + '?'; ans = items[2]; }
+    else { speak = 'Which one is between the ' + items[0].label.toLowerCase() + ' and the ' + items[2].label.toLowerCase() + '?'; ans = items[1]; }
+    var want = optionCountForLevel(level);
+    var pool = items.slice();
+    if (want > 3){
+      var used = {}; items.forEach(function(i){ used[i.label] = 1; });
+      sceneItems(shuffle(SCENE_EXTRA)).filter(function(e){ return !used[e.label]; }).slice(0, want - 3).forEach(function(e){ pool.push(e); });
+    }
+    var visual = '<div class="scene ' + (vertical ? 'scene-col' : 'scene-row') + '">' + items.map(function(i){ return '<span>' + i.emoji + '</span>'; }).join('') + '</div>';
+    return { speak:speak, prompt:speak, visual:visual, options: shuffle(pool.map(function(o){ return { html:emoHtml(o), correct: o.label === ans.label }; })) };
+  }
+
+  function shapeSvg(inner, size){
+    return '<svg viewBox="0 0 100 100" width="' + (size || 150) + '" height="' + (size || 150) + '" aria-hidden="true" style="fill:none;stroke:var(--stop-accent);stroke-width:7;stroke-linejoin:round;stroke-linecap:round">' + inner + '</svg>';
+  }
+  var OC_SHAPES = [
+    {n:'circle', closed:true, svg:'<circle cx="50" cy="50" r="34"/>'},
+    {n:'triangle', closed:true, svg:'<polygon points="50,14 88,82 12,82"/>'},
+    {n:'square', closed:true, svg:'<rect x="18" y="18" width="64" height="64"/>'},
+    {n:'heart', closed:true, svg:'<path d="M50 84 C8 54 14 18 36 18 C44 18 50 24 50 31 C50 24 56 18 64 18 C86 18 92 54 50 84 Z"/>'},
+    {n:'oval', closed:true, svg:'<ellipse cx="50" cy="50" rx="40" ry="26"/>'},
+    {n:'star', closed:true, svg:'<polygon points="50,12 61,38 90,40 67,58 75,86 50,70 25,86 33,58 10,40 39,38"/>'},
+    {n:'C shape', closed:false, svg:'<path d="M78 24 A34 34 0 1 0 78 76"/>'},
+    {n:'zigzag line', closed:false, svg:'<polyline points="10,70 30,30 50,70 70,30 90,70"/>'},
+    {n:'U shape', closed:false, svg:'<path d="M24 20 L24 60 A26 26 0 0 0 76 60 L76 20"/>'},
+    {n:'wave', closed:false, svg:'<path d="M8 50 Q29 12 50 50 T92 50"/>'},
+    {n:'square with a gap', closed:false, svg:'<polyline points="34,18 18,18 18,82 82,82 82,18 56,18"/>'},
+    {n:'triangle with a gap', closed:false, svg:'<path d="M50 14 L88 82 L12 82 L34 44"/>'}
+  ];
+  function openClosedQ(){
+    var s = OC_SHAPES[randInt(0, OC_SHAPES.length - 1)];
+    var speak = 'Is the ' + s.n + ' open or closed?';
+    var opts = [
+      { html:'<span class="opt-emoji">🔒</span><span class="opt-label">Closed</span>', correct: s.closed },
+      { html:'<span class="opt-emoji">🔓</span><span class="opt-label">Open</span>', correct: !s.closed }
+    ];
+    return { speak:speak, prompt:'Is this shape open or closed?', visual: shapeSvg(s.svg), options: shuffle(opts) };
+  }
+  var SP_SHAPES = [
+    {n:'triangle', k:3, level:'k', svg:'<polygon points="50,14 88,82 12,82"/>'},
+    {n:'square', k:4, level:'k', svg:'<rect x="18" y="18" width="64" height="64"/>'},
+    {n:'rectangle', k:4, level:'k', svg:'<rect x="10" y="30" width="80" height="42"/>'},
+    {n:'circle', k:0, level:'k', svg:'<circle cx="50" cy="50" r="34"/>', cornersOnly:true},
+    {n:'pentagon', k:5, level:'1', svg:'<polygon points="50,12 88,40 74,84 26,84 12,40"/>'},
+    {n:'hexagon', k:6, level:'1', svg:'<polygon points="26,18 74,18 96,50 74,82 26,82 4,50"/>'}
+  ];
+  function numOpts(correct, oc){
+    var cand = [];
+    for (var i = 0; i <= 8; i++) if (i !== correct) cand.push(i);
+    var picks = shuffle(cand).slice(0, Math.max(1, oc - 1));
+    return shuffle([correct].concat(picks)).map(function(n){ return { html:'<span class="opt-big-letter">' + n + '</span>', correct: n === correct }; });
+  }
+  function shapePartsQ(level, oc){
+    var pool = SP_SHAPES.filter(function(s){ return level === 'first' ? true : s.level === 'k'; });
+    var s = pool[randInt(0, pool.length - 1)];
+    var corners = s.cornersOnly || Math.random() < 0.5;
+    var speak = 'How many ' + (corners ? 'corners' : 'sides') + ' does the ' + s.n + ' have?';
+    return { speak:speak, prompt:'How many ' + (corners ? 'corners' : 'sides') + '?', visual: shapeSvg(s.svg), options: numOpts(s.k, oc) };
+  }
+
+  function buildCompare(level){
+    var oc = optionCountForLevel(level), out = [], i;
+    if (level === 'preschool'){
+      for (i = 0; i < 2; i++) out.push(tagSkill([sizeQ(['big','small'])], 'Size Words')[0]);
+      for (i = 0; i < 2; i++) out.push(tagSkill([positionQ(level)], 'Position Words')[0]);
+      for (i = 0; i < 2; i++) out.push(tagSkill([openClosedQ()], 'Open & Closed Shapes')[0]);
+      return shuffle(out);
+    }
+    if (level === 'kindergarten'){
+      out.push(tagSkill([sizeQ(['big','medium','small'])], 'Size Words')[0]);
+      for (i = 0; i < 2; i++) out.push(tagSkill([pairQ()], 'Comparing Things')[0]);
+      out.push(tagSkill([positionQ(level)], 'Position Words')[0]);
+      out.push(tagSkill([openClosedQ()], 'Open & Closed Shapes')[0]);
+      out.push(tagSkill([shapePartsQ(level, oc)], 'Shape Parts')[0]);
+      return shuffle(out);
+    }
+    for (i = 0; i < 2; i++) out.push(tagSkill([tripleQ()], 'Comparing Things')[0]);
+    for (i = 0; i < 2; i++) out.push(tagSkill([positionQ(level)], 'Position Words')[0]);
+    for (i = 0; i < 2; i++) out.push(tagSkill([shapePartsQ(level, oc)], 'Shape Parts')[0]);
+    return shuffle(out);
+  }
+
+  /* ---- name facts (first letter, last letter, how many letters) ---- */
+  function buildNameFacts(name, n, oc, allowed){
+    var kinds = shuffle(allowed).slice(0, n), out = [];
+    kinds.forEach(function(kind){
+      var q;
+      if (kind === 'count'){
+        var cand = [];
+        for (var c = Math.max(1, name.length - 2); c <= name.length + 3; c++) if (c !== name.length) cand.push(c);
+        var opts = shuffle([name.length].concat(shuffle(cand).slice(0, Math.max(1, oc - 1)))).map(function(k){ return { html:'<span class="opt-big-letter">' + k + '</span>', correct: k === name.length }; });
+        q = { speak:'How many letters are in the name ' + name + '?', prompt:'How many letters are in your name?', visual:'', options: opts };
+      } else {
+        var target = kind === 'first' ? name.charAt(0) : name.charAt(name.length - 1);
+        var d = sample(ALPHABET.filter(function(l){ return l !== target; }), Math.max(1, oc - 1));
+        var o2 = shuffle([target].concat(d)).map(function(l){ return { html:'<span class="opt-big-letter">' + l + '</span>', correct: l === target }; });
+        q = { speak:'What is the ' + kind + ' letter of the name ' + name + '?', prompt:'What is the ' + kind + ' letter of your name?', visual:'', options: o2 };
+      }
+      out.push(q);
+    });
+    return out;
+  }
+
+  /* ---- body map: a dot on a little figure ---- */
+  var BODY_MAP = [
+    {label:'Head', x:50, y:22}, {label:'Shoulders', x:31, y:46}, {label:'Hands', x:14, y:92},
+    {label:'Tummy', x:50, y:76}, {label:'Knees', x:45, y:124}, {label:'Feet', x:40, y:152}
+  ];
+  function bodyMapSvg(p){
+    return '<svg viewBox="0 0 100 165" width="120" height="198" aria-hidden="true" style="fill:none;stroke:var(--ink);stroke-width:5;stroke-linecap:round;stroke-linejoin:round">' +
+      '<circle cx="50" cy="22" r="14"/><path d="M50 36 V96 M31 46 L50 42 L69 46 M31 46 L14 92 M69 46 L86 92 M50 96 L40 152 M50 96 L60 152"/>' +
+      '<circle cx="' + p.x + '" cy="' + p.y + '" r="8" style="fill:#E11D48;stroke:#fff;stroke-width:2"/></svg>';
+  }
+  function bodyMapQ(oc){
+    var p = BODY_MAP[randInt(0, BODY_MAP.length - 1)];
+    var others = shuffle(BODY_MAP.filter(function(b){ return b.label !== p.label; })).slice(0, Math.max(1, oc - 1));
+    var opts = shuffle([p].concat(others)).map(function(b){ return { html:'<span class="opt-big-letter" style="font-size:1.45rem">' + b.label + '</span>', correct: b.label === p.label }; });
+    return { speak:'What body part is the red dot on?', prompt:'What body part is the red dot on?', visual: bodyMapSvg(p), options: opts };
+  }
+
   var STATIONS = [
     { id:'myname', accent:'--cyan', accentInk:'--cyan-ink', name:'My Trail Sign', stop:'Stop 1', requiresName:true,
       desc:{preschool:'Letters in my name', kindergarten:'Match my letters', first:'Spell my name'}, build:buildMyName },
@@ -2306,7 +2708,11 @@
     { id:'health', accent:'--lime', accentInk:'--lime-ink', name:'Health Hollow', stop:'Stop 12',
       desc:{preschool:'Point to body parts', kindergarten:'What each part does', first:'Senses & body systems'}, build:buildHealth },
     { id:'typing', accent:'--slate', accentInk:'--slate-ink', name:'Keyboard Camp', stop:'Stop 13',
-      desc:{preschool:'Find the letter key', kindergarten:'Type short words', first:'Type words & my name'}, build:buildTyping }
+      desc:{preschool:'Find the letter key', kindergarten:'Type short words', first:'Type words & my name'}, build:buildTyping },
+    { id:'feelings', accent:'--magenta', accentInk:'--magenta-ink', name:'Campfire Circle', stop:'Stop 14',
+      desc:{preschool:'Feelings & family', kindergarten:'Who is who & how I feel', first:'Relatives, feelings & words'}, build:buildCircle },
+    { id:'compare', accent:'--rose', accentInk:'--rose-ink', name:'Compare Ridge', stop:'Stop 15',
+      desc:{preschool:'Big, small & where', kindergarten:'Bigger, longer & where', first:'Which is the most?'}, build:buildCompare }
   ];
   function visibleStations(){
     return STATIONS.filter(function(s){ return !s.requiresName || (STATE.hasCustomName && STATE.userName); });
