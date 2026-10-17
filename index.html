@@ -1104,8 +1104,8 @@
       <details>
         <summary>For grown-ups: what this practices</summary>
         <div class="notes-body">
-          Each stop offers five levels — Preschool (ages 3–4), Kindergarten (age 5), 1st Grade (age 6), 2nd Grade (age 7), and 3rd Grade (age 8) — drawn from
-          the Utah Core Standards for Early Learning and the Kindergarten, 1st, 2nd, and 3rd Grade Cores. A round is 6 questions
+          Each stop offers seven levels — Preschool (ages 3–4), Kindergarten (age 5), 1st Grade (age 6), 2nd Grade (age 7), 3rd Grade (age 8), 4th Grade (age 9), and 5th Grade (age 10) — drawn from
+          the Utah Core Standards for Early Learning and the Kindergarten, 1st, 2nd, 3rd, 4th, and 5th Grade Cores. A round is 6 questions
           at whichever level is selected; every completed round earns at least one star, so nothing here is a "fail" —
           missed answers just get another gentle try.
           <br><br>
@@ -1150,6 +1150,21 @@
           equivalent fractions; Pattern Pass covers multiplying patterns and input-output tables; Base Camp Math covers multiplication and
           division facts, area, perimeter and elapsed time; Shape Overlook covers quadrilaterals, angles and symmetry; Nature Notebook
           covers forces, weather and life cycles; and Community Camp covers government, economics and maps.
+          <br><br>
+          <strong>4th Grade.</strong> The sixth level follows the Utah 4th Grade Core. Rhyme River covers Greek and Latin roots, prefixes, suffixes
+          and commonly confused words; ABC Trailhead covers verb tenses, modal verbs, sentences, punctuation and spelling; Story Cove covers
+          theme, point of view and text structure; Critter Count covers place value, rounding, large sums and differences, fractions and decimals;
+          Pattern Pass covers factors, multiples, primes and rules; Shape Overlook covers triangles, angles in degrees and polygons; Base Camp Math
+          covers multi-digit multiplication, division with remainders and multi-step word problems; Nature Notebook covers energy, Earth changes and
+          plant and animal structures; and Community Camp covers Utah history, geography and government.
+          <br><br>
+          <strong>5th Grade.</strong> The seventh level follows the Utah 5th Grade Core. Rhyme River covers Greek and Latin roots and commonly
+          confused words; ABC Trailhead covers perfect tenses, conjunctions, prepositions, punctuation and spelling; Story Cove covers theme,
+          figurative language, text structure and text evidence; Critter Count covers decimal place value, rounding and operations with decimals
+          and fractions; Pattern Pass covers the order of operations, powers of ten and the coordinate grid; Shape Overlook covers volume,
+          classifying shapes and angle facts; Base Camp Math covers multiplying two-digit numbers, long division and multi-step problems;
+          Nature Notebook covers matter, Earth systems and ecosystems; Compare Ridge covers unit conversions and graphs; and Community Camp
+          covers early America, the Revolution and the Constitution.
           <br><br>
           <strong>Community Camp &amp; the newest skills.</strong> Community Camp (Stop 16) covers community helpers, rules and manners,
           needs and wants, simple maps, goods and services, jobs and money, and facts about Utah. These skills were added after
@@ -1261,7 +1276,7 @@
      questions are inherently binary (comparing exactly two groups, or a single odd-one-out among
      otherwise-alike items) and are deliberately left out of this scaling; those are called out
      where they occur. */
-  var LEVEL_OPTION_COUNTS = { preschool:3, kindergarten:4, first:5, second:5, third:5 };
+  var LEVEL_OPTION_COUNTS = { preschool:3, kindergarten:4, first:5, second:5, third:5, fourth:5, fifth:5 };
   function optionCountForLevel(level){ return LEVEL_OPTION_COUNTS[level] || 3; }
   /* Tops up a question's own hand-authored wrong answers with extra ones borrowed from a wider
      pool of same-shaped {label,...} items, when a level needs more choices than were originally
@@ -1357,7 +1372,9 @@
     {id:'kindergarten', label:'Kindergarten', sub:'Age 5'},
     {id:'first', label:'1st Grade', sub:'Age 6'},
     {id:'second', label:'2nd Grade', sub:'Age 7'},
-    {id:'third', label:'3rd Grade', sub:'Age 8'}
+    {id:'third', label:'3rd Grade', sub:'Age 8'},
+    {id:'fourth', label:'4th Grade', sub:'Age 9'},
+    {id:'fifth', label:'5th Grade', sub:'Age 10'}
   ];
   var LETTER_POOL = [
     {letter:'A', word:'Apple', emoji:'🍎'}, {letter:'B', word:'Ball', emoji:'⚽'},
@@ -4764,6 +4781,1411 @@
     typing:'Type long words', feelings:'Feelings & friendship', compare:'Time, rulers & graphs', community:'Government & Utah'
   };
 
+  /* ======================================================================================
+     4th Grade (age 9). Written against the Utah 4th Grade Core standards (ELA, math, science,
+     social studies / Utah studies, health, fine arts). Same rules as the earlier levels: every stop
+     has its own round, every pool is finite and fixed so Right / Total stays meaningful.
+     ====================================================================================== */
+  function fmtBig(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function bigHtml(v){ return '<span>' + fmtBig(v) + '</span>'; }
+  function bigNear(n, oc, steps, lo, hi){
+    var cand = [];
+    steps.forEach(function(s){ [n + s, n - s].forEach(function(v){ if (v >= lo && v <= hi && v !== n && cand.indexOf(v) === -1) cand.push(v); }); });
+    var picks = shuffle(cand).slice(0, oc - 1);
+    return shuffle([n].concat(picks)).map(function(v){ return { html:bigHtml(v), correct:v === n }; });
+  }
+  function strOpts(right, wrongs, oc, big){
+    var wr = shuffle(wrongs.filter(function(w, i, a){ return w !== right && a.indexOf(w) === i; })).slice(0, oc - 1);
+    return shuffle([right].concat(wr)).map(function(w){ return { html:big ? '<span class="opt-big-letter" style="font-size:1.6rem;">' + w + '</span>' : wordHtml({label:w}), correct:w === right }; });
+  }
+  function fillQ(speakLead, sentence, right, wrongs, oc){
+    return { speak:speakLead + ' ' + sentence.replace('___', 'blank'), prompt:speakLead, visual:'<div class="story-text">' + sentence + '</div>', options: strOpts(right, wrongs, oc) };
+  }
+  function plainFill(items, oc){
+    var it = items[randInt(0, items.length - 1)];
+    return { speak:it[0], prompt:it[0], visual:'', options: strOpts(it[1], it[2], oc) };
+  }
+  function polyPts(n, r, cx, cy, rot){
+    var pts = [];
+    for (var i = 0; i < n; i++){ var a = rot + i * 2 * Math.PI / n; pts.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1)); }
+    return pts.join(' ');
+  }
+
+  /* ---------------- Rhyme River: roots, prefixes, suffixes, commonly confused words ---------------- */
+  var ROOTS_4 = [
+    ['tele','far','telephone'], ['bio','life','biology'], ['graph','write','autograph'], ['aqua','water','aquarium'], ['port','carry','transport'],
+    ['struct','build','construct'], ['scope','look at','telescope'], ['photo','light','photograph'], ['dict','say','dictate'], ['geo','earth','geography'],
+    ['micro','very small','microscope'], ['auto','self','automatic'], ['therm','heat','thermometer']
+  ];
+  function rootQ(oc){
+    var r = ROOTS_4[randInt(0, ROOTS_4.length - 1)];
+    var wr = ROOTS_4.filter(function(x){ return x[1] !== r[1]; }).map(function(x){ return x[1]; });
+    var sp = 'In the word ' + r[2] + ', what does the root ' + r[0] + ' mean?';
+    return { speak:sp, prompt:sp, visual:'<div class="word-seq"><span>' + r[0] + '</span><span>=</span><span>?</span></div>', options: strOpts(r[1], wr, oc) };
+  }
+  var PREF_4 = [
+    ['mis','wrong or badly','misspell'], ['inter','between','international'], ['sub','under','submarine'], ['over','too much','overcook'], ['non','not','nonstop'],
+    ['semi','half','semicircle'], ['anti','against','antifreeze'], ['super','above or more than','superstar']
+  ];
+  function prefix4Q(oc){
+    var p = PREF_4[randInt(0, PREF_4.length - 1)];
+    var wr = PREF_4.filter(function(x){ return x[1] !== p[1]; }).map(function(x){ return x[1]; });
+    var sp = 'What does the prefix ' + p[0] + ' mean in the word ' + p[2] + '?';
+    return { speak:sp, prompt:sp, visual:'<div class="word-seq"><span>' + p[0] + '-</span><span>+</span><span>' + p[2].slice(p[0].length) + '</span></div>', options: strOpts(p[1], wr, oc) };
+  }
+  var SUFF_4 = [
+    ['able','can be done','readable'], ['ment','the act of','movement'], ['ness','state of being','kindness'], ['ous','full of','joyous'],
+    ['er','one who','teacher'], ['est','the most','fastest'], ['ish','somewhat like','childish']
+  ];
+  function suffix4Q(oc){
+    var s = SUFF_4[randInt(0, SUFF_4.length - 1)];
+    var wr = SUFF_4.filter(function(x){ return x[1] !== s[1]; }).map(function(x){ return x[1]; });
+    var sp = 'What does the suffix ' + s[0] + ' mean in the word ' + s[2] + '?';
+    return { speak:sp, prompt:sp, visual:'<div class="word-seq"><span>' + s[2].slice(0, s[2].length - s[0].length) + '</span><span>+</span><span>-' + s[0] + '</span></div>', options: strOpts(s[1], wr, oc) };
+  }
+  var CONF_4 = [
+    ['The students hung ___ coats on the hooks.', 'their', ['there',"they're",'they','them']], ['Put the box over ___.', 'there', ['their',"they're",'three','these']],
+    ['___ going to the museum on Friday.', "They're", ['Their','There','They','Them']], ['Is this ___ backpack?', 'your', ["you're",'you','yours','yore']],
+    ['___ my best friend.', "You're", ['Your','You','Yours','Youre']], ['The cat licked ___ paw.', 'its', ["it's",'it','is','his']],
+    ['___ raining outside.', "It's", ['Its','It','Is','Itz']], ['First we ate lunch, ___ we played tag.', 'then', ['than','them','there','when']],
+    ['My brother is taller ___ I am.', 'than', ['then','that','thin','them']], ['We have ___ more minutes of recess.', 'two', ['to','too','tow','toe']],
+    ['___ coat is this?', 'Whose', ["Who's",'Who','Whos','Whom']], ['I do not want to ___ my keys.', 'lose', ['loose','loss','lost','looze']]
+  ];
+  function conf4Q(oc){
+    var c = CONF_4[randInt(0, CONF_4.length - 1)];
+    return fillQ('Which word fits the blank?', c[0], c[1], c[2], oc);
+  }
+  function fourth_rhyme(){
+    return shuffle(tagSkill([rootQ(5), rootQ(5)], 'Greek & Latin Roots').concat(tagSkill([prefix4Q(5)], 'Prefixes')).concat(tagSkill([suffix4Q(5)], 'Suffixes')).concat(tagSkill([conf4Q(5), conf4Q(5)], 'Commonly Confused Words')));
+  }
+
+  /* ---------------- ABC Trailhead: grammar and spelling ---------------- */
+  var TENSE_4 = [
+    ['Which sentence is in the past progressive tense?', 'I was reading when the bell rang.', ['I read the book.','I will read the book.','I am reading a book.','I will be reading later.']],
+    ['Which sentence is in the present progressive tense?', 'The dog is chasing the ball.', ['The dog chased the ball.','The dog will chase the ball.','The dog was chasing the ball.','The dog chases the ball every day.']],
+    ['Which sentence is in the future progressive tense?', 'We will be camping next weekend.', ['We camped last weekend.','We are camping now.','We were camping.','We will camp tomorrow.']],
+    ['Which sentence is in the future tense?', 'Mia will visit her grandmother.', ['Mia visited her grandmother.','Mia is visiting her grandmother.','Mia was visiting her grandmother.','Mia visits her grandmother.']],
+    ['Which sentence is in the past tense?', 'The team won the game.', ['The team will win the game.','The team is winning the game.','The team wins the game.','The team will be winning.']],
+    ['Which sentence uses the correct tense? Yesterday we ___.', 'walked to the library', ['walk to the library','will walk to the library','are walking to the library','walks to the library']]
+  ];
+  var MODAL_4 = [
+    ['Which word shows that something is allowed? "___ I use the restroom?"', 'May', ['Must','Will','Might','Would']],
+    ['Which word shows something you have to do? "You ___ wear a seat belt."', 'must', ['may','might','can','could']],
+    ['Which word shows ability? "She ___ run very fast."', 'can', ['must','should','may','might']],
+    ['Which word tells that something is going to happen in the future? "I ___ call you tomorrow."', 'will', ['can','could','might','may']],
+    ['Which word gives advice? "You ___ drink more water."', 'should', ['will','can','may','must']],
+    ['Which word means maybe? "It ___ rain this afternoon."', 'might', ['must','will','can','should']]
+  ];
+  var SENT_4 = [
+    ['Which one is a complete sentence?', 'The dog ran down the hill.', ['Running down the hill.','Because the dog was fast.','The dog down the hill.','Down the big hill.']],
+    ['Which one is a complete sentence?', 'We visited the museum on Friday.', ['On Friday at the museum.','Visited the museum.','After the long trip.','The museum on Friday.']],
+    ['Which one is a fragment, not a complete sentence?', 'Because it was raining.', ['It was raining.','We stayed inside.','The rain stopped.','Mom made soup.']],
+    ['Which one is a run-on sentence?', 'We went to the park it was sunny.', ['We went to the park.','It was sunny.','We went to the park, and it was sunny.','We played outside.']],
+    ['Which one fixes this run-on? "I like soccer my sister likes tennis."', 'I like soccer, but my sister likes tennis.', ['I like soccer my sister, likes tennis.','I like soccer my sister likes tennis.','I, like soccer my sister likes tennis.','I like soccer but my sister, likes tennis.']],
+    ['Which one fixes this run-on? "The bus was late we waited."', 'The bus was late, so we waited.', ['The bus was late we, waited.','The bus was late we waited.','The, bus was late we waited.','The bus, was late we waited.']]
+  ];
+  var QUOTE_4 = [
+    ['Which sentence uses quotation marks correctly?', '"Let\'s go to the park," said Dad.', ['"Let\'s go to the park, said Dad."','Let\'s go to the park, "said Dad."','"Let\'s go to the park" said Dad','Let\'s "go to the park," said Dad.']],
+    ['Which sentence uses quotation marks correctly?', 'Maya asked, "Can I help you?"', ['Maya asked, Can I "help you?"','"Maya asked, Can I help you?"','Maya asked "Can I help you?"','Maya asked, "Can I help you"?']],
+    ['Which sentence uses quotation marks correctly?', '"I am ready," said Eli.', ['"I am ready, said Eli."','I am ready, "said Eli."','"I am ready" said Eli.','"I am ready," "said Eli."']],
+    ['Which sentence uses quotation marks correctly?', 'The teacher said, "Please line up."', ['The teacher said "Please line up".','The teacher said, Please "line up."','"The teacher said, Please line up."','The teacher said, "please line up."']]
+  ];
+  var COMMA_4 = [
+    ['Which sentence uses a comma correctly?', 'I wanted to swim, but the pool was closed.', ['I wanted to swim but, the pool was closed.','I wanted, to swim but the pool was closed.','I wanted to swim but the pool, was closed.','I, wanted to swim but the pool was closed.']],
+    ['Which sentence uses a comma correctly?', 'After lunch, we went outside.', ['After, lunch we went outside.','After lunch we, went outside.','After lunch we went, outside.','After lunch we went outside,.']],
+    ['Which sentence uses a comma correctly?', 'Maya, please sit down.', ['Maya please, sit down.','Maya please sit, down.','Maya please sit down,.','Maya, please, sit down.']],
+    ['Which sentence uses a comma correctly?', 'The sky was dark, so we brought umbrellas.', ['The sky was dark so, we brought umbrellas.','The sky, was dark so we brought umbrellas.','The sky was dark so we brought, umbrellas.','The sky was, dark so we brought umbrellas.']],
+    ['Which sentence uses a comma correctly?', 'Yes, I can come to your party.', ['Yes I can, come to your party.','Yes I can come to your party,.','Yes I can come, to your party.','Yes I, can come to your party.']]
+  ];
+  var ADJ_4 = [
+    ['Which phrase puts the adjectives in the correct order?', 'a big red ball', ['a red big ball','a ball big red','a big ball red','red a big ball']],
+    ['Which phrase puts the adjectives in the correct order?', 'two small brown dogs', ['brown small two dogs','small two brown dogs','two brown small dogs','dogs two small brown']],
+    ['Which phrase puts the adjectives in the correct order?', 'a beautiful old house', ['an old beautiful house','a house old beautiful','a beautiful house old','old a beautiful house']],
+    ['Which phrase puts the adjectives in the correct order?', 'three tall green trees', ['green tall three trees','tall three green trees','three green tall trees','trees three tall green']]
+  ];
+  var SPELL_4 = [
+    ['necessary',['neccessary','necesary','neccesary','necessery']], ['restaurant',['restaraunt','resturant','restarant','restraunt']], ['definitely',['definately','definitly','definetely','defanitely']],
+    ['embarrass',['embarass','embarras','embarrase','embarress']], ['occasion',['ocasion','occassion','occation','ocassion']], ['experience',['experiance','expirience','experence','experiense']],
+    ['environment',['enviroment','enviornment','envirnoment','environmant']], ['courage',['couarge','courege','curage','couradge']], ['bicycle',['bycicle','bicycel','bicicle','bysicle']],
+    ['pioneer',['pionear','pioneeer','piyoneer','pioner']], ['mystery',['mistery','mysterey','mysttery','mistry']], ['knowledge',['knowlege','nolledge','knowlidge','knowladge']]
+  ];
+  function spell4Qs(n, oc){
+    return shuffle(SPELL_4).slice(0, n).map(function(s){
+      return { speak:'Which word is spelled correctly?', prompt:'Which word is spelled correctly?', visual:'', options: strOpts(s[0], s[1], oc) };
+    });
+  }
+  function fourth_letters(){
+    var pick = ['Quotation Marks', 'Commas', 'Adjective Order'][randInt(0, 2)], pool = pick === 'Quotation Marks' ? QUOTE_4 : (pick === 'Commas' ? COMMA_4 : ADJ_4);
+    return shuffle(pqs(P4(TENSE_4), 1, 5, 'Verb Tenses').concat(pqs(P4(MODAL_4), 1, 5, 'Modal Verbs')).concat(pqs(P4(SENT_4), 1, 5, 'Complete Sentences')).concat(pqs(P4(pool), 1, 5, pick)).concat(tagSkill(spell4Qs(2, 5), 'Spelling')));
+  }
+  function P4(rows){ return rows.map(function(r){ return P(r[0], r[1], r[2]); }); }
+
+  /* ---------------- Story Cove ---------------- */
+  var STORY_POOL_4 = [
+    SQ('Every spring, Mr. Ortiz\'s class plants a garden behind the school. The students pull weeds, carry water, and watch the seeds sprout. In June they pick the vegetables and share them with the school cafeteria. Most students say the best part is eating a carrot they grew themselves.', 'Which detail shows the class works as a team?', 'They share the vegetables with the cafeteria', ['They plant in the spring','They like carrots','The garden is behind the school','Mr. Ortiz is a teacher']),
+    SQ('When the power went out, Kayla\'s family lit candles and played a board game. Kayla\'s little brother won three times in a row. Kayla was a little grumpy at first, but soon she was laughing too. Later she said it was the best night of the whole week.', 'How did Kayla\'s feelings change?', 'She went from grumpy to happy', ['She went from happy to sad','She stayed grumpy all night','She went from scared to sleepy','She was never upset']),
+    SQ('Salt Lake City sits near the Great Salt Lake. Early settlers found the lake too salty to drink, but they used its edges to make salt. Today, millions of birds stop at the lake each year to rest and eat tiny brine shrimp during long trips.', 'Why do so many birds stop at the Great Salt Lake?', 'They rest and eat brine shrimp there', ['They drink the salty water','They build nests of salt','They are afraid of the city','They are looking for settlers']),
+    SQ('Jordan wanted a new skateboard, but it cost forty dollars. He mowed lawns for his neighbors and saved every dollar. After six weeks, he finally had enough. He walked into the store with a big smile and bought the board.', 'What can you tell about Jordan?', 'He works hard to reach a goal', ['He gets everything he wants','He does not like to save','He is afraid of stores','He lost his money']),
+    SQ('Honeybees do a special dance to tell other bees where flowers are. A short, round dance means food is close. A wiggly dance in a straight line shows which direction to fly and how far to go. This dance helps the whole hive find food quickly.', 'What is the main purpose of the bee dance?', 'To tell other bees where to find food', ['To warm up the hive','To scare away birds','To make honey','To choose a queen']),
+    SQ('The old bridge had been closed for months. Cracks ran across the concrete, and the railing was rusty. Workers finally came with big trucks and tools. They worked all summer, and in September the town held a party to open the new, shiny bridge.', 'What problem did the town solve?', 'An unsafe bridge was replaced', ['A river dried up','A road was too short','A party was cancelled','A truck got stuck']),
+    SQ('Priya was nervous about reading her poem to the class. Her hands shook and her voice came out quiet. Her friend Sam gave her a thumbs-up, so she took a deep breath and tried again. This time her voice was strong, and everyone clapped.', 'What helped Priya do better the second time?', 'A friend\'s support and a deep breath', ['A louder microphone','A shorter poem','A new teacher','Staying quiet']),
+    SQ('Wetlands are areas where land is covered with shallow water. They clean the water by trapping dirt, and they soak up extra rain so towns do not flood. Many frogs, ducks, and fish also live there. That is why people work to protect wetlands.', 'Why do people work to protect wetlands?', 'They clean water, stop floods, and shelter animals', ['They are good places to build malls','They are always dry','They have no animals','They make storms stronger'])
+  ];
+  var THEME_4 = [
+    SQ('Rosa found a wallet on the sidewalk with money inside. She was tempted to keep it, but she remembered how upset she would feel if she lost her own. She took it to the front office, and the owner thanked her with tears of joy.', 'What is the theme of this story?', 'Doing the right thing matters', ['Money is the most important thing','Never walk on sidewalks','Wallets are easy to find','Offices are busy places']),
+    SQ('Theo failed his first science quiz and wanted to quit trying. His teacher suggested he study a little each night. Week by week, his scores rose, and by the end of the term he earned the top grade.', 'What is the theme of this story?', 'Steady effort leads to improvement', ['Science is too hard','Quizzes are unfair','Teachers give easy grades','Quitting is smart']),
+    SQ('A small seed lay in the dry dirt, wishing to be a tall tree. The wind laughed, and the rocks said it was too little. But the seed drank each raindrop and stretched toward the sun. Years later, it was the tallest tree in the valley.', 'What is the theme of this story?', 'Being small does not stop big dreams', ['Wind is always mean','Rocks are strong','Rain is rare','Valleys are quiet']),
+    SQ('Two neighbors argued over a fence for years. When a storm knocked it down, each neighbor helped fix the other\'s side. As they worked, they began to talk and laugh. The new fence stood between them, but so did a new friendship.', 'What is the theme of this story?', 'Helping each other can end a quarrel', ['Fences are expensive','Storms are fun','Neighbors should move away','Arguments are good']),
+    SQ('Mina bragged that she could run faster than anyone. In the school race, she sprinted so hard at the start that she ran out of energy. A quiet boy named Leo kept a steady pace and passed her near the finish.', 'What is the theme of this story?', 'Bragging can backfire', ['Fast runners always win','Races are not fair','Quiet kids are slow','Running is bad for you'])
+  ];
+  var POV_4 = [
+    ['I climbed the hill and looked at the valley below.', true], ['She walked slowly down the path, wondering what was ahead.', false], ['We built a fort from blankets and chairs.', true],
+    ['The boy opened the door and found a surprise.', false], ['My brother and I laughed until our sides hurt.', true], ['They packed their bags and left before sunrise.', false],
+    ['I could not believe my eyes when the curtain rose.', true], ['The old man told the children a story by the fire.', false]
+  ];
+  function povQ(){
+    var s = POV_4[randInt(0, POV_4.length - 1)];
+    return { speak:'Is this story told in first person or third person? ' + s[0], prompt:'Which point of view is it?',
+      visual:'<div class="story-text">' + s[0] + '</div><div class="story-text" style="font-size:.95rem;">First person uses I, me, we. Third person uses he, she, they, or names.</div>', options: two('First person', 'Third person', s[1]) };
+  }
+  var STRUCT_4 = [
+    P('"First, mix the flour and eggs. Next, pour the batter in a pan. Finally, bake it for twenty minutes." How is this text organized?', 'Sequence (time order)', ['Compare and contrast','Cause and effect','Problem and solution','Description']),
+    P('"Frogs live in water and on land, but toads spend more time on land. Frogs have smooth skin; toads have bumpy skin." How is this text organized?', 'Compare and contrast', ['Sequence (time order)','Cause and effect','Problem and solution','Description']),
+    P('"Because the river flooded, the road was covered with water. As a result, the bus took a new route." How is this text organized?', 'Cause and effect', ['Sequence (time order)','Compare and contrast','Description','Problem and solution']),
+    P('"The playground had no shade. Kids got too hot, so the school planted trees to give shade." How is this text organized?', 'Problem and solution', ['Sequence (time order)','Compare and contrast','Cause and effect','Description']),
+    P('"The desert is hot and dry. Sand stretches for miles, and tall cactuses stand under the bright sun." How is this text organized?', 'Description', ['Sequence (time order)','Compare and contrast','Cause and effect','Problem and solution'])
+  ];
+  var FIG_4 = [
+    P('What does the saying "Actions speak louder than words" mean?', '🏃|What you do matters more than what you say', ['🔊|You should shout all the time','🤐|Never speak to anyone','🎤|Singing is better than talking','📢|Loud people are right']),
+    P('What does the saying "Don\'t count your chickens before they hatch" mean?', '🥚|Do not plan on something before it happens', ['🐔|Chickens are hard to count','🍳|Eat eggs every day','🏠|Build a coop first','📅|Eggs hatch in a week']),
+    P('What does the saying "Look before you leap" mean?', '👀|Think about it before you act', ['🐸|Frogs jump high','🏃|Always run fast','🙈|Close your eyes','🪜|Climb a ladder']),
+    P('What does "bite off more than you can chew" mean?', '🍔|Take on too much to handle', ['🦷|Eat with your front teeth','😋|Eat slowly','🍽️|Share your food','🧁|Bake a cake']),
+    P('What does "once in a blue moon" mean?', '🌙|Very rarely', ['🔵|Every night','🌕|Every month for sure','🎨|When you paint','🌌|When it is cold']),
+    P('What does "the ball is in your court" mean?', '🎾|It is your turn to make a choice', ['🏀|You must play basketball','🏟️|Go to the stadium','🚫|You are out of the game','📣|Be loud']),
+    P('What does the saying "A penny saved is a penny earned" mean?', '🪙|Saving money is smart', ['💸|Spend all you have','🔍|Pennies are lucky','🏦|Banks are closed','🧾|Receipts are important'])
+  ];
+  function fourth_story(){
+    var fig = Math.random() < 0.65 ? pqs(FIG_4, 1, 5, 'Figurative Language') : tagSkill([simileQ()], 'Similes & Metaphors');
+    return shuffle(
+      tagSkill(buildStoryLeveled(STORY_POOL_4, 5, 2), 'Story Comprehension').concat(tagSkill(buildStoryLeveled(THEME_4, 5, 1), 'Theme'))
+        .concat(tagSkill([povQ()], 'Point of View')).concat(pqs(STRUCT_4, 1, 5, 'Text Structure')).concat(fig)
+    );
+  }
+
+  /* ---------------- Word Spring: vocabulary ---------------- */
+  var CTX_4 = [
+    P('The tiny insect was so minuscule that we needed a magnifying glass to see it. What does "minuscule" mean?', 'Extremely small', ['Very loud','Very colorful','Very fast','Very old']),
+    P('The hikers were exhausted after the long climb, so they sat down to rest. What does "exhausted" mean?', 'Very tired', ['Very hungry','Very happy','Very cold','Very lost']),
+    P('Because the soup was scalding, Ben waited for it to cool before taking a bite. What does "scalding" mean?', 'Very hot', ['Very salty','Very thick','Very sweet','Very cold']),
+    P('The kitten was timid and hid under the couch whenever visitors came. What does "timid" mean?', 'Shy and easily scared', ['Loud and rough','Fast and strong','Large and lazy','Proud and happy']),
+    P('The library was silent; you could hear a pin drop. What does "silent" mean?', 'Without any sound', ['Full of music','Very crowded','Very bright','Very messy']),
+    P('The teacher was delighted with our work and gave us all a sticker. What does "delighted" mean?', 'Very pleased', ['Very angry','Very sleepy','Very worried','Very confused']),
+    P('It was a vast desert, stretching for miles in every direction. What does "vast" mean?', 'Very large', ['Very narrow','Very cold','Very noisy','Very new']),
+    P('The detective examined the footprints carefully to find clues. What does "examined" mean?', 'Looked at closely', ['Erased','Ignored','Painted','Tasted'])
+  ];
+  var SYN4 = [
+    P('Which word means the same as enormous?', 'huge', ['tiny','plain','slow','quiet']), P('Which word means the same as rapid?', 'fast', ['loud','weak','late','gentle']),
+    P('Which word means the same as courageous?', 'brave', ['clever','shy','calm','polite']), P('Which word means the same as ancient?', 'very old', ['very loud','very bright','very small','very new']),
+    P('Which word means the same as gather?', 'collect', ['scatter','forget','hide','throw']), P('Which word means the same as difficult?', 'hard', ['easy','quick','simple','short']),
+    P('Which word means the same as glance?', 'quick look', ['long nap','loud shout','deep breath','big jump']), P('Which word means the same as strange?', 'odd', ['normal','common','tidy','safe'])
+  ];
+  var ANT4 = [
+    P('Which word means the opposite of ancient?', 'modern', ['old','huge','wise','tall']), P('Which word means the opposite of generous?', 'selfish', ['kind','giving','rich','brave']),
+    P('Which word means the opposite of victory?', 'defeat', ['prize','trophy','battle','success']), P('Which word means the opposite of expand?', 'shrink', ['grow','stretch','spread','build']),
+    P('Which word means the opposite of arrive?', 'depart', ['reach','return','enter','stay']), P('Which word means the opposite of fragile?', 'sturdy', ['weak','thin','delicate','light']),
+    P('Which word means the opposite of cautious?', 'careless', ['careful','shy','slow','alert']), P('Which word means the opposite of increase?', 'decrease', ['grow','add','rise','gain'])
+  ];
+  var MULTI_4 = [
+    P('Which meaning of "park" is used? We had to park the car by the curb.', 'To leave a vehicle in a spot', ['A place with grass and trees','A kind of game','A type of tree','A fast run']),
+    P('Which meaning of "rock" is used? The baby began to rock gently in the chair.', 'To move back and forth', ['A hard piece of stone','A kind of music','A type of candy','A big mountain']),
+    P('Which meaning of "bank" is used? We walked along the bank of the river.', 'The land beside a river', ['A place that keeps money','A row of lights','To lean over','A type of boat']),
+    P('Which meaning of "kind" is used? What kind of dog is that?', 'A type or sort', ['Gentle and caring','A kind of toy','To be friendly','A very big dog']),
+    P('Which meaning of "right" is used? Turn right at the stop sign.', 'The opposite of left', ['Correct','A freedom people have','To fix','A kind of angle']),
+    P('Which meaning of "well" is used? The family drew water from the well.', 'A deep hole with water', ['In a good way','Healthy','A kind of bucket','A type of pump'])
+  ];
+  var ANALOGY_4 = [
+    P('Hot is to cold as big is to…', 'small', ['large','warm','tall','huge']), P('Bird is to nest as bear is to…', 'den', ['tree','honey','forest','paw']),
+    P('Pencil is to write as scissors are to…', 'cut', ['draw','paper','sharp','glue']), P('Day is to night as summer is to…', 'winter', ['sun','spring','warm','hot']),
+    P('Finger is to hand as toe is to…', 'foot', ['shoe','leg','nail','sock']), P('Teacher is to school as doctor is to…', 'hospital', ['nurse','medicine','patient','bandage']),
+    P('Puppy is to dog as kitten is to…', 'cat', ['mouse','fur','cub','pet']), P('Happy is to glad as sad is to…', 'unhappy', ['joyful','cheerful','proud','excited'])
+  ];
+  function fourth_sightwords(){
+    return shuffle(pqs(CTX_4, 2, 5, 'Context Clues').concat(pqs(SYN4, 1, 5, 'Synonyms')).concat(pqs(ANT4, 1, 5, 'Antonyms')).concat(pqs(MULTI_4, 1, 5, 'Multiple-Meaning Words')).concat(pqs(ANALOGY_4, 1, 5, 'Word Relationships')));
+  }
+
+  /* ---------------- Critter Count: place value, rounding, fractions, decimals ---------------- */
+  var PV_4 = [[4582,'hundreds',500],[7318,'tens',10],[2945,'thousands',2000],[6073,'hundreds',0],[8426,'ones',6],[3891,'thousands',3000],[5207,'tens',0],[9164,'hundreds',100],[1735,'tens',30],[4860,'hundreds',800]];
+  function placeValue4Q(oc){
+    var p = PV_4[randInt(0, PV_4.length - 1)], n = p[0], places = { ones:1, tens:10, hundreds:100, thousands:1000 }, digit = Math.floor(n / places[p[1]]) % 10;
+    var sp = 'In ' + fmtBig(n) + ', what is the value of the digit ' + digit + ' in the ' + p[1] + ' place?';
+    var right = digit * places[p[1]], cand = [digit, digit * 10, digit * 100, digit * 1000, digit * 10000].filter(function(v, i, a){ return v !== right && a.indexOf(v) === i; });
+    return { speak:sp, prompt:sp, visual:'', options: shuffle([right].concat(shuffle(cand.concat([right + 10, right + 100])).slice(0, oc - 1))).map(function(v){ return { html:bigHtml(v), correct:v === right }; }) };
+  }
+  var ROUND_4 = [[4672,1000,5000],[3249,1000,3000],[8501,1000,9000],[6350,100,6400],[2784,100,2800],[9618,100,9600],[38450,10000,40000],[72610,10000,70000],[15829,1000,16000],[4065,10,4070],[8793,10,8790],[5555,100,5600]];
+  function round4Q(oc){
+    var r = ROUND_4[randInt(0, ROUND_4.length - 1)], unit = { 10:'ten', 100:'hundred', 1000:'thousand', 10000:'ten thousand' }[r[1]];
+    var sp = 'Round ' + fmtBig(r[0]) + ' to the nearest ' + unit + '.';
+    var right = r[2], cand = [right - r[1], right + r[1], right + 2 * r[1], right - 2 * r[1], r[0]].filter(function(v, i, a){ return v > 0 && v !== right && a.indexOf(v) === i; });
+    return { speak:sp, prompt:sp, visual:'', options: shuffle([right].concat(shuffle(cand).slice(0, oc - 1))).map(function(v){ return { html:bigHtml(v), correct:v === right }; }) };
+  }
+  var ADDSUB_4 = [[3482,'+',2519],[4756,'+',1389],[6205,'+',2897],[5143,'+',3688],[9000,'-',4635],[7482,'-',3519],[8300,'-',2745],[6021,'-',1998],[12430,'+',5870],[25600,'-',9400]];
+  function addsub4Q(oc){
+    var p = ADDSUB_4[randInt(0, ADDSUB_4.length - 1)], ans = p[1] === '+' ? p[0] + p[2] : p[0] - p[2];
+    var sp = fmtBig(p[0]) + (p[1] === '+' ? ' plus ' : ' minus ') + fmtBig(p[2]) + '. What is the ' + (p[1] === '+' ? 'sum' : 'difference') + '?';
+    return { speak:sp, prompt:'What is the ' + (p[1] === '+' ? 'sum' : 'difference') + '?', visual: seqVisual([fmtBig(p[0]), p[1] === '+' ? '+' : '-', fmtBig(p[2])]), options: bigNear(ans, oc, [1, 10, 100, 1000, 900], 0, 99999) };
+  }
+  var EQF_4 = [[[3,4],8],[[2,3],6],[[1,2],10],[[3,5],10],[[5,6],12],[[1,4],12],[[2,5],10],[[3,8],16]];
+  function eqFrac4Q(oc){
+    var e = EQF_4[randInt(0, EQF_4.length - 1)], n = e[0][0], d = e[0][1], D = e[1], N = n * D / d;
+    var sp = n + ' over ' + d + ' equals blank over ' + D + '. What number goes in the blank?';
+    return { speak:sp, prompt:'Which number makes the fractions equal?', visual: seqVisual([n + '/' + d, '=', '?/' + D]), options: numNear(N, oc, [1, 2, 3, 4], 1, 30) };
+  }
+  var CMPF_4 = [[[3,4],[5,8]],[[2,3],[3,5]],[[1,2],[3,8]],[[5,6],[3,4]],[[2,5],[1,2]],[[3,10],[1,4]],[[7,8],[5,6]],[[4,5],[7,10]]];
+  function compFrac4Q(){
+    var p = CMPF_4[randInt(0, CMPF_4.length - 1)], a = p[0][0] / p[0][1], b = p[1][0] / p[1][1], greater = Math.random() < 0.5;
+    var win = (greater ? a > b : a < b) ? p[0] : p[1], f = function(x){ return x[0] + '/' + x[1]; };
+    var sp = 'Which fraction is ' + (greater ? 'greater' : 'less') + '? ' + f(p[0]) + ' or ' + f(p[1]) + '.';
+    return { speak:sp, prompt:'Which fraction is ' + (greater ? 'greater' : 'less') + '?', visual:'', options: shuffle([p[0], p[1]]).map(function(x){ return { html:'<span class="opt-big-letter" style="font-size:1.7rem;">' + f(x) + '</span>', correct:x === win }; }) };
+  }
+  var DEC_4 = [['3/10','0.3'],['7/10','0.7'],['45/100','0.45'],['9/100','0.09'],['6/10','0.6'],['27/100','0.27'],['3/100','0.03'],['81/100','0.81']];
+  var DEC_POOL = ['0.3','0.7','0.45','0.09','0.6','0.27','0.03','0.81','0.4','0.54','0.9','3.0','30','0.003'];
+  function decimal4Q(oc){
+    var d = DEC_4[randInt(0, DEC_4.length - 1)], toDec = Math.random() < 0.6;
+    if (toDec){
+      var wr = DEC_POOL.filter(function(x){ return x !== d[1]; });
+      return { speak:'Which decimal is the same as ' + d[0].replace('/', ' over ') + '?', prompt:'Which decimal equals ' + d[0] + '?', visual:'', options: strOpts(d[1], wr, oc, true) };
+    }
+    var fr = DEC_4.map(function(x){ return x[0]; }).filter(function(x){ return x !== d[0]; });
+    return { speak:'Which fraction is the same as ' + d[1].replace('.', ' point ') + '?', prompt:'Which fraction equals ' + d[1] + '?', visual:'', options: strOpts(d[0], fr, oc, true) };
+  }
+  function fourth_counting(){
+    return shuffle(tagSkill([placeValue4Q(5)], 'Place Value').concat(tagSkill([round4Q(5)], 'Rounding')).concat(tagSkill([addsub4Q(5)], 'Add & Subtract Large Numbers'))
+      .concat(tagSkill([eqFrac4Q(5)], 'Equivalent Fractions')).concat(tagSkill([compFrac4Q()], 'Comparing Fractions')).concat(tagSkill([decimal4Q(5)], 'Decimals')));
+  }
+
+  /* ---------------- Pattern Pass: factors, multiples, primes, rules ---------------- */
+  var FACT_4 = [[24,6,[5,7,9,10]],[18,9,[4,5,7,8]],[30,5,[7,8,9,11]],[36,12,[5,7,8,10]],[20,4,[3,6,7,9]],[28,7,[5,6,8,9]],[42,6,[4,5,8,9]],[16,8,[3,5,6,7]]];
+  function factor4Q(oc){
+    var f = FACT_4[randInt(0, FACT_4.length - 1)], sp = 'Which number is a factor of ' + f[0] + '?';
+    return { speak:sp, prompt:sp, visual:'', options: shuffle([f[1]].concat(shuffle(f[2]).slice(0, oc - 1))).map(function(v){ return { html:numHtml(v), correct:v === f[1] }; }) };
+  }
+  var MULT_4 = [[7,21,[17,27,15,25]],[6,18,[16,20,22,19]],[9,45,[44,46,47,40]],[8,32,[30,34,36,38]],[5,35,[32,33,37,38]],[4,28,[26,27,29,30]],[12,36,[32,34,35,38]],[3,27,[25,26,28,29]]];
+  function multiple4Q(oc){
+    var m = MULT_4[randInt(0, MULT_4.length - 1)], sp = 'Which number is a multiple of ' + m[0] + '?';
+    return { speak:sp, prompt:sp, visual:'', options: shuffle([m[1]].concat(shuffle(m[2]).slice(0, oc - 1))).map(function(v){ return { html:numHtml(v), correct:v === m[1] }; }) };
+  }
+  var PRIME_4 = [['prime',7,[9,15,21,25]],['prime',11,[9,12,15,21]],['prime',13,[9,15,21,27]],['prime',17,[15,21,25,27]],['composite',15,[2,3,5,7]],['composite',21,[3,5,7,11]],['composite',9,[2,3,5,7]],['composite',27,[2,3,11,13]]];
+  function prime4Q(oc){
+    var p = PRIME_4[randInt(0, PRIME_4.length - 1)], sp = 'Which number is ' + p[0] + '? ' + (p[0] === 'prime' ? 'A prime number has exactly two factors, 1 and itself.' : 'A composite number has more than two factors.');
+    return { speak:sp, prompt:'Which number is ' + p[0] + '?', visual:'<div class="story-text" style="font-size:.95rem;">' + (p[0] === 'prime' ? 'A prime number has exactly two factors: 1 and itself.' : 'A composite number has more than two factors.') + '</div>',
+      options: shuffle([p[1]].concat(shuffle(p[2]).slice(0, oc - 1))).map(function(v){ return { html:numHtml(v), correct:v === p[1] }; }) };
+  }
+  var RULEPAT_4 = [[3,6,'add'],[2,5,'add'],[100,10,'sub'],[5,4,'add'],[90,15,'sub'],[1,8,'add'],[4,9,'add'],[60,7,'sub']];
+  function rulePat4Q(oc){
+    var r = RULEPAT_4[randInt(0, RULEPAT_4.length - 1)], seq = [r[0]], i;
+    for (i = 1; i < 5; i++) seq.push(r[2] === 'add' ? seq[i - 1] + r[1] : seq[i - 1] - r[1]);
+    var ans = r[2] === 'add' ? seq[4] + r[1] : seq[4] - r[1];
+    var sp = 'The rule is ' + (r[2] === 'add' ? 'add ' : 'subtract ') + r[1] + '. Start at ' + r[0] + '. ' + seq.join(', ') + ', blank. What comes next?';
+    return { speak:sp, prompt:'Rule: ' + (r[2] === 'add' ? 'add ' : 'subtract ') + r[1] + '. What comes next?', visual: seqVisual(seq.concat(['?'])), options: numNear(ans, oc, [r[1], 1, 2, 10], 0, 200) };
+  }
+  var IO4_RULES = [
+    ['Multiply by 4', function(x){ return x * 4; }, [2,3,5], 7], ['Add 12', function(x){ return x + 12; }, [3,5,8], 10], ['Multiply by 6', function(x){ return x * 6; }, [2,4,5], 3],
+    ['Subtract 8', function(x){ return x - 8; }, [12,15,20], 25], ['Multiply by 10', function(x){ return x * 10; }, [3,5,6], 8], ['Divide by 2', function(x){ return x / 2; }, [4,8,12], 20]
+  ];
+  var IO4_LABELS = ['Multiply by 4','Add 12','Multiply by 6','Subtract 8','Multiply by 10','Divide by 2','Add 8','Multiply by 3','Divide by 4'];
+  function io4OutputQ(oc){
+    var r = IO4_RULES[randInt(0, IO4_RULES.length - 1)], x = r[3], ans = r[1](x);
+    return { speak:'The rule is ' + r[0].toLowerCase() + '. What is the output when the input is ' + x + '?', prompt:'Rule: ' + r[0] + '. What is the output?', visual: ioTable(r, x), options: numNear(ans, oc, [1, 2, 4, 8], 0, 90) };
+  }
+  function io4RuleQ(oc){
+    var r = IO4_RULES[randInt(0, IO4_RULES.length - 1)], wr = shuffle(IO4_LABELS.filter(function(l){ return l !== r[0]; })).slice(0, oc - 1);
+    return { speak:'Look at the table. What is the rule?', prompt:'What is the rule?', visual: ioTable(r), options: shuffle([r[0]].concat(wr)).map(function(w){ return { html:wordHtml({label:w}), correct:w === r[0] }; }) };
+  }
+  function fourth_patterns(){
+    return shuffle(tagSkill([factor4Q(5)], 'Factors').concat(tagSkill([multiple4Q(5)], 'Multiples')).concat(tagSkill([prime4Q(5)], 'Prime & Composite'))
+      .concat(tagSkill([rulePat4Q(5)], 'Number Pattern Rules')).concat(tagSkill([io4OutputQ(5)], 'Input-Output Tables')).concat(tagSkill([io4RuleQ(5)], 'Pattern Rules')));
+  }
+
+  /* ---------------- Shape Overlook: triangles, angles, polygons, lines ---------------- */
+  var TRI_4 = [
+    ['equilateral', angSvg('<polygon points="80,6 130,92.6 30,92.6" style="fill:none"/>'), 'All three sides are the same length.'],
+    ['isosceles', angSvg('<polygon points="80,8 115,92 45,92" style="fill:none"/>'), 'Exactly two sides are the same length.'],
+    ['scalene', angSvg('<polygon points="20,88 140,88 95,14" style="fill:none"/>'), 'No sides are the same length.'],
+    ['right', angSvg('<polygon points="30,12 30,88 130,88" style="fill:none"/><path d="M30 72 L46 72 L46 88" style="stroke-width:3;stroke:#2B2340"/>'), 'It has one square corner (90 degrees).']
+  ];
+  function triangle4Q(oc){
+    var t = TRI_4[randInt(0, TRI_4.length - 1)], names = ['equilateral triangle','isosceles triangle','scalene triangle','right triangle'], right = t[0] + ' triangle';
+    var wr = shuffle(names.filter(function(n){ return n !== right; })).concat(['circle','square']).slice(0, oc - 1);
+    if (t[0] === 'equilateral') wr = wr.filter(function(n){ return n !== 'isosceles triangle'; }).concat(['pentagon']);
+    if (t[0] === 'right') wr = wr.filter(function(n){ return n !== 'scalene triangle' && n !== 'isosceles triangle'; }).concat(['pentagon']);
+    return { speak:'Look at the shape. What is it called? ' + t[2], prompt:'What kind of triangle is it? ' + t[2], visual:t[1], options: strOpts(right, wr, oc) };
+  }
+  var DEG_4 = [[30,'acute'],[45,'acute'],[60,'acute'],[90,'right'],[110,'obtuse'],[120,'obtuse'],[150,'obtuse'],[80,'acute']];
+  function degreeQ(){
+    var d = DEG_4[randInt(0, DEG_4.length - 1)], rad = d[0] * Math.PI / 180, L = 88, vx = 20 + L * Math.max(0, -Math.cos(rad));
+    var svg = angSvg('<path d="M' + vx.toFixed(1) + ' 86 L' + Math.min(152, vx + L).toFixed(1) + ' 86 M' + vx.toFixed(1) + ' 86 L' + (vx + L * Math.cos(rad)).toFixed(1) + ' ' + (86 - L * Math.sin(rad)).toFixed(1) + '"/>') + '<div class="story-text" style="font-size:1.3rem;">' + d[0] + '°</div>';
+    return { speak:'This angle measures ' + d[0] + ' degrees. Is it acute, right, or obtuse?', prompt:'The angle is ' + d[0] + '°. What kind of angle is it?', visual:svg,
+      options: shuffle(['Acute (less than 90°)','Right (exactly 90°)','Obtuse (more than 90°)'].map(function(w){ return { html:wordHtml({label:w}), correct:w.toLowerCase().indexOf(d[1]) === 0 }; })) };
+  }
+  var POLY_4 = [[5,'pentagon'],[6,'hexagon'],[8,'octagon'],[3,'triangle'],[4,'quadrilateral']];
+  function polygon4Q(oc){
+    var p = POLY_4[randInt(0, POLY_4.length - 1)], svg = angSvg('<polygon points="' + polyPts(p[0], 40, 80, 50, -Math.PI / 2) + '" style="fill:none"/>');
+    var wr = POLY_4.map(function(x){ return x[1]; }).filter(function(n){ return n !== p[1]; }).concat(['circle']);
+    return { speak:'What is this shape called?', prompt:'What is this shape called?', visual:svg, options: strOpts(p[1], wr, oc) };
+  }
+  var RAY_4 = [
+    ['line segment', angSvg('<path d="M30 50 L130 50"/><circle cx="30" cy="50" r="5" style="fill:#2B2340;stroke:none"/><circle cx="130" cy="50" r="5" style="fill:#2B2340;stroke:none"/>'), 'It has two endpoints.'],
+    ['ray', angSvg('<path d="M30 50 L140 50 M128 40 L140 50 L128 60"/><circle cx="30" cy="50" r="5" style="fill:#2B2340;stroke:none"/>'), 'It has one endpoint and goes on forever one way.'],
+    ['line', angSvg('<path d="M12 50 L148 50 M22 40 L10 50 L22 60 M138 40 L150 50 L138 60"/>'), 'It goes on forever both ways.'],
+    ['point', angSvg('<circle cx="80" cy="50" r="7" style="fill:#2B2340;stroke:none"/>'), 'It names one exact place.']
+  ];
+  function ray4Q(oc){
+    var r = RAY_4[randInt(0, RAY_4.length - 1)], wr = RAY_4.map(function(x){ return x[0]; }).filter(function(n){ return n !== r[0]; }).concat(['angle']);
+    return { speak:'What is this called? ' + r[2], prompt:'What is this called? ' + r[2], visual:r[1], options: strOpts(r[0], wr, oc) };
+  }
+  var SYM4_ITEMS = [['a square',4,[1,2,3,0]],['a rectangle that is not a square',2,[1,3,4,0]],['an equilateral triangle',3,[1,2,4,0]],['a regular hexagon',6,[2,3,4,8]],['an isosceles triangle',1,[0,2,3,4]]];
+  function sym4Q(oc){
+    var s = SYM4_ITEMS[randInt(0, 4)], sp = 'How many lines of symmetry does ' + s[0] + ' have?';
+    return { speak:sp, prompt:sp, visual:'', options: shuffle([s[1]].concat(shuffle(s[2]).slice(0, oc - 1))).map(function(v){ return { html:numHtml(v), correct:v === s[1] }; }) };
+  }
+  function fourth_shapes(){
+    return shuffle(tagSkill([triangle4Q(5)], 'Triangles').concat(tagSkill([degreeQ(), degreeQ()], 'Angles')).concat(tagSkill([polygon4Q(5)], 'Polygons')).concat(tagSkill([ray4Q(5)], 'Lines & Rays')).concat(tagSkill([sym4Q(5)], 'Symmetry')));
+  }
+
+  /* ---------------- Color Canyon: warm and cool, color schemes, principles of design ---------------- */
+  var WARMCOOL = { Red:'warm', Orange:'warm', Yellow:'warm', Green:'cool', Blue:'cool', Purple:'cool' };
+  function warmCoolQ(){
+    var names = Object.keys(WARMCOOL), c = names[randInt(0, names.length - 1)];
+    return { speak:'Is this color warm or cool?', prompt:'Is ' + c.toLowerCase() + ' a warm color or a cool color?', visual: swatchLg(CWHEEL[c]), options: two('Warm', 'Cool', WARMCOOL[c] === 'warm') };
+  }
+  var SCHEME_4 = [
+    P('Which color scheme uses colors that sit next to each other on the color wheel, like blue, blue-green, and green?', 'Analogous', ['Complementary','Monochromatic','Random','Primary']),
+    P('Which color scheme uses different tints and shades of just one color?', 'Monochromatic', ['Analogous','Complementary','Primary','Warm']),
+    P('Which color scheme uses two colors that sit across from each other, like blue and orange?', 'Complementary', ['Analogous','Monochromatic','Neutral','Cool']),
+    P('Light blue, medium blue, and dark blue make which kind of scheme?', 'Monochromatic', ['Complementary','Analogous','Warm','Random']),
+    P('Red, orange, and yellow sit next to each other on the wheel. They make which kind of scheme?', 'Analogous', ['Monochromatic','Complementary','Cool','Neutral']),
+    P('Which colors are called the primary colors?', 'Red, yellow, and blue', ['Green, orange, and purple','Black, white, and gray','Pink, brown, and tan','Red, green, and orange'])
+  ];
+  var DESIGN_4 = [
+    P('Which principle of design is about making one part stand out as the most important?', 'Emphasis', ['Balance','Pattern','Rhythm','Unity']),
+    P('Which principle of design makes both sides of a picture feel equal in weight?', 'Balance', ['Emphasis','Contrast','Movement','Rhythm']),
+    P('Which principle of design uses very different things, like light and dark, next to each other?', 'Contrast', ['Balance','Unity','Pattern','Rhythm']),
+    P('Which principle of design repeats shapes, lines, or colors again and again?', 'Pattern', ['Contrast','Emphasis','Balance','Movement']),
+    P('Which principle of design helps your eye travel across an artwork?', 'Movement', ['Balance','Pattern','Contrast','Emphasis']),
+    P('Which principle of design makes all the parts of an artwork feel like they belong together?', 'Unity', ['Contrast','Emphasis','Movement','Pattern'])
+  ];
+  var LINE_4 = [
+    P('Which kind of line goes straight up and down?', '⬆️|Vertical', ['➡️|Horizontal','↗️|Diagonal','〰️|Wavy','🔄|Spiral']),
+    P('Which kind of line goes side to side, like the horizon?', '➡️|Horizontal', ['⬆️|Vertical','↗️|Diagonal','⚡|Zigzag','🔄|Spiral']),
+    P('Which kind of line slants, like a slide?', '↗️|Diagonal', ['⬆️|Vertical','➡️|Horizontal','🔄|Spiral','⭕|Closed']),
+    P('Which kind of line has sharp points that go up and down?', '⚡|Zigzag', ['〰️|Wavy','⬆️|Vertical','➡️|Horizontal','⭕|Closed']),
+    P('Which describes the texture of sandpaper?', '🧱|Rough', ['🪞|Smooth','🧊|Slippery','☁️|Fluffy','💧|Wet']),
+    P('Value in art tells how…', '🌗|Light or dark a color is', ['🔊|Loud a sound is','💰|Much art costs','📏|Long a line is','🧱|Rough a surface is'])
+  ];
+  function fourth_colors(){
+    return shuffle(tagSkill([warmCoolQ()], 'Warm & Cool Colors').concat(pqs(SCHEME_4, 2, 5, 'Color Schemes')).concat(pqs(DESIGN_4, 2, 5, 'Principles of Design')).concat(pqs(LINE_4, 1, 5, 'Elements of Art')));
+  }
+
+  /* ---------------- Base Camp Math: multiply, divide, area, word problems ---------------- */
+  var MUL4 = [[23,4],[17,5],[36,3],[48,6],[52,7],[64,8],[75,9],[19,6],[38,4],[81,5],[27,8],[46,7],[125,4],[213,3],[304,5],[418,2]];
+  function mult4Q(oc){
+    var m = MUL4[randInt(0, MUL4.length - 1)], ans = m[0] * m[1];
+    return { speak:m[0] + ' times ' + m[1] + ' equals what?', prompt:m[0] + ' × ' + m[1] + ' = ?', visual: seqVisual([m[0], '×', m[1]]), options: numNear(ans, oc, [m[1], 10, 20, 100, m[0]], 10, 2000) };
+  }
+  var DIVR_4 = [[17,5],[23,4],[29,6],[38,7],[45,8],[50,9],[34,5],[62,8],[47,6],[75,10],[26,4],[59,7]];
+  function divRem4Q(oc){
+    var d = DIVR_4[randInt(0, DIVR_4.length - 1)], q = Math.floor(d[0] / d[1]), r = d[0] % d[1], right = q + ' R ' + r;
+    var cand = [(q + 1) + ' R ' + r, (q - 1) + ' R ' + r, q + ' R ' + (r + 1), q + ' R ' + (r > 0 ? r - 1 : r + 2), (q + 1) + ' R ' + (d[1] - r)].filter(function(x, i, a){ return x !== right && a.indexOf(x) === i && x.indexOf('-') === -1; });
+    return { speak:d[0] + ' divided by ' + d[1] + '. What is the quotient and remainder?', prompt:d[0] + ' ÷ ' + d[1] + ' = ? (R means remainder)', visual: seqVisual([d[0], '÷', d[1]]), options: strOpts(right, cand, oc, true) };
+  }
+  var WORD4 = [
+    ['Sam has 4 boxes with 12 pencils in each box. He gives away 15 pencils. How many pencils does he have left?', 33, [27,48,19,63]],
+    ['A bus holds 36 students. There are 5 buses. How many students can ride in all?', 180, [41,160,31,150]],
+    ['Mia read 24 pages each day for 6 days. How many pages did she read?', 144, [30,120,124,164]],
+    ['There are 96 stickers shared equally by 8 friends. How many stickers does each friend get?', 12, [88,104,11,14]],
+    ['A farmer packs 8 eggs in each carton. He has 7 cartons. How many eggs does he pack?', 56, [15,48,63,54]],
+    ['Tara had 85 dollars. She bought a game for 29 dollars and a book for 18 dollars. How much money does she have left?', 38, [47,56,114,67]],
+    ['A garden has 9 rows with 14 plants in each row. How many plants are there?', 126, [23,116,135,106]],
+    ['A ribbon is 150 centimeters long. Lia cuts it into pieces that are each 25 centimeters. How many pieces does she get?', 6, [5,7,125,175]]
+  ];
+  function word4Q(oc){
+    var w = WORD4[randInt(0, WORD4.length - 1)];
+    return { speak:w[0], prompt:w[0], visual:'', options: shuffle([w[1]].concat(shuffle(w[2]).slice(0, oc - 1))).map(function(v){ return { html:numHtml(v), correct:v === w[1] }; }) };
+  }
+  var AP4 = [[9,4,'area'],[12,3,'area'],[8,7,'area'],[11,5,'area'],[15,6,'perimeter'],[10,8,'perimeter'],[14,9,'perimeter'],[13,4,'perimeter']];
+  function areaPerim4Q(oc){
+    var a = AP4[randInt(0, AP4.length - 1)], l = a[0], w = a[1], ans = a[2] === 'area' ? l * w : 2 * (l + w);
+    var sc = Math.min(14, 190 / l), svg = '<svg viewBox="0 0 ' + (l * sc + 60) + ' ' + (w * sc + 50) + '" width="' + Math.min(320, l * sc + 80) + '" style="max-width:100%;height:auto;" aria-hidden="true"><rect x="30" y="14" width="' + (l * sc) + '" height="' + (w * sc) + '" fill="' + (a[2] === 'area' ? '#BFE3F6' : '#FFF1C2') + '" stroke="#2B2340" stroke-width="3"/><text x="' + (30 + l * sc / 2) + '" y="' + (w * sc + 38) + '" font-size="16" font-weight="800" text-anchor="middle" fill="#2B2340">' + l + ' ft</text><text x="' + (36 + l * sc) + '" y="' + (14 + w * sc / 2 + 6) + '" font-size="16" font-weight="800" fill="#2B2340">' + w + ' ft</text></svg>';
+    var sp = 'A rectangle is ' + l + ' feet long and ' + w + ' feet wide. What is its ' + a[2] + '?';
+    return { speak:sp, prompt:'What is the ' + a[2] + ' of the rectangle? (' + (a[2] === 'area' ? 'length × width' : 'distance around') + ')', visual:svg, options: numNear(ans, oc, [l, w, 2, 4, l + w], 4, 200) };
+  }
+  var COMP4 = [
+    ['A giraffe is 18 feet tall. A kitten is 2 feet tall. The giraffe is how many times as tall as the kitten?', 9, [7,8,16,20]],
+    ['Ella has 5 stickers. Her brother has 4 times as many. How many stickers does her brother have?', 20, [9,25,1,24]],
+    ['A red ribbon is 6 inches long. A blue ribbon is 7 times as long. How long is the blue ribbon?', 42, [13,48,36,35]],
+    ['Carlos is 8 years old. His grandfather is 9 times as old. How old is his grandfather?', 72, [17,64,81,63]],
+    ['A shelf holds 15 books. A bigger shelf holds 3 times as many. How many books does the bigger shelf hold?', 45, [18,30,12,60]],
+    ['A tree is 24 feet tall. A bush is 3 feet tall. The tree is how many times as tall as the bush?', 8, [6,7,21,9]]
+  ];
+  function comp4Q(oc){
+    var c = COMP4[randInt(0, COMP4.length - 1)];
+    return { speak:c[0], prompt:c[0], visual:'', options: shuffle([c[1]].concat(shuffle(c[2]).slice(0, oc - 1))).map(function(v){ return { html:numHtml(v), correct:v === c[1] }; }) };
+  }
+  function fourth_adding(){
+    return shuffle(tagSkill([mult4Q(5), mult4Q(5)], 'Multi-Digit Multiplication').concat(tagSkill([divRem4Q(5)], 'Division with Remainders')).concat(tagSkill([word4Q(5)], 'Multi-Step Word Problems')).concat(tagSkill([areaPerim4Q(5)], 'Area & Perimeter')).concat(tagSkill([comp4Q(5)], 'Multiplicative Comparison')));
+  }
+
+  /* ---------------- Nature Notebook: energy, Earth changes, plant and animal structures ---------------- */
+  var ENERGY_4 = [
+    P('Which type of energy can you hear?', '🔊|Sound energy', ['💡|Light energy','🔥|Heat energy','⚡|Electrical energy','🧲|Magnetic energy']),
+    P('You rub your hands together and they feel warm. What kind of energy do you feel?', '🔥|Heat', ['🔊|Sound','🧲|Magnetism','🌈|Color','🎈|Air']),
+    P('A battery lights a bulb. What kind of energy flows through the wire?', '⚡|Electrical energy', ['🔊|Sound energy','🌬️|Wind energy','🔥|Fire energy','🧊|Cold energy']),
+    P('Which material is a good conductor of heat?', '🥄|A metal spoon', ['🪵|A wooden spoon','🥤|A foam cup','🧤|A rubber glove','🧸|A stuffed toy']),
+    P('Sound is made when objects…', '🎸|Vibrate', ['🧊|Freeze','🎨|Change color','🪨|Stay still','🌈|Glow']),
+    P('Which one is a source of light energy?', '☀️|The Sun', ['🌙|The Moon','🪞|A mirror','🌑|A shadow','🪨|A rock']),
+    P('What happens when light hits a mirror?', '🪞|It bounces off (reflects)', ['🕳️|It disappears','🔥|It melts','🔊|It makes a sound','🧊|It freezes']),
+    P('A wind turbine changes the motion of wind into…', '💨|Electricity', ['🌧️|Rain','🍞|Food','🎨|Paint','🧊|Ice'])
+  ];
+  var EARTH_4 = [
+    P('What is weathering?', '🪨|Breaking rock into smaller pieces', ['🚚|Moving soil to a new place','🌱|Growing new plants','🌋|Making new mountains','💧|Making clouds']),
+    P('What is erosion?', '🚚|Moving bits of rock and soil from one place to another', ['🪨|Breaking rock into pieces','🌱|Planting seeds','🧊|Freezing water','🔥|Burning wood']),
+    P('What is deposition?', '⬇️|Dropping sediment in a new place', ['🪨|Cracking a rock','🌋|A volcano erupting','🌧️|Rain falling','🌬️|Wind blowing']),
+    P('Which of these can cause erosion?', '🌊|Flowing water', ['🏠|A parked house','🪑|A chair','📚|A book','🧸|A toy']),
+    P('Water freezes in a crack in a rock and the crack gets bigger. This is an example of…', '❄️|Weathering', ['🌋|A volcano','🚚|Deposition','🌱|Photosynthesis','🔥|Burning']),
+    P('What can fossils in rock layers tell us?', '🦴|About living things from long ago', ['📅|What day it is','🍎|How apples grow','🌦️|Tomorrow\'s weather','🎵|Songs from the past']),
+    P('In rock layers that have not been disturbed, which layer is usually the oldest?', '⬇️|The bottom layer', ['⬆️|The top layer','↔️|The middle layer','🌈|The brightest layer','🧊|The coldest layer']),
+    P('Which of these can change Earth\'s surface quickly?', '🌋|A volcano or an earthquake', ['🌱|A growing seed','🌙|The Moon rising','🍂|Falling leaves','☁️|A passing cloud'])
+  ];
+  var STRUCT_BIO_4 = [
+    P('What do roots do for a plant?', '🌱|Take in water and hold the plant in place', ['🌸|Make seeds','☀️|Make sunlight','🍃|Make wind','🐝|Catch bugs']),
+    P('What do leaves do for most plants?', '🍃|Use sunlight to make food', ['💧|Pull up water from soil','🌱|Hold the plant in the ground','🦋|Make butterflies','🧊|Keep the plant cold']),
+    P('What is the job of a flower?', '🌸|Help the plant make seeds', ['💧|Soak up water','🪨|Hold soil together','🌬️|Make wind','🐛|Eat insects']),
+    P('Which beak shape helps a bird crack seeds?', '🐦|A short, thick beak', ['🦆|A flat, wide beak','🦜|A very long, thin beak','🦅|A hook for tearing meat','🦢|A beak with no tip']),
+    P('Why do owls have large eyes?', '🦉|To see well in the dark', ['🍪|To eat cookies','🌞|To look at the sun','🌧️|To find rain','🎵|To sing']),
+    P('Which body part helps a fish breathe underwater?', '🐟|Gills', ['🫁|Lungs','🦷|Teeth','🦶|Feet','👂|Ears']),
+    P('Which part of your body protects your brain?', '💀|Skull', ['🦷|Teeth','🦵|Leg bone','💪|Muscles','🫁|Lungs']),
+    P('Which sense organ do you use to detect light?', '👁️|Eyes', ['👂|Ears','👃|Nose','👅|Tongue','🖐️|Skin'])
+  ];
+  function fourth_nature(){
+    return shuffle(pqs(ENERGY_4, 2, 5, 'Energy').concat(pqs(EARTH_4, 2, 5, 'Earth Changes')).concat(pqs(STRUCT_BIO_4, 2, 5, 'Plant & Animal Structures')));
+  }
+
+  /* ---------------- Health Hollow ---------------- */
+  var NUTR_4 = [
+    P('Which nutrient gives your body the most quick energy?', '🍞|Carbohydrates', ['🥩|Protein','🧈|Water','🧂|Salt','🧊|Ice']),
+    P('Which nutrient helps build and repair muscles?', '🥚|Protein', ['🍬|Sugar','🧂|Salt','🥤|Soda','🍭|Candy']),
+    P('Which mineral helps build strong bones and teeth?', '🥛|Calcium', ['🧂|Salt','🍬|Sugar','🔩|Iron nails','🍋|Lemon juice']),
+    P('Which food is a good source of fiber?', '🥦|Beans and whole grains', ['🍭|Lollipops','🥤|Soda','🍟|Fries','🧁|Frosting']),
+    P('What are vitamins and minerals?', '🍊|Nutrients your body needs in small amounts', ['🍬|Candy ingredients','🧴|Kinds of soap','🔋|Batteries','🎒|School supplies']),
+    P('About how much of your plate should be fruits and vegetables?', '🍽️|About half', ['🥄|Almost none','🍽️|All of it','🥄|One bite','🍽️|Exactly one tenth']),
+    P('Which food has the most added sugar?', '🍫|A candy bar', ['🍎|An apple','🥕|A carrot','🥛|Plain milk','🥦|Broccoli']),
+    P('Which one is a healthy snack?', '🥕|Carrot sticks and hummus', ['🍭|A lollipop','🍟|A bag of fries','🥤|A large soda','🍰|Frosting from a can'])
+  ];
+  var BODY_4 = [
+    P('Where do most nutrients get absorbed into your blood?', '🍽️|Small intestine', ['🫁|Lungs','🧠|Brain','🦷|Teeth','💪|Muscles']),
+    P('What does your heart do?', '🫀|Pumps blood through your body', ['🍽️|Breaks down food','🌬️|Fills with air','🦴|Holds your body up','🧠|Stores memories']),
+    P('What do your lungs do?', '🫁|Bring in oxygen and send out carbon dioxide', ['🍽️|Break down food','🩸|Make bones','🧠|Control thinking','💪|Move your arms']),
+    P('Which body system sends messages between your brain and body?', '🧠|Nervous system', ['🍽️|Digestive system','🫁|Respiratory system','🦴|Skeletal system','🛡️|Immune system']),
+    P('What is the largest organ of the human body?', '🧍|Skin', ['🫀|Heart','🧠|Brain','🫁|Lungs','🦷|Tooth']),
+    P('What do red blood cells carry?', '🩸|Oxygen', ['🍎|Apples','🔊|Sound','💡|Light','🧂|Salt']),
+    P('Which body system uses muscles to move your bones?', '💪|Muscular system', ['🍽️|Digestive system','🧠|Nervous system','🫁|Respiratory system','🛡️|Immune system'])
+  ];
+  var STRESS_4 = [
+    P('Which is a healthy way to calm down when you feel stressed?', '🌬️|Take slow, deep breaths', ['🥊|Hit something','📢|Yell at a friend','🙈|Pretend nothing is wrong forever','🍬|Eat a lot of candy']),
+    P('You feel nervous about a test. What can help?', '📝|Study a little each day and get a good night of sleep', ['😴|Stay up all night','🙈|Skip the test','😡|Be angry at the teacher','🍬|Eat only candy']),
+    P('Who can you talk to when you feel sad or worried?', '👨‍👩‍👧|A trusted adult', ['🤐|No one','🤷|A stranger online','📱|Any app','🪞|Only your mirror']),
+    P('Which activity can help reduce stress?', '🏃|Exercise or playing outside', ['📺|Watching TV for hours','🛌|Staying in bed all day','🍟|Eating chips','📱|Scrolling for hours']),
+    P('Sleep is important because it helps your…', '😴|Body and brain recover', ['📺|TV get brighter','🧸|Toys get clean','🏫|School get closer','🎒|Bag get lighter'])
+  ];
+  var SAFE_4 = [
+    P('What should you do if your clothes catch fire?', '🔥|Stop, drop, and roll', ['🏃|Run fast','🌬️|Blow on it','📞|Call a friend first','🙈|Hide in a closet']),
+    P('What number do you call in an emergency in the United States?', '📞|911', ['111','411','311','999']),
+    P('You find a gun. What should you do?', '🛑|Do not touch it, leave, and tell an adult', ['🔫|Pick it up','📸|Take a photo','🎮|Play with it','🙈|Hide it']),
+    P('Why should you wear a helmet when you ride a bike?', '🚲|It protects your head', ['🎨|It makes the bike red','🔊|It plays music','🏁|It makes you win','🌬️|It keeps wind away']),
+    P('Which online habit is safest?', '🔐|Keep your passwords private', ['🔑|Share them with friends','📝|Write them on your desk','🌐|Post them online','📱|Use the same one everywhere']),
+    P('Before you cross a street, you should…', '🚦|Stop, look both ways, and listen', ['📱|Look at your phone','🏃|Run across','🎧|Turn up music','🙈|Close your eyes'])
+  ];
+  var SUBST_4 = [
+    P('Why is vaping harmful for kids?', '🚭|It can harm the growing brain and lungs', ['🍬|It makes you taller','💪|It builds muscles','🧠|It helps you learn','🌈|It is just water']),
+    P('Medicine is safe when it is…', '💊|Taken only as directed by a trusted adult', ['🍬|Shared with friends','🍯|Eaten like candy','🧃|Mixed into juice for fun','🎒|Carried in a backpack']),
+    P('Which is a good way to say no to peer pressure?', '✋|Say no firmly and walk away', ['😬|Go along with it','🤫|Do it secretly','😂|Laugh and give in','🏃|Dare them back']),
+    P('Where should household medicine and cleaners be kept?', '🔒|Up high or locked away', ['🧸|On the floor','🎒|In your backpack','🍽️|On the dinner table','🛁|In the bathtub']),
+    P('Nicotine is a drug found in…', '🚬|Tobacco and vape products', ['🍎|Apples','🥛|Milk','🍞|Bread','💧|Water'])
+  ];
+  function fourth_health(){
+    return shuffle(pqs(NUTR_4, 2, 5, 'Nutrition').concat(pqs(BODY_4, 1, 5, 'Body Systems')).concat(pqs(STRESS_4, 1, 5, 'Stress & Sleep')).concat(pqs(SAFE_4, 1, 5, 'Staying Safe')).concat(pqs(SUBST_4, 1, 5, 'Medicine & Tobacco Safety')));
+  }
+
+  /* ---------------- Keyboard Camp ---------------- */
+  var TYPE4 = ['temperature','environment','experience','necessary','restaurant','imagination','mysterious','neighborhood','electricity','communicate','understand','vegetable','celebrate','technology','pioneer','survival','pyramid','dictionary','volcano','telescope','continent','amazing','celebrate','knowledge','decimal','symmetry','equation','paragraph','character','invention'];
+  function fourth_typing(){
+    var pool = TYPE4.filter(function(w, i, a){ return a.indexOf(w) === i; });
+    var out = sample(pool, 6).map(function(w){ return typeQ(w, 'Type the word ' + w + '.', 'Type the word ' + w, '', 'Typing Long Words'); });
+    var nm = cleanName();
+    if (nm) out[out.length - 1] = typeQ(nm.toLowerCase(), 'Type your name, ' + nm + '.', 'Type your name, ' + nm, '', 'Typing My Name');
+    return shuffle(out);
+  }
+
+  /* ---------------- Campfire Circle ---------------- */
+  var FEEL_WORDS_4 = [
+    P('What does "frustrated" mean?', 'Upset because something is hard or not working', ['Very sleepy','Full of energy','Proud of a friend','Quiet and calm']),
+    P('What does "disappointed" mean?', 'Sad because something did not turn out as you hoped', ['Excited about a surprise','Angry at the weather','Thankful for a gift','Tired after a run']),
+    P('What does "empathy" mean?', 'Understanding how someone else feels', ['Winning a game','Being very loud','Knowing every answer','Being alone']),
+    P('What does "optimistic" mean?', 'Expecting good things to happen', ['Always worried','Feeling sleepy','Not caring at all','Feeling jealous']),
+    P('What does "resilient" mean?', 'Able to bounce back after a hard time', ['Easy to break','Very loud','Always first','Afraid of change']),
+    P('What does "embarrassed" mean?', 'Feeling shy or awkward about something', ['Feeling very strong','Feeling very hungry','Feeling thankful','Feeling calm'])
+  ];
+  var CHOICES_4 = [
+    P('Two friends both want the same game. What is a fair way to solve it?', '🤝|Take turns or agree on a plan', ['🥊|Fight for it','😤|Take it by force','🚪|Never talk again','📢|Tell everyone the other is mean']),
+    P('Your friend is left out at recess. What can you do?', '👋|Invite them to join in', ['🙈|Ignore them','😂|Laugh about it','🚶|Walk away','📣|Tell others to stay away']),
+    P('You made a mistake that hurt someone\'s feelings. What is the best next step?', '🗣️|Say sorry and try to make it right', ['🙈|Pretend it did not happen','👉|Blame someone else','🚪|Leave','😠|Get angry']),
+    P('You feel angry. Which choice helps you stay calm?', '🌬️|Take a break and breathe slowly', ['🥊|Hit a wall','📢|Scream at someone','💣|Break things','🤥|Tell a lie']),
+    P('A classmate says something unkind to you. What is a strong response?', '🛡️|Calmly say "That is not okay" and tell an adult if it continues', ['😠|Say something meaner','🙈|Say nothing forever','📱|Post about it online','🥊|Hit them']),
+    P('What is a growth mindset?', '🌱|Believing you can get better with practice', ['🚫|Believing you can never learn','🏆|Always being the best','😴|Skipping hard things','🙈|Hiding mistakes']),
+    P('Someone asks you to keep a secret that could hurt someone. What should you do?', '🙋|Tell a trusted adult', ['🤐|Keep it secret','📱|Tell everyone online','🚶|Walk away and forget','😂|Laugh about it']),
+    P('A group project partner is not helping. What is a good first step?', '💬|Politely ask them to help and share the work', ['😠|Yell at them','🏃|Quit the project','🙈|Do everything alone and complain','📢|Tell the whole class'])
+  ];
+  function fourth_feelings(){
+    return shuffle(pqs(FEEL_WORDS_4, 2, 5, 'Feeling Words').concat(pqs(CHOICES_4, 4, 5, 'Kind & Calm Choices')));
+  }
+
+  /* ---------------- Compare Ridge: conversions, line plots, time, money ---------------- */
+  var CONV_4 = [
+    ['How many inches are in 3 feet?', 36, [30,24,12,48]], ['How many minutes are in 2 hours?', 120, [60,100,90,200]], ['How many centimeters are in 4 meters?', 400, [40,44,100,4000]],
+    ['How many grams are in 3 kilograms?', 3000, [300,30,1000,6000]], ['How many feet are in 4 yards?', 12, [4,8,16,3]], ['How many seconds are in 3 minutes?', 180, [60,120,300,30]],
+    ['How many pints are in 2 quarts?', 4, [2,8,6,3]], ['How many ounces are in 2 pounds?', 32, [16,8,24,64]], ['How many days are in 3 weeks?', 21, [7,14,28,30]],
+    ['How many millimeters are in 5 centimeters?', 50, [5,500,15,10]], ['How many cups are in 3 pints?', 6, [3,4,8,12]], ['How many quarts are in 3 gallons?', 12, [3,6,8,16]]
+  ];
+  function conv4Q(oc){
+    var c = CONV_4[randInt(0, CONV_4.length - 1)];
+    return { speak:c[0], prompt:c[0], visual:'', options: shuffle([c[1]].concat(shuffle(c[2]).slice(0, oc - 1))).map(function(v){ return { html:bigHtml(v), correct:v === c[1] }; }) };
+  }
+  var LP_4 = [[0,2,3,4,1,0],[1,0,2,3,3,1],[0,1,4,2,0,2],[2,1,0,3,1,1],[0,3,2,0,4,1]];
+  function linePlotSvg(counts){
+    var s = '<svg viewBox="0 0 320 130" width="340" style="max-width:100%;height:auto;" aria-hidden="true"><line x1="20" y1="100" x2="300" y2="100" stroke="#2B2340" stroke-width="3" stroke-linecap="round"/>';
+    counts.forEach(function(c, i){
+      var x = 40 + i * 48;
+      s += '<line x1="' + x + '" y1="94" x2="' + x + '" y2="106" stroke="#2B2340" stroke-width="3"/><text x="' + x + '" y="124" font-size="15" font-weight="800" text-anchor="middle" fill="#2B2340">' + (i + 1) + '</text>';
+      for (var k = 0; k < c; k++) s += '<text x="' + x + '" y="' + (88 - k * 20) + '" font-size="20" font-weight="800" text-anchor="middle" fill="#C2410C">X</text>';
+    });
+    return s + '</svg>';
+  }
+  function linePlot4Q(oc){
+    var cnt = LP_4[randInt(0, LP_4.length - 1)], kind = randInt(0, 2), ans, sp, pr, nz = [];
+    cnt.forEach(function(c, k){ if (c > 0) nz.push(k); });
+    var i = nz[randInt(0, nz.length - 1)];
+    if (kind === 0){ ans = cnt[i]; sp = 'The line plot shows how many inches long each pencil is. How many pencils are ' + (i + 1) + (i === 0 ? ' inch' : ' inches') + ' long?'; pr = 'How many pencils are ' + (i + 1) + (i === 0 ? ' inch' : ' inches') + ' long?'; }
+    else if (kind === 1){ ans = cnt.reduce(function(a, b){ return a + b; }, 0); sp = 'Each X is one pencil. How many pencils are shown in all?'; pr = 'How many pencils are shown in all?'; }
+    else { var m = Math.max.apply(null, cnt); ans = cnt.indexOf(m) + 1; sp = 'Each X is one pencil. What length is the most common?'; pr = 'What length (in inches) is the most common?'; if (cnt.filter(function(c){ return c === m; }).length > 1){ ans = cnt.reduce(function(a, b){ return a + b; }, 0); sp = 'Each X is one pencil. How many pencils are shown in all?'; pr = 'How many pencils are shown in all?'; } }
+    return { speak:sp, prompt:pr, visual:'<div class="add-stage">' + linePlotSvg(cnt) + '</div>', options: numNear(ans, oc, [1, 2, 3], 0, 20) };
+  }
+  var ELAPSE_4 = [['1:20','3:05'],['2:10','4:40'],['9:30','11:15'],['3:45','5:15'],['10:05','12:35'],['7:15','8:50'],['12:20','2:10'],['4:10','6:00']];
+  function elapse4Q(oc){
+    var e = ELAPSE_4[randInt(0, ELAPSE_4.length - 1)], pt = function(t){ var a = t.split(':'); return +a[0] % 12 * 60 + +a[1]; }, mins = (pt(e[1]) - pt(e[0]) + 720) % 720;
+    var fm = function(m){ var h = Math.floor(m / 60), r = m % 60; return (h ? h + (h === 1 ? ' hour' : ' hours') : '') + (h && r ? ' ' : '') + (r ? r + ' minutes' : ''); };
+    var right = fm(mins), cand = [mins + 15, mins - 15, mins + 60, mins - 60, mins + 30, mins - 30].filter(function(m){ return m > 0; }).map(fm);
+    return { speak:'Practice starts at ' + e[0] + ' and ends at ' + e[1] + '. How much time passes?', prompt:'How much time passes from ' + e[0] + ' to ' + e[1] + '?', visual:'', options: strOpts(right, cand, oc) };
+  }
+  var MONEY_4 = [
+    ['Maya buys a book for $3.45 and a pen for $1.20. How much does she spend in all?', '$4.65', ['$4.55','$5.65','$3.65','$4.25']],
+    ['Leo pays for a $2.35 snack with a $5.00 bill. How much change should he get?', '$2.65', ['$2.75','$3.65','$2.35','$3.35']],
+    ['A notebook costs $4.75 and a marker costs $1.50. How much more is the notebook?', '$3.25', ['$3.75','$6.25','$2.25','$4.25']],
+    ['Sara has $10.00. She buys a toy for $6.40. How much money is left?', '$3.60', ['$4.60','$3.40','$4.40','$16.40']],
+    ['Three apples cost $0.75 each. How much do all three cost?', '$2.25', ['$1.75','$3.25','$2.75','$2.50']],
+    ['A ticket costs $8.50. Dad buys 2 tickets. How much does he pay?', '$17.00', ['$16.00','$10.50','$18.00','$15.50'] ]
+  ];
+  function money4Q(oc){
+    var m = MONEY_4[randInt(0, MONEY_4.length - 1)];
+    return { speak:m[0], prompt:m[0], visual:'', options: strOpts(m[1], m[2], oc, true) };
+  }
+  function fourth_compare(){
+    return shuffle(tagSkill([conv4Q(5), conv4Q(5)], 'Unit Conversions').concat(tagSkill([linePlot4Q(5), linePlot4Q(5)], 'Line Plots')).concat(tagSkill([elapse4Q(5)], 'Elapsed Time')).concat(tagSkill([money4Q(5)], 'Money & Decimals')));
+  }
+
+  /* ---------------- Community Camp: Utah history, geography, government ---------------- */
+  var UHIST_4 = [
+    P('In what year did Utah become a state?', '1896', ['1847','1869','1912','1776']),
+    P('Which leader guided the first group of Latter-day Saint pioneers into the Salt Lake Valley in 1847?', 'Brigham Young', ['Abraham Lincoln','John Wesley Powell','Jim Bridger','Ulysses Grant']),
+    P('On which date does Utah celebrate Pioneer Day?', 'July 24', ['July 4','December 25','September 1','March 17']),
+    P('What happened at Promontory Summit, Utah, in 1869?', '🚂|A golden spike joined two railroads', ['🌋|A volcano erupted','🏆|The Olympics began','🗳️|Utah became a state','🐎|A pony race was held']),
+    P('When were the Winter Olympic Games held in Salt Lake City?', '2002', ['1996','1988','2010','1984']),
+    P('What is Utah\'s capital city?', 'Salt Lake City', ['Provo','Ogden','St. George','Logan']),
+    P('Why did many pioneers travel west to Utah in the 1840s?', '🛤️|To find a place to live and worship freely', ['🏝️|To visit the beach','🎡|To see a fair','🛒|To shop at a mall','🏆|To win a race'])
+  ];
+  var UNAT_4 = [
+    P('Which Native American nations have homelands in Utah?', 'The Ute, Goshute, Paiute, Navajo, and Shoshone', ['The Cherokee, Seminole, and Sioux','The Inuit and Aleut','The Mohawk and Iroquois','The Hopi and Cree only']),
+    P('Which Native American nation has a large homeland in southeastern Utah and the Four Corners area?', 'The Navajo (Diné)', ['The Inuit','The Seminole','The Cherokee','The Iroquois']),
+    P('Which group lived in the dry west desert of Utah, including near the Great Salt Lake Desert?', 'The Goshute', ['The Cherokee','The Seminole','The Mohawk','The Inuit']),
+    P('What is a reservation?', '🏞️|Land set aside for a Native American nation', ['🏨|A hotel booking','🍽️|A restaurant table','🚌|A bus route','🏫|A school classroom']),
+    P('What do we call things people made long ago that tell us how they lived?', '🏺|Artifacts', ['🍎|Snacks','🌧️|Weather','🎨|Colors','📏|Rulers'])
+  ];
+  var UGEO_4 = [
+    P('What is the highest point in Utah?', 'Kings Peak', ['Mount Everest','Mount Whitney','Pikes Peak','Mount Rushmore']),
+    P('Which is one of Utah\'s five national parks?', 'Bryce Canyon', ['Yellowstone','Yosemite','Glacier','Grand Teton']),
+    P('Which state shares Utah\'s eastern border?', 'Colorado', ['Nevada','Oregon','Montana','Texas']),
+    P('Which state borders Utah on the west?', 'Nevada', ['Colorado','Wyoming','New Mexico','Idaho']),
+    P('Which large lake is in northern Utah and is saltier than the ocean?', 'Great Salt Lake', ['Lake Powell','Bear Lake','Utah Lake','Lake Tahoe']),
+    P('What do we call a very dry area that gets little rain?', '🏜️|Desert', ['🌧️|Rainforest','🧊|Glacier','🌊|Ocean','🏔️|Peak']),
+    P('Utah is in which part of the United States?', 'The West', ['The Northeast','The Southeast','The Midwest','The far North'])
+  ];
+  var UGOV_4 = [
+    P('Who leads the executive branch of Utah\'s government?', 'The governor', ['A mayor','The principal','A senator in Washington','A judge']),
+    P('Which group makes the laws for Utah?', 'The Utah State Legislature', ['The U.S. Supreme Court','The school board','The governor alone','The police']),
+    P('What are taxes used for?', '🛣️|Roads, schools, and other public services', ['🍬|Candy for the mayor','🎮|Video games for the government','🏖️|Vacations','🧸|Toys']),
+    P('Which is a responsibility of a citizen?', '🗳️|Obey laws and vote when old enough', ['🎢|Skip all rules','🙈|Ignore the community','🗑️|Litter','😴|Never help anyone']),
+    P('What is a constitution?', '📜|The plan and basic rules of a government', ['🍽️|A kind of menu','🌦️|A weather report','🎶|A song book','🏟️|A game schedule'])
+  ];
+  var USYM_4 = [
+    P('What is Utah\'s state flower?', '🌷|Sego lily', ['🌹|Rose','🌻|Sunflower','🌼|Daisy','🪻|Violet']),
+    P('What is Utah\'s state bird?', '🐦|California gull', ['🦅|Bald eagle','🦉|Great horned owl','🦆|Mallard duck','🕊️|Dove']),
+    P('What is Utah\'s state motto?', 'Industry', ['Freedom','Liberty','Honor','Explore']),
+    P('What symbol is on Utah\'s state flag and is a sign of hard work?', '🐝|The beehive', ['🌲|A pine tree','🦅|An eagle','🌵|A cactus','⭐|A big star']),
+    P('Utah is nicknamed the ___ State.', '🐝|Beehive', ['☀️|Sunshine','🍑|Peach','🌲|Evergreen','🌽|Corn'])
+  ];
+  function fourth_community(){
+    return shuffle(pqs(UHIST_4, 2, 5, 'Utah History').concat(pqs(UNAT_4, 1, 5, 'Native Peoples')).concat(pqs(UGEO_4, 1, 5, 'Utah Geography')).concat(pqs(UGOV_4, 1, 5, 'Government & Citizenship')).concat(pqs(USYM_4, 1, 5, 'Utah Symbols')));
+  }
+
+  var FOURTH_BUILDERS = {
+    myname: function(){ return buildMyName('first'); }, rhyme: fourth_rhyme, letters: fourth_letters, story: fourth_story,
+    sightwords: fourth_sightwords, counting: fourth_counting, patterns: fourth_patterns, shapes: fourth_shapes, colors: fourth_colors,
+    adding: fourth_adding, nature: fourth_nature, health: fourth_health, typing: fourth_typing, feelings: fourth_feelings,
+    compare: fourth_compare, community: fourth_community
+  };
+  Object.keys(FOURTH_BUILDERS).forEach(function(id){
+    if (id === 'myname') return;
+    var fn = FOURTH_BUILDERS[id];
+    FOURTH_BUILDERS[id] = function(){
+      var r;
+      for (var t = 0; t < 40; t++){
+        r = fn();
+        var ks = r.map(function(q){ return q.skill + '|' + qKey(q, id); });
+        if (ks.filter(function(k, i){ return ks.indexOf(k) === i; }).length === ks.length) return r;
+      }
+      return r;
+    };
+  });
+  var FOURTH_DESC = {
+    myname:'Spell my name', rhyme:'Roots & word parts', letters:'Grammar & spelling', story:'Point of view & text structure',
+    sightwords:'Context clues & analogies', counting:'Place value & fractions', patterns:'Factors & primes', shapes:'Triangles & angles',
+    colors:'Color schemes & design', adding:'Multi-digit math', nature:'Energy & Earth changes', health:'Nutrition & safety',
+    typing:'Type long words', feelings:'Empathy & problem solving', compare:'Conversions & line plots', community:'Utah history'
+  };
+
+  /* ======================================================================================
+     5th Grade (age 10). Written against the Utah 5th Grade Core standards (ELA, math, science,
+     social studies, health, fine arts). Same rules as the earlier levels: every stop has its own
+     round, every pool is finite and fixed so Right / Total stays meaningful.
+     ====================================================================================== */
+  function decStr(v, places){ return String(+Number(v).toFixed(places === undefined ? 2 : places)); }
+  function decNear(v, oc, places){
+    var cand = [], p = Math.pow(10, places === undefined ? 2 : places);
+    [0.1, 1, 0.01, 10, 0.5, 2].forEach(function(s){ [v + s, v - s].forEach(function(w){ var t = Math.round(w * p) / p; if (t > 0 && Math.abs(t - v) > 1e-9 && cand.indexOf(decStr(t, places)) === -1) cand.push(decStr(t, places)); }); });
+    return strOpts(decStr(v, places), cand, oc, true);
+  }
+  function numStrOpts(right, wrongs, oc){
+    return shuffle([right].concat(shuffle(wrongs.filter(function(w){ return w !== right; })).slice(0, oc - 1))).map(function(v){ return { html:bigHtml(v), correct:v === right }; });
+  }
+  function frOpts(right, wrongs, oc){ return strOpts(right, wrongs, oc, true); }
+
+  /* ---------------- Rhyme River: roots, prefixes, suffixes, confused words ---------------- */
+  var ROOTS_5 = [
+    ['chron','time','chronological'], ['spect','look','spectator'], ['rupt','break','interrupt'], ['scrib','write','describe'], ['vis','see','visible'],
+    ['aud','hear','audience'], ['hydro','water','hydrate'], ['ped','foot','pedal'], ['cycl','circle','bicycle'], ['ject','throw','eject'],
+    ['bene','good','benefit'], ['mem','remember','memory'], ['terr','land','territory'], ['mit','send','transmit']
+  ];
+  function root5Q(oc){
+    var r = ROOTS_5[randInt(0, ROOTS_5.length - 1)], wr = ROOTS_5.filter(function(x){ return x[1] !== r[1]; }).map(function(x){ return x[1]; });
+    var sp = 'In the word ' + r[2] + ', what does the root ' + r[0] + ' mean?';
+    return { speak:sp, prompt:sp, visual:'<div class="word-seq"><span>' + r[0] + '</span><span>=</span><span>?</span></div>', options: strOpts(r[1], wr, oc) };
+  }
+  var PREF_5 = [
+    ['anti','against','antibody'], ['trans','across','transport'], ['semi','half','semicircle'], ['mid','middle','midnight'], ['pre','before','preview'],
+    ['post','after','postgame'], ['multi','many','multicolor'], ['under','too little','underestimate'], ['ex','out','export']
+  ];
+  function prefix5Q(oc){
+    var p = PREF_5[randInt(0, PREF_5.length - 1)], wr = PREF_5.filter(function(x){ return x[1] !== p[1]; }).map(function(x){ return x[1]; });
+    var sp = 'What does the prefix ' + p[0] + ' mean in the word ' + p[2] + '?';
+    return { speak:sp, prompt:sp, visual:'<div class="word-seq"><span>' + p[0] + '-</span><span>+</span><span>' + p[2].slice(p[0].length) + '</span></div>', options: strOpts(p[1], wr, oc) };
+  }
+  var SUFF_5 = [
+    ['ology','study of','biology'], ['ify','make or become','simplify'], ['tion','act or process of','creation'], ['ity','state or quality of','safety'],
+    ['ward','in the direction of','backward'], ['less','without','fearless'], ['ist','person who','artist']
+  ];
+  function suffix5Q(oc){
+    var s = SUFF_5[randInt(0, SUFF_5.length - 1)], wr = SUFF_5.filter(function(x){ return x[1] !== s[1]; }).map(function(x){ return x[1]; });
+    var sp = 'What does the suffix ' + s[0] + ' mean in the word ' + s[2] + '?';
+    return { speak:sp, prompt:sp, visual:'<div class="word-seq"><span>' + s[2].slice(0, s[2].length - s[0].length) + '</span><span>+</span><span>-' + s[0] + '</span></div>', options: strOpts(s[1], wr, oc) };
+  }
+  var CONF_5 = [
+    ['Rain can ___ our plans for the picnic.', 'affect', ['effect','effects','affected','effecting']], ['The medicine had a good ___ on her cough.', 'effect', ['affect','affected','effective','affects']],
+    ['Please ___ my apology.', 'accept', ['except','expect','excerpt','exceed']], ['Everyone ___ Sam was ready on time.', 'except', ['accept','expect','excerpt','exceed']],
+    ['The ___ of our school welcomed the new students.', 'principal', ['principle','prince','principe','principals']], ['Honesty is an important ___.', 'principle', ['principal','prince','principe','principals']],
+    ['I wonder ___ it will rain tomorrow.', 'whether', ['weather','wether','wheather','whither']], ['The ___ is sunny and warm today.', 'weather', ['whether','wether','wheather','whither']],
+    ['A camel can live in the ___.', 'desert', ['dessert','desart','desirt','dezert']], ['We had apple pie for ___.', 'dessert', ['desert','dessirt','desset','desart']],
+    ['Press the ___ to slow down the bike.', 'brake', ['break','brack','braik','brak']], ['The capital of Utah is Salt Lake City, but the ___ building is on a hill.', 'capitol', ['capital','capitel','capitall','captiol']]
+  ];
+  function conf5Q(oc){
+    var c = CONF_5[randInt(0, CONF_5.length - 1)];
+    return fillQ('Which word fits the blank?', c[0], c[1], c[2], oc);
+  }
+  function fifth_rhyme(){
+    return shuffle(tagSkill([root5Q(5), root5Q(5)], 'Greek & Latin Roots').concat(tagSkill([prefix5Q(5)], 'Prefixes')).concat(tagSkill([suffix5Q(5)], 'Suffixes')).concat(tagSkill([conf5Q(5), conf5Q(5)], 'Commonly Confused Words')));
+  }
+
+  /* ---------------- ABC Trailhead: grammar and spelling ---------------- */
+  var PERFECT_5 = [
+    ['Which sentence uses the present perfect tense?', 'I have finished my homework.', ['I finished my homework.','I had finished my homework.','I will finish my homework.','I am finishing my homework.']],
+    ['Which sentence uses the past perfect tense?', 'She had eaten before we arrived.', ['She ate before we arrived.','She eats before we arrive.','She will eat before we arrive.','She was eating when we arrived.']],
+    ['Which sentence uses the future perfect tense?', 'By noon, we will have finished the project.', ['By noon, we finished the project.','By noon, we will finish the project.','By noon, we are finishing the project.','By noon, we finish the project.']],
+    ['Which sentence keeps the same tense all the way through?', 'Last night we ate dinner and watched a movie.', ['Last night we ate dinner and watch a movie.','Last night we eat dinner and watched a movie.','Last night we eating dinner and watched a movie.','Last night we will eat dinner and watched a movie.']],
+    ['Which sentence keeps the same tense all the way through?', 'Tomorrow she will pack her bag and leave early.', ['Tomorrow she will pack her bag and left early.','Tomorrow she packed her bag and will leave early.','Tomorrow she packs her bag and left early.','Tomorrow she will pack her bag and leaves early.']],
+    ['Which sentence uses the present perfect tense?', 'They have lived in Utah for five years.', ['They lived in Utah for five years.','They will live in Utah for five years.','They had lived in Utah when they were small.','They are living in Utah.']]
+  ];
+  var CONJ_5 = [
+    ['Which words complete the sentence? "___ my brother ___ my sister likes broccoli."', 'Neither … nor', ['Either … nor','Both … or','Neither … or','Both … nor']],
+    ['Which words complete the sentence? "You can ___ stay inside ___ play outside."', 'either … or', ['neither … or','both … nor','either … nor','both … or']],
+    ['Which word best connects the ideas? "I took an umbrella ___ it was raining."', 'because', ['but','or','although','unless']],
+    ['Which word best connects the ideas? "We will go to the park ___ it rains."', 'unless', ['because','and','so','since']],
+    ['Which word best connects the ideas? "I wanted to play, ___ my homework was not done."', 'but', ['because','so','or','and']],
+    ['Which word best connects the ideas? "She was tired, ___ she went to bed early."', 'so', ['but','or','although','unless']]
+  ];
+  var PREP_5 = [
+    ['Which word is a preposition? "The cat slept under the table."', 'under', ['cat','slept','table','the']],
+    ['Which word is an interjection? "Wow! That was amazing."', 'Wow', ['That','was','amazing','the']],
+    ['Which word is a conjunction? "I like tea and cookies."', 'and', ['like','tea','cookies','I']],
+    ['Which word is a preposition? "We walked through the forest."', 'through', ['We','walked','forest','the']],
+    ['Which word is an interjection? "Oh no! I forgot my lunch."', 'Oh no', ['forgot','lunch','my','I']],
+    ['Which word is a conjunction? "He ran fast, but he lost the race."', 'but', ['ran','fast','race','lost']]
+  ];
+  var PUNCT_5 = [
+    ['Which sentence uses commas correctly?', 'However, we stayed inside.', ['However we, stayed inside.','However we stayed, inside.','However, we, stayed inside.','However we stayed inside,.']],
+    ['Which sentence uses commas correctly?', 'My friend, Mia, plays the piano.', ['My friend Mia, plays the piano.','My friend, Mia plays the piano.','My, friend Mia plays the piano.','My friend Mia plays, the piano.']],
+    ['Which sentence uses a comma correctly?', 'You like pizza, don\'t you?', ['You, like pizza don\'t you?','You like pizza don\'t, you?','You like, pizza don\'t you?','You like pizza don\'t you,?']],
+    ['Which sentence uses commas correctly in a list?', 'We bought apples, pears, and grapes.', ['We bought apples pears, and grapes.','We bought, apples pears and grapes.','We bought apples, pears and, grapes.','We bought apples pears and, grapes.']],
+    ['Which should be put in quotation marks?', 'The title of a poem', ['The title of a book','The title of a movie','The name of a city','The title of a magazine']],
+    ['Which should be written in italics or underlined?', 'The title of a book', ['The title of a poem','The title of a short story','The title of a song','The title of a chapter']]
+  ];
+  var SPELL_5 = [
+    ['rhythm',['rythm','rhythem','rhythum','rithm']], ['conscience',['concience','consience','conscence','conshence']], ['guarantee',['garantee','guarentee','gaurantee','guarante']],
+    ['privilege',['priviledge','privelege','privlege','privilage']], ['immediately',['immediatly','imediately','immediatley','immedietely']], ['recommend',['reccomend','recomend','recommed','reccommend']],
+    ['vacuum',['vaccum','vacume','vaccuum','vacum']], ['maintenance',['maintainance','maintenence','maintanance','maintenace']], ['sufficient',['sufficent','suficient','sufficiant','sufisient']],
+    ['schedule',['shedule','scedule','schedual','skedule']], ['particular',['particuler','perticular','particlar','particulur']], ['exaggerate',['exagerate','exaggarate','exaggerete','exagirate']]
+  ];
+  function spell5Qs(n, oc){
+    return shuffle(SPELL_5).slice(0, n).map(function(s){ return { speak:'Which word is spelled correctly?', prompt:'Which word is spelled correctly?', visual:'', options: strOpts(s[0], s[1], oc) }; });
+  }
+  function fifth_letters(){
+    return shuffle(pqs(P4(PERFECT_5), 1, 5, 'Perfect & Consistent Tenses').concat(pqs(P4(CONJ_5), 1, 5, 'Conjunctions')).concat(pqs(P4(PREP_5), 1, 5, 'Prepositions, Conjunctions & Interjections')).concat(pqs(P4(PUNCT_5), 1, 5, 'Punctuation')).concat(tagSkill(spell5Qs(2, 5), 'Spelling')));
+  }
+
+  /* ---------------- Story Cove ---------------- */
+  var STORY_POOL_5 = [
+    SQ('Marcus stood at the edge of the stage, gripping his trumpet so hard his knuckles turned white. Behind the curtain he could hear the crowd murmuring. His teacher whispered, "Remember how you practiced." Marcus closed his eyes, took one slow breath, and stepped into the light.', 'What can you infer about how Marcus feels before he steps on stage?', 'He is nervous but trying to be brave', ['He is bored and sleepy','He is angry at his teacher','He forgot his trumpet','He is excited to leave']),
+    SQ('The old lighthouse keeper climbed the stairs every evening, even when his knees ached. Ships that passed in the night depended on his lamp. During the great storm, he stayed at his post until morning. The next day, three fishing crews thanked him for guiding them home.', 'Which word best describes the keeper?', 'Dependable', ['Careless','Greedy','Silly','Lazy']),
+    SQ('Plants make their own food using sunlight, water, and carbon dioxide. This process is called photosynthesis. It takes place mostly in the leaves, which contain a green substance called chlorophyll. As plants make food, they also release oxygen that people and animals breathe.', 'Why are plants important for people and animals?', 'They release oxygen that we breathe', ['They never need water','They are always green','They make carbon dioxide','They grow only in leaves']),
+    SQ('When Aisha moved to Utah, everything seemed strange: the mountains, the dry air, even the cold dust of snow on her boots. At first she missed her old neighborhood. But after a hike with her new class, she saw the red cliffs glowing at sunset and whispered, "I think I could love it here."', 'How do Aisha\'s feelings change in the story?', 'She goes from homesick to hopeful', ['She goes from happy to angry','She stays unhappy the whole time','She becomes afraid of mountains','She wants to leave more than before']),
+    SQ('Some desert animals sleep through the hottest part of the day and come out at night. Kangaroo rats, for example, spend the day in cool underground burrows. At night, when the air is cooler, they search for seeds. This behavior helps them save water and stay safe from the heat.', 'What is the main idea of this passage?', 'Desert animals have behaviors that help them survive the heat', ['Kangaroo rats are the fastest desert animals','Deserts are always cold at night','Seeds are the only food in the desert','Burrows are hard to dig']),
+    SQ('Eli\'s team lost the championship by one point. In the locker room, some players threw their gear and complained about the referee. Eli took a deep breath, shook hands with the other team, and said, "Good game." Later, his coach told him she was proud of how he handled losing.', 'Why was Eli\'s coach proud of him?', 'He showed good sportsmanship', ['He scored the most points','He yelled at the referee','He quit the team','He forgot the game']),
+    SQ('The town library once had only a small room of books. Then volunteers began collecting donations, painting walls, and building shelves on weekends. Within two years, the library had a children\'s corner, a computer lab, and a reading garden. People who had never visited began coming every week.', 'What caused the library to improve?', 'Volunteers gave their time and donations', ['The town closed the old library','The books were free for one year','A giant storm hit the town','The library moved to another state']),
+    SQ('Water on Earth moves in a cycle. The Sun heats oceans and lakes, and water evaporates into the air. High in the sky it cools, condenses into clouds, and later falls as rain or snow. Some of that water runs back to the ocean through rivers, and the cycle begins again.', 'What starts the water cycle by heating the water?', 'The Sun', ['The wind','The Moon','The rain','The clouds'])
+  ];
+  var THEME_5 = [
+    SQ('Lena found a stray puppy shivering outside her apartment. She wanted to keep it, but she knew the owners might be missing it. She made flyers and posted them around the neighborhood. A week later, a little girl hugged the puppy and cried happy tears.', 'What is the theme of this story?', 'Doing the right thing can bring joy to others', ['Puppies are hard to train','Flyers are expensive','Apartments should allow pets','Never talk to strangers']),
+    SQ('Ravi\'s model rocket failed three times. Each time, he studied what went wrong and changed his design. On the fourth try, the rocket soared above the field while his friends cheered.', 'What is the theme of this story?', 'Do not give up when something is hard', ['Rockets are dangerous','Friends should not cheer','Models are easy to build','Fields are best for flying']),
+    SQ('A rich king owned a golden goose that laid one golden egg each day. Greedy for more, he cut the goose open to find all the gold at once. He found nothing inside and had no more eggs.', 'What is the theme of this story?', 'Greed can make you lose what you have', ['Geese are valuable','Kings are wise','Gold is heavy','Eggs are fragile']),
+    SQ('Two rival chefs competed to cook the best soup at the fair. When a storm knocked out the power, they combined their ingredients and cooked together over one fire. The whole town said it was the best soup they had ever tasted.', 'What is the theme of this story?', 'Working together can beat competing', ['Storms are good for cooking','Soup tastes best at fairs','Chefs should not compete','Fires are dangerous']),
+    SQ('Nora tried to hide her mistake on the science project by telling a small lie. Soon she had to tell bigger lies to cover it up. In the end, she told her teacher the truth and felt a huge weight lift off her shoulders.', 'What is the theme of this story?', 'Honesty is the best way to solve a problem', ['Science is not important','Teachers always forgive','Lies are easy to remember','Projects should be short'])
+  ];
+  var EVID_5 = [
+    SQ('Mina was the first to arrive at the field. She laced up her cleats, stretched, and kicked the ball against the wall again and again. When the coach arrived, he smiled and said, "Mina, you have more drive than anyone I have coached."', 'Which sentence from the story best shows that Mina works hard?', 'She kicked the ball against the wall again and again.', ['She laced up her cleats.','The coach arrived.','She was at the field.','Mina smiled at the coach.']),
+    SQ('The cave was dark and silent. Drops of water echoed from somewhere far away. Jonah\'s flashlight flickered, and his heart pounded as he took another step forward.', 'Which sentence best shows that Jonah is frightened?', 'His heart pounded as he took another step forward.', ['The cave was dark and silent.','Drops of water echoed.','He had a flashlight.','The cave was far away.']),
+    SQ('Grandma\'s kitchen always smelled of cinnamon. She hummed while she rolled the dough, and she let me press cookie cutters into it. When the cookies came out of the oven, she hugged me and said they tasted better because we made them together.', 'Which detail best shows that Grandma enjoys spending time with the narrator?', 'She let the narrator press cookie cutters into the dough.', ['The kitchen smelled of cinnamon.','The cookies came out of the oven.','She rolled the dough.','Grandma has a kitchen.']),
+    SQ('Beavers are known as nature\'s engineers. They cut down trees with their strong teeth and build dams across streams. The dams create ponds that protect their lodges from predators and provide homes for many other animals.', 'Which sentence best supports the idea that beavers change their environment?', 'The dams create ponds that provide homes for other animals.', ['Beavers have strong teeth.','Beavers are known as engineers.','Predators live in the forest.','Streams are long.'])
+  ];
+  var FIG_5 = [
+    ['The wind whispered through the trees.', 'Personification'], ['I am so hungry I could eat a horse.', 'Hyperbole'], ['Her voice was music to my ears.', 'Metaphor'],
+    ['He ran like a cheetah.', 'Simile'], ['The sun smiled down on the picnic.', 'Personification'], ['This backpack weighs a ton.', 'Hyperbole'],
+    ['The classroom was a beehive of activity.', 'Metaphor'], ['She was as brave as a lion.', 'Simile'], ['It is raining cats and dogs.', 'Idiom'],
+    ['I have told you a million times.', 'Hyperbole'], ['The car coughed and sputtered to a stop.', 'Personification'], ['She is a rock for her family.', 'Metaphor']
+  ];
+  var FIG_TYPES = ['Simile','Metaphor','Personification','Hyperbole','Idiom'];
+  function figure5Q(){
+    var f = FIG_5[randInt(0, FIG_5.length - 1)];
+    return { speak:'What kind of figurative language is this? ' + f[0], prompt:'What kind of figurative language is it?', visual:'<div class="story-text">' + f[0] + '</div>',
+      options: shuffle(FIG_TYPES.map(function(w){ return { html:wordHtml({label:w}), correct:w === f[1] }; })) };
+  }
+  var STRUCT_5 = [
+    P('"Rockets burn fuel, which pushes gas out the bottom. As a result, the rocket is pushed upward." How is this text organized?', 'Cause and effect', ['Sequence (time order)','Compare and contrast','Problem and solution','Description']),
+    P('"Reptiles have scales and lay eggs, while mammals have fur and usually give birth to live young." How is this text organized?', 'Compare and contrast', ['Cause and effect','Sequence (time order)','Problem and solution','Description']),
+    P('"The town\'s river kept flooding every spring. Engineers built a wall to hold back the water, and the flooding stopped." How is this text organized?', 'Problem and solution', ['Sequence (time order)','Compare and contrast','Cause and effect','Description']),
+    P('"First, collect your materials. Second, glue the base. Third, wait for it to dry. Finally, paint it." How is this text organized?', 'Sequence (time order)', ['Cause and effect','Compare and contrast','Problem and solution','Description']),
+    P('"The canyon was a maze of red walls streaked with orange and gold. Tall pines clung to the edges, and a thin stream sparkled below." How is this text organized?', 'Description', ['Sequence (time order)','Compare and contrast','Cause and effect','Problem and solution'])
+  ];
+  function fifth_story(){
+    return shuffle(tagSkill(buildStoryLeveled(STORY_POOL_5, 5, 2), 'Story Comprehension').concat(tagSkill(buildStoryLeveled(THEME_5, 5, 1), 'Theme')).concat(tagSkill([figure5Q()], 'Figurative Language')).concat(pqs(STRUCT_5, 1, 5, 'Text Structure')).concat(tagSkill(buildStoryLeveled(EVID_5, 5, 1), 'Text Evidence')));
+  }
+
+  /* ---------------- Word Spring: vocabulary ---------------- */
+  var CTX_5 = [
+    P('The hikers were reluctant to leave the warm cabin, so they stayed another hour. What does "reluctant" mean?', 'Unwilling', ['Excited','Lost','Hungry','Brave']),
+    P('Fresh fruit was abundant at the market; every stand was piled high. What does "abundant" mean?', 'Plentiful', ['Rare','Expensive','Spoiled','Sour']),
+    P('The persistent mosquito kept buzzing around my ear no matter how many times I waved it away. What does "persistent" mean?', 'Not giving up', ['Very quiet','Very slow','Very small','Very funny']),
+    P('Mia was hesitant at the edge of the pool, standing still for a long time before she jumped. What does "hesitant" mean?', 'Unsure and slow to act', ['Eager to jump','Angry at the pool','Very tired','Hungry']),
+    P('The artist used vivid colors, so the painting seemed to glow. What does "vivid" mean?', 'Bright and strong', ['Dull and gray','Small and dark','Old and cracked','Soft and faint']),
+    P('The tranquil lake was so calm that the mountains were mirrored perfectly in the water. What does "tranquil" mean?', 'Calm and peaceful', ['Stormy','Crowded','Frozen','Muddy']),
+    P('The explorer was determined to reach the top, even though the climb was steep and long. What does "determined" mean?', 'Firmly decided', ['Confused','Tired','Careless','Worried']),
+    P('After the long game, the players were parched and drank gallons of water. What does "parched" mean?', 'Very thirsty', ['Very sleepy','Very cold','Very proud','Very loud'])
+  ];
+  var SYN5 = [
+    P('Which word means the same as ponder?', 'think carefully', ['run quickly','sleep deeply','shout loudly','eat slowly']), P('Which word means the same as assist?', 'help', ['block','ignore','break','leave']),
+    P('Which word means the same as swift?', 'quick', ['slow','heavy','weak','dull']), P('Which word means the same as generous?', 'giving', ['stingy','shy','angry','plain']),
+    P('Which word means the same as fragile?', 'easily broken', ['very heavy','very loud','very smooth','very old']), P('Which word means the same as brief?', 'short', ['long','wide','tall','deep']),
+    P('Which word means the same as precious?', 'valuable', ['cheap','common','broken','plain']), P('Which word means the same as conceal?', 'hide', ['show','find','share','drop'])
+  ];
+  var ANT5 = [
+    P('Which word means the opposite of abundant?', 'scarce', ['plentiful','large','heavy','loud']), P('Which word means the opposite of reluctant?', 'eager', ['unwilling','tired','careful','slow']),
+    P('Which word means the opposite of permanent?', 'temporary', ['lasting','strong','large','careful']), P('Which word means the opposite of transparent?', 'opaque', ['clear','thin','bright','smooth']),
+    P('Which word means the opposite of accept?', 'reject', ['allow','agree','receive','thank']), P('Which word means the opposite of humble?', 'proud', ['modest','quiet','kind','shy']),
+    P('Which word means the opposite of generous?', 'stingy', ['giving','kind','rich','busy']), P('Which word means the opposite of ancient?', 'brand new', ['very old','huge','tall','wise'])
+  ];
+  var MULTI_5 = [
+    P('Which meaning of "lead" is used? The guide will lead us up the trail.', 'To guide', ['A kind of metal','A pencil part','A leash','A type of rock']),
+    P('Which meaning of "lead" is used? Some old pipes were made of lead.', 'A heavy metal', ['To guide','To be first in a race','A dog\'s leash','A pencil case']),
+    P('Which meaning of "present" is used? Maya wrapped a present for her friend.', 'A gift', ['The time right now','To show something','To be there','A kind of paper']),
+    P('Which meaning of "minute" is used? The ant is minute, so you need a magnifier to see it.', 'Extremely small', ['Sixty seconds','A short meeting','A moment','A kind of clock']),
+    P('Which meaning of "wind" is used? Please wind the clock before bed.', 'To turn something around and around', ['Moving air','A storm','A kind of music','A type of wave']),
+    P('Which meaning of "object" is used? A ball is an object you can throw.', 'A thing you can see or touch', ['To disagree','A goal','A rule','A kind of game'])
+  ];
+  var CONNOT_5 = [
+    ['Which word sounds more positive? thrifty or stingy?', 'thrifty', 'stingy'], ['Which word sounds more positive? curious or nosy?', 'curious', 'nosy'],
+    ['Which word sounds more positive? confident or arrogant?', 'confident', 'arrogant'], ['Which word sounds more positive? slim or skinny?', 'slim', 'skinny'],
+    ['Which word sounds more positive? unique or weird?', 'unique', 'weird'], ['Which word sounds more positive? determined or stubborn?', 'determined', 'stubborn'],
+    ['Which word sounds more positive? aroma or stench?', 'aroma', 'stench'], ['Which word sounds more positive? cozy or cramped?', 'cozy', 'cramped']
+  ];
+  function connot5Q(){
+    var c = CONNOT_5[randInt(0, CONNOT_5.length - 1)];
+    return { speak:c[0], prompt:c[0], visual:'', options: two(c[1], c[2], true) };
+  }
+  function fifth_sightwords(){
+    return shuffle(pqs(CTX_5, 2, 5, 'Context Clues').concat(pqs(SYN5, 1, 5, 'Synonyms')).concat(pqs(ANT5, 1, 5, 'Antonyms')).concat(pqs(MULTI_5, 1, 5, 'Multiple-Meaning Words')).concat(tagSkill([connot5Q()], 'Positive & Negative Words')));
+  }
+
+  /* ---------------- Critter Count: decimals and fractions ---------------- */
+  function speakFrac(f){ return f.replace('/', ' over '); }
+  var DPV_5 = ['3.472','6.185','2.938','8.056','5.714','9.321','7.649','1.508','4.263','6.837'];
+  function decPlace5Q(oc){
+    var s = DPV_5[randInt(0, DPV_5.length - 1)], names = ['tenths','hundredths','thousandths'], dec = s.split('.')[1], p = randInt(1, 3), d = +dec[p - 1];
+    if (d === 0){ p = (p % 3) + 1; d = +dec[p - 1]; }
+    if (d === 0){ p = (p % 3) + 1; d = +dec[p - 1]; }
+    var right = decStr(d / Math.pow(10, p), 3), cand = [d / 10, d / 100, d / 1000, d, d * 10].map(function(v){ return decStr(v, 3); });
+    var sp = 'In ' + s.replace('.', ' point ') + ', what is the value of the digit ' + d + ' in the ' + names[p - 1] + ' place?';
+    return { speak:sp, prompt:'In ' + s + ', what is the value of the ' + d + ' in the ' + names[p - 1] + ' place?', visual:'', options: strOpts(right, cand.filter(function(c){ return c !== right; }), oc, true) };
+  }
+  var RDEC_5 = [['6.47','tenth','6.5'],['2.38','tenth','2.4'],['5.862','hundredth','5.86'],['9.275','hundredth','9.28'],['3.6','whole number','4'],['8.49','whole number','8'],['0.746','hundredth','0.75'],['12.34','tenth','12.3'],['7.051','hundredth','7.05'],['15.5','whole number','16']];
+  function roundDec5Q(oc){
+    var r = RDEC_5[randInt(0, RDEC_5.length - 1)], v = +r[2], cand = [], st = r[1] === 'tenth' ? 0.1 : (r[1] === 'hundredth' ? 0.01 : 1), pl = r[1] === 'tenth' ? 1 : (r[1] === 'hundredth' ? 2 : 0);
+    [v + st, v - st, v + 2 * st, v - 2 * st, +r[0]].forEach(function(w){ var t = decStr(w, 3); if (w > 0 && t !== r[2] && cand.indexOf(t) === -1) cand.push(t); });
+    var sp = 'Round ' + r[0].replace('.', ' point ') + ' to the nearest ' + r[1] + '.';
+    return { speak:sp, prompt:'Round ' + r[0] + ' to the nearest ' + r[1] + '.', visual:'', options: strOpts(r[2], cand, oc, true) };
+  }
+  var CDEC_5 = [[0.6,0.58],[0.45,0.5],[1.09,1.9],[3.2,3.19],[0.07,0.7],[2.5,2.45],[0.81,0.8],[5.06,5.6]];
+  function compDec5Q(){
+    var p = CDEC_5[randInt(0, CDEC_5.length - 1)], greater = Math.random() < 0.5, win = (greater ? Math.max : Math.min)(p[0], p[1]);
+    var sp = 'Which decimal is ' + (greater ? 'greater' : 'less') + '? ' + String(p[0]).replace('.', ' point ') + ' or ' + String(p[1]).replace('.', ' point ') + '.';
+    return { speak:sp, prompt:'Which decimal is ' + (greater ? 'greater' : 'less') + '?', visual:'', options: shuffle([p[0], p[1]]).map(function(x){ return { html:'<span class="opt-big-letter" style="font-size:1.7rem;">' + x + '</span>', correct:x === win }; }) };
+  }
+  var ASDEC_5 = [[3.6,'+',2.45],[7.2,'-',3.85],[12.5,'+',4.75],[9,'-',4.36],[5.08,'+',3.9],[15.3,'-',8.75],[0.75,'+',0.6],[20,'-',12.45]];
+  function addDec5Q(oc){
+    var p = ASDEC_5[randInt(0, ASDEC_5.length - 1)], ans = p[1] === '+' ? p[0] + p[2] : p[0] - p[2];
+    var sp = String(p[0]).replace('.', ' point ') + (p[1] === '+' ? ' plus ' : ' minus ') + String(p[2]).replace('.', ' point ') + '. What is the ' + (p[1] === '+' ? 'sum' : 'difference') + '?';
+    return { speak:sp, prompt:'What is the ' + (p[1] === '+' ? 'sum' : 'difference') + '?', visual: seqVisual([String(p[0]), p[1] === '+' ? '+' : '-', String(p[2])]), options: decNear(Math.round(ans * 100) / 100, oc, 2) };
+  }
+  var AFR_5 = [
+    ['1/2','+','1/3','5/6',['2/5','2/6','1/5','3/5']], ['1/4','+','2/3','11/12',['3/7','3/12','2/12','1/12']], ['2/5','+','1/2','9/10',['3/7','3/10','1/10','3/5']],
+    ['3/4','+','1/8','7/8',['4/12','4/8','3/32','5/8']], ['1/6','+','1/3','1/2',['2/9','2/6','1/9','2/3']], ['2/3','+','1/6','5/6',['3/9','3/6','2/18','1/6']],
+    ['3/10','+','1/5','1/2',['4/15','4/10','3/50','7/10']], ['1/2','+','1/4','3/4',['2/6','2/4','1/8','1/3']],
+    ['3/4','-','1/2','1/4',['2/2','2/4','1/2','4/6']], ['2/3','-','1/2','1/6',['1/1','1/3','3/5','1/2']], ['5/6','-','1/3','1/2',['4/3','4/6','1/3','2/3']]
+  ];
+  function addFrac5Q(oc){
+    var a = AFR_5[randInt(0, AFR_5.length - 1)], word = a[1] === '+' ? ' plus ' : ' minus ';
+    return { speak:speakFrac(a[0]) + word + speakFrac(a[2]) + '. What is the answer?', prompt:'What is the answer? Use a common denominator.', visual: seqVisual([a[0], a[1] === '+' ? '+' : '-', a[2]]), options: frOpts(a[3], a[4], oc) };
+  }
+  var MFR_5 = [
+    ['1/2','3/4','3/8',['4/6','3/6','4/8','1/4']], ['2/3','3/5','2/5',['5/8','6/8','5/15','6/5']], ['3/4','2/5','3/10',['5/9','6/9','5/20','3/20']],
+    ['1/3','1/4','1/12',['2/7','1/7','2/12','1/1']], ['2/5','1/2','1/5',['3/7','2/7','3/10','2/3']], ['6','1/3','2',['3','18','1/2','4']],
+    ['8','3/4','6',['11','24','2','32']], ['9','2/3','6',['11','18','3','27']]
+  ];
+  function mulFrac5Q(oc){
+    var m = MFR_5[randInt(0, MFR_5.length - 1)];
+    return { speak:speakFrac(m[0]) + ' times ' + speakFrac(m[1]) + '. What is the product?', prompt:'What is the product?', visual: seqVisual([m[0], '×', m[1]]), options: frOpts(m[2], m[3], oc) };
+  }
+  function fifth_counting(){
+    return shuffle(tagSkill([decPlace5Q(5)], 'Decimal Place Value').concat(tagSkill([roundDec5Q(5)], 'Rounding Decimals')).concat(tagSkill([compDec5Q()], 'Comparing Decimals'))
+      .concat(tagSkill([addDec5Q(5)], 'Add & Subtract Decimals')).concat(tagSkill([addFrac5Q(5)], 'Add & Subtract Fractions')).concat(tagSkill([mulFrac5Q(5)], 'Multiplying Fractions')));
+  }
+
+  /* ---------------- Pattern Pass: order of operations, powers of 10, coordinate grid ---------------- */
+  var OOO_5 = [
+    ['3 + 4 × 5',23,[35,27,12,60]], ['(3 + 4) × 5',35,[23,27,19,12]], ['20 − 6 ÷ 2',17,[7,14,23,10]], ['(20 − 6) ÷ 2',7,[17,10,14,5]], ['2 × 3 + 4 × 5',26,[50,30,20,34]],
+    ['18 ÷ 3 + 2',8,[3,12,9,6]], ['10 − 2 × 3',4,[24,16,7,6]], ['5 × (2 + 6)',40,[16,32,30,17]], ['12 + 8 ÷ 4',14,[5,20,3,16]]
+  ];
+  function ooo5Q(oc){
+    var o = OOO_5[randInt(0, OOO_5.length - 1)], sp = o[0].replace(/×/g, ' times ').replace(/÷/g, ' divided by ').replace(/−/g, ' minus ').replace(/\+/g, ' plus ').replace(/\(/g, ' open parenthesis ').replace(/\)/g, ' close parenthesis ').replace(/\s+/g, ' ').trim();
+    return { speak:'What is ' + sp + '? Do the parentheses first, then multiply and divide, then add and subtract.', prompt:'What is the value? (Parentheses first, then × and ÷, then + and −)', visual:'<div class="story-text" style="font-size:1.7rem;">' + o[0] + '</div>',
+      options: shuffle([o[1]].concat(shuffle(o[2]).slice(0, oc - 1))).map(function(v){ return { html:numHtml(v), correct:v === o[1] }; }) };
+  }
+  var POW_5 = [
+    ['What is 3.4 × 10?','34',['0.34','340','3.04','3.41']], ['What is 0.5 × 100?','50',['5','0.05','500','0.5']], ['What is 4.2 ÷ 10?','0.42',['42','4.02','0.042','4.12']],
+    ['What is 25 × 1,000?','25,000',['2,500','250,000','250','25']], ['What is 6 ÷ 100?','0.06',['0.6','600','0.006','60']], ['What is 10³ (10 × 10 × 10)?','1,000',['30','100','10,000','300']],
+    ['What is 10² (10 × 10)?','100',['20','1,000','10','200']], ['What is 7.5 × 10?','75',['7.5','0.75','750','705']]
+  ];
+  function pow5Q(oc){
+    var p = POW_5[randInt(0, POW_5.length - 1)], sp = p[0].replace('³', ' to the third power').replace('²', ' to the second power').replace('×', 'times').replace('÷', 'divided by').replace(/(\d)\.(\d)/g, '$1 point $2');
+    return { speak:sp, prompt:p[0], visual:'', options: strOpts(p[1], p[2], oc, true) };
+  }
+  function gridSvg(points, labeled){
+    var o = 36, b = 196, u = 30, s = '<svg viewBox="0 0 240 230" width="260" style="max-width:100%;height:auto;" aria-hidden="true">', i;
+    for (i = 0; i <= 6; i++){
+      s += '<line x1="' + (o + i * u) + '" y1="' + b + '" x2="' + (o + i * u) + '" y2="' + (b - 6 * u) + '" stroke="#D9D3E8" stroke-width="1.5"/><line x1="' + o + '" y1="' + (b - i * u) + '" x2="' + (o + 6 * u) + '" y2="' + (b - i * u) + '" stroke="#D9D3E8" stroke-width="1.5"/>';
+      s += '<text x="' + (o + i * u) + '" y="' + (b + 17) + '" font-size="13" font-weight="800" text-anchor="middle" fill="#2B2340">' + i + '</text><text x="' + (o - 10) + '" y="' + (b - i * u + 4) + '" font-size="13" font-weight="800" text-anchor="middle" fill="#2B2340">' + i + '</text>';
+    }
+    s += '<line x1="' + o + '" y1="' + b + '" x2="' + (o + 6 * u + 8) + '" y2="' + b + '" stroke="#2B2340" stroke-width="3" stroke-linecap="round"/><line x1="' + o + '" y1="' + b + '" x2="' + o + '" y2="' + (b - 6 * u - 8) + '" stroke="#2B2340" stroke-width="3" stroke-linecap="round"/>';
+    points.forEach(function(p){
+      var cx = o + p[0] * u, cy = b - p[1] * u;
+      s += '<circle cx="' + cx + '" cy="' + cy + '" r="6.5" fill="#C2410C" stroke="#2B2340" stroke-width="2"/>';
+      if (labeled) s += '<text x="' + (cx + 10) + '" y="' + (cy - 8) + '" font-size="17" font-weight="900" fill="#2B2340">' + p[2] + '</text>';
+    });
+    return s + '</svg>';
+  }
+  var GRIDPTS_5 = [[3,4],[5,2],[2,6],[6,3],[4,1],[1,5],[5,4],[2,3]];
+  function gridCoord5Q(oc){
+    var p = GRIDPTS_5[randInt(0, GRIDPTS_5.length - 1)], x = p[0], y = p[1], f = function(a, b){ return '(' + a + ', ' + b + ')'; };
+    var cand = [f(y, x), f(x, y + 1), f(x + 1, y), f(x, Math.max(0, y - 1)), f(Math.max(0, x - 1), y)];
+    return { speak:'Look at the point on the grid. What are its coordinates? The first number is how far across, and the second number is how far up.', prompt:'What are the coordinates of the point? (across, up)', visual:'<div class="add-stage">' + gridSvg([[x, y]], false) + '</div>', options: strOpts(f(x, y), cand, oc, true) };
+  }
+  var GRIDSETS_5 = [
+    [[1,3,'A'],[4,2,'B'],[2,5,'C'],[5,4,'D'],[6,1,'E']], [[2,1,'A'],[5,3,'B'],[3,6,'C'],[6,5,'D'],[1,4,'E']]
+  ];
+  function gridLetter5Q(oc){
+    var set = GRIDSETS_5[randInt(0, GRIDSETS_5.length - 1)], t = set[randInt(0, set.length - 1)];
+    var sp = 'Which letter is at the point ' + t[0] + ' across and ' + t[1] + ' up?';
+    return { speak:sp, prompt:'Which letter is at (' + t[0] + ', ' + t[1] + ')?', visual:'<div class="add-stage">' + gridSvg(set, true) + '</div>', options: strOpts(t[2], set.map(function(q){ return q[2]; }), oc, true) };
+  }
+  var REL_5 = [[3,6],[2,10],[4,12],[2,6],[5,10],[1,4]];
+  function rel5Q(oc){
+    var r = REL_5[randInt(0, REL_5.length - 1)], A = [], B = [], i, k = r[1] / r[0];
+    for (i = 0; i < 4; i++){ A.push(i * r[0]); B.push(i * r[1]); }
+    var right = k + ' times as large', cand = [2, 3, 4, 5, 6, 10].filter(function(v){ return v !== k; }).map(function(v){ return v + ' times as large'; }).concat(['the same size']);
+    return { speak:'Pattern A starts at 0 and adds ' + r[0] + ' each time. Pattern B starts at 0 and adds ' + r[1] + ' each time. Each number in B is how many times the matching number in A?',
+      prompt:'Pattern A adds ' + r[0] + ' and pattern B adds ' + r[1] + '. How is each B number related to the A number?', visual: '<div class="story-text" style="font-size:1.1rem;">A: ' + A.join(', ') + '<br>B: ' + B.join(', ') + '</div>', options: strOpts(right, cand, oc) };
+  }
+  function fifth_patterns(){
+    return shuffle(tagSkill([ooo5Q(5), ooo5Q(5)], 'Order of Operations').concat(tagSkill([pow5Q(5)], 'Powers of 10')).concat(tagSkill([gridCoord5Q(5)], 'Coordinate Grid')).concat(tagSkill([gridLetter5Q(5)], 'Coordinate Grid')).concat(tagSkill([rel5Q(5)], 'Pattern Relationships')));
+  }
+
+  /* ---------------- Shape Overlook: volume, classifying shapes, angles ---------------- */
+  function boxSvg(l, w, h){
+    var u = Math.min(26, 130 / (l + w * 0.5), 105 / (h + w * 0.5)), dx = w * u * 0.5, dy = w * u * 0.5, x0 = 24, yT = 30 + dy, W = l * u, H = h * u, f = function(n){ return n.toFixed(1); };
+    var s = '<svg viewBox="0 0 ' + f(x0 + W + dx + 60) + ' ' + f(yT + H + 34) + '" width="' + Math.min(330, x0 + W + dx + 70) + '" style="max-width:100%;height:auto;" aria-hidden="true">';
+    s += '<polygon points="' + f(x0) + ',' + f(yT) + ' ' + f(x0 + W) + ',' + f(yT) + ' ' + f(x0 + W + dx) + ',' + f(yT - dy) + ' ' + f(x0 + dx) + ',' + f(yT - dy) + '" fill="#E6F4FF" stroke="#2B2340" stroke-width="3" stroke-linejoin="round"/>';
+    s += '<polygon points="' + f(x0 + W) + ',' + f(yT) + ' ' + f(x0 + W + dx) + ',' + f(yT - dy) + ' ' + f(x0 + W + dx) + ',' + f(yT - dy + H) + ' ' + f(x0 + W) + ',' + f(yT + H) + '" fill="#BFE3F6" stroke="#2B2340" stroke-width="3" stroke-linejoin="round"/>';
+    s += '<rect x="' + f(x0) + '" y="' + f(yT) + '" width="' + f(W) + '" height="' + f(H) + '" fill="#FFF1C2" stroke="#2B2340" stroke-width="3" stroke-linejoin="round"/>';
+    s += '<text x="' + f(x0 + W / 2) + '" y="' + f(yT + H + 22) + '" font-size="15" font-weight="800" text-anchor="middle" fill="#2B2340">' + l + ' units long</text>';
+    s += '<text x="' + f(x0 + W + dx + 8) + '" y="' + f(yT + H / 2 + 5) + '" font-size="15" font-weight="800" fill="#2B2340">' + h + ' tall</text>';
+    s += '<text x="' + f(x0 + W / 2 + dx) + '" y="' + f(yT - dy - 8) + '" font-size="15" font-weight="800" text-anchor="middle" fill="#2B2340">' + w + ' wide</text>';
+    return s + '</svg>';
+  }
+  function numOpts5(right, wrongs, oc){
+    var wr = shuffle(wrongs.filter(function(w, i, a){ return w !== right && w > 0 && a.indexOf(w) === i; })).slice(0, oc - 1);
+    return shuffle([right].concat(wr)).map(function(v){ return { html:bigHtml(v), correct:v === right }; });
+  }
+  var BOX_5 = [[2,3,4],[5,2,3],[4,4,2],[6,3,2],[3,3,3],[5,4,2],[7,2,2],[10,2,3]];
+  function boxVol5Q(oc){
+    var b = BOX_5[randInt(0, BOX_5.length - 1)], l = b[0], w = b[1], h = b[2], ans = l * w * h;
+    return { speak:'This box is ' + l + ' units long, ' + w + ' units wide, and ' + h + ' units tall. What is its volume in cubic units?', prompt:'What is the volume of the box? (cubic units)', visual:'<div class="add-stage">' + boxSvg(l, w, h) + '</div>',
+      options: numOpts5(ans, [l + w + h, l * w, l * h, w * h, 2 * (l * w + l * h + w * h), ans + l, ans - w], oc) };
+  }
+  var LAYER_5 = [[3,8],[4,6],[5,10],[2,15],[6,5],[7,4]];
+  function layerVol5Q(oc){
+    var p = LAYER_5[randInt(0, LAYER_5.length - 1)], ans = p[0] * p[1];
+    return { speak:'A box is filled with ' + p[0] + ' layers of unit cubes. Each layer has ' + p[1] + ' cubes. What is the volume in cubic units?', prompt:p[0] + ' layers × ' + p[1] + ' cubes in each layer = volume?', visual:'', options: numOpts5(ans, [p[0] + p[1], ans + p[1], ans - p[0], p[1], p[0], ans + 10], oc) };
+  }
+  var CLASS_5 = [
+    ['Which statement is true?', 'All squares are rectangles.', ['All rectangles are squares.','All trapezoids are squares.','No rhombus has four equal sides.','Every triangle has four sides.']],
+    ['Which shape always has four equal sides and four right angles?', 'Square', ['Rectangle','Rhombus','Trapezoid','Parallelogram']],
+    ['A quadrilateral with exactly one pair of parallel sides is a…', 'Trapezoid', ['Parallelogram','Square','Rectangle','Pentagon']],
+    ['A parallelogram always has…', 'Two pairs of parallel sides', ['Four right angles','Four equal sides','Exactly one pair of parallel sides','Three sides']],
+    ['A rhombus always has…', 'Four equal sides', ['Four right angles','Exactly one pair of parallel sides','Three sides','Five angles']],
+    ['Which figure is NOT a polygon?', 'A circle', ['A triangle','A hexagon','A pentagon','A square']],
+    ['Which two things do a square and a rectangle always share?', 'Four right angles', ['Four equal sides','Only one pair of parallel sides','Five angles','Three sides']]
+  ];
+  var TANG_5 = [[50,60],[30,90],[45,45],[70,40],[80,35],[25,65],[100,30],[55,75]];
+  function triAngle5Q(oc){
+    var t = TANG_5[randInt(0, TANG_5.length - 1)], ans = 180 - t[0] - t[1];
+    var svg = '<div class="add-stage"><svg viewBox="0 0 200 135" width="260" style="max-width:100%;height:auto;" aria-hidden="true"><polygon points="24,100 176,100 110,18" fill="#FFF1C2" stroke="#2B2340" stroke-width="3" stroke-linejoin="round"/>' +
+      '<text x="24" y="124" font-size="16" font-weight="800" text-anchor="middle" fill="#2B2340">' + t[0] + '°</text><text x="176" y="124" font-size="16" font-weight="800" text-anchor="middle" fill="#2B2340">' + t[1] + '°</text><text x="110" y="58" font-size="20" font-weight="900" text-anchor="middle" fill="#C2410C">?</text></svg></div>';
+    return { speak:'The angles inside a triangle add up to 180 degrees. Two angles are ' + t[0] + ' degrees and ' + t[1] + ' degrees. How big is the third angle?', prompt:'The angles of a triangle add up to 180°. What is the missing angle?', visual:svg,
+      options: strOpts(ans + '°', [ans + 10, ans - 10, ans + 20, 180 - t[0], 180 - t[1], 90, t[0] + t[1]].filter(function(v){ return v > 0 && v !== ans; }).map(function(v){ return v + '°'; }), oc, true) };
+  }
+  var AFACT_5 = [
+    ['right angle (90°)',35,55], ['right angle (90°)',62,28], ['right angle (90°)',17,73], ['right angle (90°)',48,42],
+    ['straight line (180°)',130,50], ['straight line (180°)',110,70], ['straight line (180°)',95,85], ['straight line (180°)',155,25], ['straight line (180°)',72,108]
+  ];
+  function angleFact5Q(oc){
+    var a = AFACT_5[randInt(0, AFACT_5.length - 1)], wr = [a[2] + 10, a[2] - 10, a[2] + 20, a[1], 180 - a[2], 90 - a[2]].filter(function(v){ return v > 0 && v !== a[2]; });
+    return { speak:'Two angles together make a ' + a[0].replace('(', '').replace(')', '').replace('°', ' degrees') + '. One of the angles is ' + a[1] + ' degrees. How big is the other angle?', prompt:'Two angles make a ' + a[0] + '. One is ' + a[1] + '°. What is the other?', visual:'', options: strOpts(a[2] + '°', wr.map(function(v){ return v + '°'; }), oc, true) };
+  }
+  function fifth_shapes(){
+    return shuffle(tagSkill([boxVol5Q(5)], 'Volume').concat(tagSkill([layerVol5Q(5)], 'Volume')).concat(pqs(P4(CLASS_5), 2, 5, 'Classifying Shapes')).concat(tagSkill([triAngle5Q(5)], 'Triangle Angles')).concat(tagSkill([angleFact5Q(5)], 'Angle Facts')));
+  }
+
+  /* ---------------- Color Canyon: perspective, color, design, art forms ---------------- */
+  var PERSP_5 = [
+    P('In a picture, which part is closest to the viewer?', 'Foreground', ['Background','Middle ground','Horizon line','Frame']),
+    P('In a picture, which part is farthest from the viewer?', 'Background', ['Foreground','Middle ground','Frame','Border']),
+    P('Objects that look smaller and sit higher on the page seem…', 'Farther away', ['Closer','Heavier','Warmer','Louder']),
+    P('An artist overlaps two trees so one hides part of the other. The covered tree looks…', 'Farther back', ['Closer','Bigger','Older','Brighter']),
+    P('Where the sky seems to meet the land in a drawing is called the…', 'Horizon line', ['Foreground','Vanishing point','Frame','Border']),
+    P('Railroad tracks seem to come together far away at one spot. That spot is the…', 'Vanishing point', ['Foreground','Frame','Border','Center of the paper'])
+  ];
+  var SCHEME_5 = [
+    P('Which pair of colors are complementary?', 'Red and green', ['Red and orange','Blue and green','Yellow and orange','Blue and purple']),
+    P('Blue sits across the color wheel from which color?', 'Orange', ['Green','Purple','Red','Yellow']),
+    P('Yellow sits across the color wheel from which color?', 'Purple', ['Orange','Green','Blue','Red']),
+    P('Which colors are neutral colors?', 'Black, white, and gray', ['Red, yellow, and blue','Orange, green, and purple','Pink, teal, and gold','Red, orange, and yellow']),
+    P('What is a tint?', 'A color mixed with white', ['A color mixed with black','A color mixed with its complement','A color that glows','A color that is warm']),
+    P('What is a shade?', 'A color mixed with black', ['A color mixed with white','A color mixed with yellow','A color that is cool','A color that is neutral'])
+  ];
+  var DESIGN_5 = [
+    P('A design where both halves look exactly the same has…', 'Symmetrical balance', ['Asymmetrical balance','Variety','Rhythm','Emphasis']),
+    P('A design with different objects that still feel equally heavy has…', 'Asymmetrical balance', ['Symmetrical balance','Rhythm','Unity','Pattern']),
+    P('Repeating shapes with spaces between them to make a beat creates…', 'Rhythm', ['Contrast','Balance','Emphasis','Proportion']),
+    P('How the sizes of parts compare to each other, like a head to a body, is called…', 'Proportion', ['Rhythm','Emphasis','Balance','Movement']),
+    P('Using many different shapes, colors, or textures to keep a design interesting is called…', 'Variety', ['Unity','Balance','Proportion','Rhythm']),
+    P('Which principle of design sends your eye first to the most important part?', 'Emphasis', ['Rhythm','Proportion','Variety','Balance'])
+  ];
+  var MEDIUM_5 = [
+    P('Which art form is made by carving, modeling, or building three-dimensional objects?', 'Sculpture', ['Painting','Photography','Collage','Printmaking']),
+    P('Pressing an inked surface onto paper to make copies is called…', 'Printmaking', ['Sculpture','Photography','Ceramics','Collage']),
+    P('Gluing pieces of paper and other materials onto a surface makes a…', 'Collage', ['Sculpture','Print','Photograph','Pot']),
+    P('A potter shapes clay and fires it in a kiln. What is this art called?', 'Ceramics', ['Photography','Printmaking','Collage','Weaving']),
+    P('Which medium uses water-based paint that looks see-through?', 'Watercolor', ['Oil paint','Charcoal','Clay','Crayon']),
+    P('Which drawing tool makes dark, smudgy lines from burned wood?', 'Charcoal', ['Watercolor','Clay','Marker','Glue']),
+    P('A portrait is a picture of…', 'A person', ['A mountain','A bowl of fruit','A building','A river']),
+    P('A landscape is a picture of…', 'Outdoor scenery', ['A person\'s face','A bowl of fruit','A pet','A toy']),
+    P('A still life is a picture of…', 'Objects like fruit and flowers', ['A mountain range','A running horse','A crowd of people','A storm'])
+  ];
+  function fifth_colors(){
+    return shuffle(pqs(PERSP_5, 1, 5, 'Perspective').concat(pqs(SCHEME_5, 1, 5, 'Color Schemes')).concat(pqs(DESIGN_5, 2, 5, 'Principles of Design')).concat(pqs(MEDIUM_5, 2, 5, 'Art Forms & Mediums')));
+  }
+
+  /* ---------------- Base Camp Math: multiply, divide, word problems, fractions ---------------- */
+  var MUL5 = [[23,14],[35,12],[41,26],[18,15],[52,31],[27,19],[45,22],[36,24],[64,13],[38,17],[72,11],[29,43]];
+  function mult5Q(oc){
+    var m = MUL5[randInt(0, MUL5.length - 1)], ans = m[0] * m[1];
+    return { speak:m[0] + ' times ' + m[1] + ' equals what?', prompt:m[0] + ' × ' + m[1] + ' = ?', visual: seqVisual([m[0], '×', m[1]]), options: bigNear(ans, oc, [10, 20, 100, 200, m[0], m[1]], 10, 9999) };
+  }
+  var DIV5 = [[756,12],[432,18],[912,24],[585,15],[1248,16],[960,32],[884,26],[1512,24]];
+  function div5Q(oc){
+    var d = DIV5[randInt(0, DIV5.length - 1)], ans = d[0] / d[1];
+    return { speak:d[0] + ' divided by ' + d[1] + ' equals what?', prompt:fmtBig(d[0]) + ' ÷ ' + d[1] + ' = ?', visual: seqVisual([fmtBig(d[0]), '÷', d[1]]), options: bigNear(ans, oc, [1, 2, 3, 10, 20], 1, 999) };
+  }
+  var WORD5 = [
+    ['A school buys 24 boxes of markers with 12 markers in each box. They hand out 150 markers. How many markers are left?', 138, [288,126,174,162]],
+    ['A baker makes 18 trays with 15 muffins on each tray. He sells 200 of them. How many muffins are left?', 70, [470,90,50,60]],
+    ['Ben saves 12 dollars each week for 8 weeks. He buys a helmet for 39 dollars. How many dollars does he have left?', 57, [135,47,69,87]],
+    ['A theater has 25 rows with 32 seats in each row. If 640 seats are filled, how many seats are empty?', 160, [90,120,1440,200]],
+    ['A farmer picks 45 pounds of apples each day for 14 days and sells 400 pounds. How many pounds are left?', 230, [185,1030,270,430]],
+    ['A class shares 144 pencils equally among 12 students. Then each student loses 3 pencils. How many pencils does each student have now?', 9, [12,15,141,4]],
+    ['Mia walks 3 kilometers each day for 15 days. Her brother walks 38 kilometers in all. How many more kilometers did Mia walk?', 7, [53,83,3,15]]
+  ];
+  function word5Q(oc){
+    var w = WORD5[randInt(0, WORD5.length - 1)];
+    return { speak:w[0], prompt:w[0], visual:'', options: numOpts5(w[1], w[2], oc) };
+  }
+  var FOF_5 = [[3,4,24],[2,5,30],[5,6,36],[3,8,40],[2,3,27],[1,4,52],[7,10,50],[4,9,45]];
+  function fracOf5Q(oc){
+    var f = FOF_5[randInt(0, FOF_5.length - 1)], ans = f[0] * f[2] / f[1];
+    return { speak:'What is ' + f[0] + ' over ' + f[1] + ' of ' + f[2] + '?', prompt:'What is ' + f[0] + '/' + f[1] + ' of ' + f[2] + '?', visual:'', options: numNear(ans, oc, [f[2] / f[1], 2, 3, 5, f[0]], 1, 99) };
+  }
+  var FDIV_5 = [[3,4,'pizzas','friends'],[2,5,'sandwiches','kids'],[5,8,'pies','students'],[4,5,'candy bars','players'],[5,6,'sheets of paper','teams'],[3,10,'liters of juice','cousins'],[7,8,'cakes','guests']];
+  function fracDiv5Q(oc){
+    var f = FDIV_5[randInt(0, FDIV_5.length - 1)], n = f[0], d = f[1], right = n + '/' + d;
+    return { speak:n + ' ' + f[2] + ' are shared equally among ' + d + ' ' + f[3] + '. How much does each one get?', prompt:n + ' ' + f[2] + ' shared equally among ' + d + ' ' + f[3] + '. How much does each get?', visual:'',
+      options: frOpts(right, [d + '/' + n, '1/' + d, '1/' + n, n + '/' + (d + n), (n + 1) + '/' + d], oc) };
+  }
+  function fifth_adding(){
+    return shuffle(tagSkill([mult5Q(5), mult5Q(5)], 'Multiplying Two-Digit Numbers').concat(tagSkill([div5Q(5)], 'Long Division')).concat(tagSkill([word5Q(5)], 'Multi-Step Word Problems')).concat(tagSkill([fracOf5Q(5)], 'Fraction of a Number')).concat(tagSkill([fracDiv5Q(5)], 'Fractions as Division')));
+  }
+
+  /* ---------------- Nature Notebook: matter, Earth and space, ecosystems ---------------- */
+  var MATTER_5 = [
+    P('What is matter?', '⚛️|Anything that has mass and takes up space', ['💡|Only things you can see','🔊|Only sounds','💭|Thoughts and ideas','🌈|Only colors']),
+    P('Which is an example of a physical change?', '🧊|Ice melting into water', ['🍞|Bread toasting and turning brown','🔥|Wood burning to ash','🍎|An apple rotting','🔩|Iron rusting']),
+    P('Which is an example of a chemical change?', '🔥|Wood burning into ash', ['🧊|Ice melting','✂️|Cutting paper','💧|Water boiling','🥤|Sugar dissolving in water']),
+    P('You stir sand into water. What have you made?', '🥣|A mixture', ['🧪|A brand new substance','⚛️|An element','🔥|A fire','🧊|A solid']),
+    P('A sugar cube dissolves completely in a cup of water. What happens to the total mass?', '⚖️|It stays the same', ['📉|It disappears','📈|It doubles','🔥|It turns to fire','🧊|It becomes ice']),
+    P('Which is a property of a metal like copper?', '🔌|It conducts electricity well', ['🪵|It is a great insulator','🧊|It melts at room temperature','🎈|It is lighter than air','🍬|It dissolves in water']),
+    P('Water vapor is water as a…', '💨|Gas', ['🧊|Solid','💧|Liquid','🪨|Rock','🔥|Flame'])
+  ];
+  var ESPACE_5 = [
+    P('Which force pulls objects toward the center of Earth?', '🌍|Gravity', ['🧲|Magnetism','🌬️|Wind','🔥|Heat','💡|Light']),
+    P('Why does the Sun look much brighter than other stars?', '☀️|It is much closer to Earth', ['🌟|It is the biggest star in space','🌙|It is closer than the Moon','🧊|It is colder','🌑|It makes no light']),
+    P('What causes day and night on Earth?', '🌍|Earth spinning on its axis', ['🌙|The Moon blocking the Sun','☀️|The Sun moving around Earth','☁️|Clouds covering the Sun','🔄|Earth moving closer to the Sun']),
+    P('Most of Earth\'s water is…', '🌊|Salt water in the oceans', ['🏞️|Fresh water in lakes','☁️|Water in clouds','🚰|Water in rivers','💧|Water in the soil']),
+    P('Which Earth system includes all the oceans, lakes, and rivers?', '💧|Hydrosphere', ['🌬️|Atmosphere','🪨|Geosphere','🌳|Biosphere','🔥|Magma']),
+    P('Which Earth system is the layer of gases around Earth?', '🌬️|Atmosphere', ['💧|Hydrosphere','🪨|Geosphere','🌳|Biosphere','🔥|Magma']),
+    P('Which Earth system includes rocks, soil, and mountains?', '🪨|Geosphere', ['🌬️|Atmosphere','💧|Hydrosphere','🌳|Biosphere','☁️|Clouds']),
+    P('Why does the Moon look bright at night?', '🌙|It reflects sunlight', ['🔥|It makes its own light','💡|It is a star','🌞|It is on fire','🪞|It is covered in lamps'])
+  ];
+  var ECO_5 = [
+    P('In a food chain, where does the energy first come from?', '☀️|The Sun', ['🌱|Plants','🐇|Rabbits','🦅|Hawks','🪨|Rocks']),
+    P('What do producers do?', '🌱|Make their own food using sunlight', ['🐺|Eat only meat','🍄|Break down dead things','🦌|Eat plants','🦅|Hunt other animals']),
+    P('Which of these is a decomposer?', '🍄|A mushroom', ['🐇|A rabbit','🐺|A wolf','🌻|A sunflower','🦅|An eagle']),
+    P('What do decomposers do?', '♻️|Break down dead plants and animals and return nutrients to the soil', ['🌞|Make sunlight','🦌|Hunt other animals','🌱|Make food from the Sun','💧|Make rain']),
+    P('A hawk eats a snake that ate a mouse that ate seeds. Which is the producer?', '🌱|The seeds (plants)', ['🐍|The snake','🦅|The hawk','🐭|The mouse','🍄|A mushroom']),
+    P('What does a food web show?', '🕸️|How many food chains connect in an ecosystem', ['📅|The days of the week','🌦️|Tomorrow\'s weather','🏔️|A map of mountains','🧪|A science experiment']),
+    P('Most of the rabbits in a meadow disappear. What will likely happen to the foxes that eat them?', '🦊|They will have less food', ['🍖|They will have more food','🌧️|They will make more rain','🌱|They will become plants','🦅|They will become hawks']),
+    P('An animal that eats only plants is called a…', '🥬|Herbivore', ['🥩|Carnivore','🍽️|Omnivore','🍄|Decomposer','🌱|Producer'])
+  ];
+  function fifth_nature(){
+    return shuffle(pqs(MATTER_5, 2, 5, 'Matter').concat(pqs(ESPACE_5, 2, 5, 'Earth Systems & Space')).concat(pqs(ECO_5, 2, 5, 'Ecosystems')));
+  }
+
+  /* ---------------- Health Hollow ---------------- */
+  var LABEL_5 = [
+    P('On a food label, which line tells you how much food counts as one serving?', '🏷️|Serving size', ['💰|Price','📅|Expiration date','🏭|The factory name','🔢|Zip code']),
+    P('A label says one serving has 200 calories. You eat 2 servings. How many calories do you eat?', '400', ['200','100','600','2']),
+    P('Which two things should you try to limit when you read a nutrition label?', '🧂|Added sugars and sodium', ['🥦|Fiber and protein','🥛|Calcium and vitamins','🍎|Vitamins and water','💧|Water and fiber']),
+    P('Calories are a measure of…', '🔥|Energy in food', ['📏|How long food lasts','⚖️|How heavy food is','🎨|Food color','💰|Food price']),
+    P('What does the % Daily Value tell you?', '📊|How much of a day\'s need for a nutrient is in one serving', ['💰|How much the food costs','📅|How many days it lasts','🍽️|How many servings are in the box','🔥|How hot the food is'])
+  ];
+  var BODY_5 = [
+    P('Which body system fights germs?', '🛡️|Immune system', ['🦴|Skeletal system','🍽️|Digestive system','🫁|Respiratory system','🧠|Nervous system']),
+    P('Which organs filter your blood and make urine?', 'Kidneys', ['Heart','Lungs','Brain','Stomach']),
+    P('Which body system includes the stomach and the intestines?', '🍽️|Digestive system', ['🫀|Circulatory system','🫁|Respiratory system','🦴|Skeletal system','🧠|Nervous system']),
+    P('What do arteries do?', '🫀|Carry blood away from the heart', ['🍽️|Break down food','🧠|Send messages to the brain','🦴|Hold bones together','🫁|Fill with air']),
+    P('Which part of the blood helps fight infection?', '🩸|White blood cells', ['🔴|Red blood cells','🩹|Platelets','🦴|Bones','🌬️|Oxygen']),
+    P('Messages travel between the brain and the body through the…', '🧠|Nerves', ['🦴|Bones','🫁|Lungs','🍽️|Stomach','🦷|Teeth'])
+  ];
+  var DRUG_5 = [
+    P('Why is alcohol especially harmful for kids and teens?', 'It can harm a growing brain and body', ['It makes you taller','It is a safe drink for kids','It helps you learn','It gives you more energy']),
+    P('What is the safest choice if someone offers you a cigarette or a vape?', '✋|Say no and walk away', ['😬|Try it once','🎒|Take it for a friend','🙈|Hide it in your bag','🤔|Say maybe later']),
+    P('Which of these is an addictive drug found in tobacco?', '🚬|Nicotine', ['🥛|Calcium','🍊|Vitamin C','🌾|Fiber','🧂|Salt']),
+    P('What can happen when a person becomes addicted to a drug?', 'They feel they cannot stop using it', ['They get taller','They get smarter','It becomes easy to quit','They never get sick']),
+    P('Who can safely give you medicine?', '👨‍⚕️|A parent or trusted adult who knows the directions', ['🧒|Any friend','🕵️|A stranger','💻|Anyone online','🍬|Nobody — you choose any pills yourself']),
+    P('What is secondhand smoke?', '🚬|Smoke you breathe in from someone else\'s tobacco', ['🕯️|Smoke from a birthday candle','🌫️|A kind of fog','🫁|Smoke that is good for lungs','🚿|Steam from a shower'])
+  ];
+  var DIGI_5 = [
+    P('Which is private information you should NOT post online?', '🏠|Your home address', ['🎨|A drawing you made','🏀|Your favorite sport','🌈|Your favorite color','😂|A joke']),
+    P('Someone you do not know online asks to meet you. What should you do?', '🙋|Do not answer, and tell a trusted adult', ['🌳|Meet them at the park','🏠|Send your address','📞|Give your phone number','🤫|Keep it a secret']),
+    P('What is cyberbullying?', '📱|Using phones or computers to be mean to someone', ['🎮|Playing a game with a friend','📖|Reading an ebook','💌|Sending a thank-you note','🧮|Using a calculator']),
+    P('You see someone being bullied online. What is a good choice?', '🤝|Tell a trusted adult and be kind to the person', ['😂|Join in','📤|Share the mean post','🙈|Ignore it and laugh','💬|Post a meaner comment']),
+    P('A strong password should…', '🔐|Be long and mix letters, numbers, and symbols', ['📛|Be your name','🔢|Be 1234','👯|Be shared with a friend','🎂|Be your birthday']),
+    P('A pop-up says you won a free prize if you click. What should you do?', '🛑|Do not click, and ask an adult', ['🖱️|Click it right away','🏠|Type in your address','📤|Share it with all your friends','💳|Enter a parent\'s card'])
+  ];
+  var MENT_5 = [
+    P('Which is a healthy way to handle a strong feeling like anger?', '🌬️|Take a break and talk about it', ['🤐|Keep it bottled up forever','📢|Yell at others','💥|Break something','🎭|Pretend you feel nothing']),
+    P('Which is a sign you might want to talk to a trusted adult?', '💬|You feel sad or worried for many days', ['🍽️|You ate lunch','🏆|You won a game','🪥|You brushed your teeth','👕|You wore a blue shirt']),
+    P('Which habits help your mind and body feel better?', '🏃|Exercise, sleep, and time with friends', ['🌙|Skipping sleep','🚪|Staying alone all day','🍽️|Never eating','🥊|Fighting']),
+    P('Setting a goal and taking small steps helps build…', '💪|Confidence', ['😟|Worry','😠|Anger','😶|Loneliness','🥱|Boredom']),
+    P('What does it mean to be assertive?', '🗣️|Stating what you need clearly and respectfully', ['👊|Being aggressive','🤐|Staying silent','😤|Being rude','🙈|Giving in to everything'])
+  ];
+  var AID_5 = [
+    P('What should you do first if someone is badly hurt?', '📞|Call 911 or get an adult right away', ['🏃|Move them quickly','🍎|Give them food','📸|Take a photo','⏳|Wait and see']),
+    P('How should you care for a small cut?', '🩹|Wash it with clean water and cover it with a bandage', ['🪨|Rub dirt on it','🙈|Leave it open and dirty','👆|Pick at it','🧂|Pour salt on it']),
+    P('What should you do first for a nosebleed?', '👃|Sit up, lean forward, and pinch your nose', ['🔙|Lean your head back','🛏️|Lie flat','💨|Blow your nose hard','🧻|Push a tissue deep inside']),
+    P('A burn from hot water should be…', '🚿|Cooled with cool running water', ['🧈|Rubbed with butter','🫧|Popped','🔥|Held near heat','🙈|Ignored']),
+    P('What is the universal sign that someone is choking?', '🤲|Hands on the throat', ['👋|Waving','👏|Clapping','👍|Thumbs up','🙅|Crossing arms'])
+  ];
+  function fifth_health(){
+    return shuffle(pqs(LABEL_5, 1, 5, 'Food Labels').concat(pqs(BODY_5, 1, 5, 'Body Systems')).concat(pqs(DRUG_5, 1, 5, 'Alcohol, Tobacco & Drugs')).concat(pqs(DIGI_5, 1, 5, 'Digital Citizenship')).concat(pqs(MENT_5, 1, 5, 'Mental & Emotional Health')).concat(pqs(AID_5, 1, 5, 'First Aid')));
+  }
+
+  /* ---------------- Keyboard Camp ---------------- */
+  var TYPE5 = ['adventure','government','population','explanation','temperature','hemisphere','ecosystem','generation','character','experiment','settlement','colonist','delicious','tremendous','opposite','magnificent','neighborhood','independence','democracy','constitution','revolution','atmosphere','photosynthesis','mountain','whisper','different','conclusion','occasion','separate','dangerous'];
+  function fifth_typing(){
+    var out = sample(TYPE5, 6).map(function(w){ return typeQ(w, 'Type the word ' + w + '.', 'Type the word ' + w, '', 'Typing Long Words'); });
+    var nm = cleanName();
+    if (nm) out[out.length - 1] = typeQ(nm.toLowerCase(), 'Type your name, ' + nm + '.', 'Type your name, ' + nm, '', 'Typing My Name');
+    return shuffle(out);
+  }
+
+  /* ---------------- Campfire Circle ---------------- */
+  var FEEL_5 = [
+    P('What does "apprehensive" mean?', 'Worried about something that may happen', ['Very proud','Fast asleep','Full of laughter','Totally calm']),
+    P('What does "sympathy" mean?', 'Feeling sorry about someone else\'s trouble', ['Winning a race','Being very hungry','Telling a secret','Being angry at a friend']),
+    P('What does "integrity" mean?', 'Doing the right thing even when no one is watching', ['Being the loudest','Always winning','Telling small lies','Doing what is easy']),
+    P('What does "perseverance" mean?', 'Not giving up even when something is hard', ['Quitting early','Being very quiet','Always being first','Avoiding challenges']),
+    P('What does "compromise" mean?', 'Each person gives up a little to reach an agreement', ['One person always wins','Nobody talks','Everyone argues louder','Walking away angry']),
+    P('What does "tolerant" mean?', 'Accepting people who are different from you', ['Disliking new ideas','Teasing others','Wanting everyone to be the same','Ignoring everyone'])
+  ];
+  var CHOICE_5 = [
+    P('Your team lost because of a mistake you made. What shows maturity?', '🙋|Admit it, apologize, and try to improve', ['👉|Blame a teammate','🚪|Quit the team','🙈|Pretend it did not happen','🗣️|Make up an excuse']),
+    P('You find a wallet with money inside. What shows integrity?', '🏢|Turn it in to an adult or the office', ['💰|Keep the money','🛍️|Spend it','🙈|Hide it','🤐|Tell no one']),
+    P('Two classmates disagree about a project idea. What is a good compromise?', '🤝|Use parts of both ideas', ['☝️|Use only one person\'s idea','🛑|Stop working','📢|Argue louder','🗳️|Vote on who is smarter']),
+    P('A new student sits alone at lunch. What can you do?', '👋|Invite them to sit with you', ['🙈|Ignore them','🤫|Whisper about them','🚫|Tell them to move','😂|Laugh at them']),
+    P('Friends pressure you to do something unsafe. What is a good plan?', '✋|Say no, suggest something else, and leave if needed', ['😬|Go along with it','🎯|Dare them back','🤫|Do it secretly','🤞|Say yes and hope for the best']),
+    P('You feel overwhelmed by homework. What is a good strategy?', '📝|Make a list and do one task at a time', ['🚫|Skip all of it','⏳|Wait until the last minute','🏳️|Give up','📋|Copy a friend\'s work']),
+    P('Someone says something that hurts your feelings. Which "I" message works best?', '💬|"I feel upset when you say that. Please stop."', ['😠|"You are so mean!"','👥|"Everyone hates you."','😤|"I will get you back."','🙄|"Whatever, nobody cares."']),
+    P('Why is it important to listen when you disagree with someone?', '👂|You can understand their view and solve the problem', ['🏆|So you can win','📢|So you can talk louder','🔍|So you can find their mistakes','🤐|So they stop talking'])
+  ];
+  function fifth_feelings(){
+    return shuffle(pqs(FEEL_5, 2, 5, 'Feeling Words').concat(pqs(CHOICE_5, 4, 5, 'Kind & Calm Choices')));
+  }
+
+  /* ---------------- Compare Ridge: conversions, graphs, time, money ---------------- */
+  var CONV_5 = [
+    ['How many centimeters are in 2.5 meters?', 250, [25,2500,52,205]], ['How many kilograms are in 3,000 grams?', 3, [30,300,0.3,3000]], ['How many meters are in 5 kilometers?', 5000, [50,500,50000,5]],
+    ['How many milliliters are in 4 liters?', 4000, [40,400,40000,4]], ['How many hours are in 240 minutes?', 4, [24,2,6,40]], ['How many feet are in 60 inches?', 5, [6,12,50,720]],
+    ['How many ounces are in 3 pounds?', 48, [16,30,36,64]], ['How many quarts are in 2 gallons?', 8, [2,4,16,6]], ['How many gallons are in 12 quarts?', 3, [4,6,48,12]],
+    ['How many centimeters are in 7 meters?', 700, [70,7000,77,17]], ['How many liters are in 5,000 milliliters?', 5, [50,500,5000,0.5]], ['How many inches are in 4 yards?', 144, [12,48,36,120]]
+  ];
+  function conv5Q(oc){
+    var c = CONV_5[randInt(0, CONV_5.length - 1)];
+    return { speak:c[0], prompt:c[0], visual:'', options: shuffle([c[1]].concat(shuffle(c[2]).slice(0, oc - 1))).map(function(v){ return { html:bigHtml(v), correct:v === c[1] }; }) };
+  }
+  var LP_5 = [[2,1,3,0],[1,3,0,2],[0,2,2,3],[3,0,1,2],[1,1,4,2]];
+  var LP_TICKS = ['1/4','1/2','3/4','1'];
+  function fracPlotSvg(counts){
+    var s = '<svg viewBox="0 0 320 135" width="340" style="max-width:100%;height:auto;" aria-hidden="true"><line x1="20" y1="100" x2="300" y2="100" stroke="#2B2340" stroke-width="3" stroke-linecap="round"/>';
+    counts.forEach(function(c, i){
+      var x = 60 + i * 65;
+      s += '<line x1="' + x + '" y1="94" x2="' + x + '" y2="106" stroke="#2B2340" stroke-width="3"/><text x="' + x + '" y="124" font-size="15" font-weight="800" text-anchor="middle" fill="#2B2340">' + LP_TICKS[i] + '</text>';
+      for (var k = 0; k < c; k++) s += '<text x="' + x + '" y="' + (88 - k * 20) + '" font-size="20" font-weight="800" text-anchor="middle" fill="#C2410C">X</text>';
+    });
+    return s + '</svg>';
+  }
+  function fracPlot5Q(oc){
+    var cnt = LP_5[randInt(0, LP_5.length - 1)], kind = randInt(0, 2), ans, sp, pr, nz = [], i, total = cnt.reduce(function(a, b){ return a + b; }, 0);
+    cnt.forEach(function(c, k){ if (c > 0) nz.push(k); });
+    if (kind === 0){ i = nz[randInt(0, nz.length - 1)]; ans = cnt[i]; sp = 'Each X is one ribbon. The line plot shows ribbon lengths in yards. How many ribbons are ' + LP_TICKS[i].replace('/', ' over ') + ' yard long?'; pr = 'How many ribbons are ' + LP_TICKS[i] + ' yard long?'; }
+    else if (kind === 1){ ans = total; sp = 'Each X is one ribbon. How many ribbons are shown in all?'; pr = 'How many ribbons are shown in all?'; }
+    else {
+      var hi = cnt.indexOf(Math.max.apply(null, cnt)), lo = cnt.indexOf(Math.min.apply(null, cnt));
+      if (cnt.filter(function(c){ return c === cnt[hi]; }).length > 1 || cnt.filter(function(c){ return c === cnt[lo]; }).length > 1){ ans = total; sp = 'Each X is one ribbon. How many ribbons are shown in all?'; pr = 'How many ribbons are shown in all?'; }
+      else { ans = cnt[hi] - cnt[lo]; sp = 'How many more ribbons are ' + LP_TICKS[hi].replace('/', ' over ') + ' yard long than ' + LP_TICKS[lo].replace('/', ' over ') + ' yard long?'; pr = 'How many more ribbons are ' + LP_TICKS[hi] + ' yard long than ' + LP_TICKS[lo] + ' yard long?'; }
+    }
+    return { speak:sp, prompt:pr, visual:'<div class="add-stage">' + fracPlotSvg(cnt) + '</div>', options: numNear(ans, oc, [1, 2, 3], 0, 20) };
+  }
+  var BAR_5 = [
+    { title:'Favorite Pets', labels:['Dog','Cat','Fish','Bird'], vals:[8,6,2,4] },
+    { title:'Favorite Sports', labels:['Soccer','Swim','Tennis','Bike'], vals:[10,4,6,12] },
+    { title:'Favorite Lunches', labels:['Pizza','Salad','Tacos','Pasta'], vals:[12,4,8,6] }
+  ];
+  function barSvg(g){
+    var max = Math.max.apply(null, g.vals), top = Math.ceil(max / 2) * 2 + 2, h = 120, y0 = 150, x0 = 46, bw = 46, gap = 18, i, s = '<svg viewBox="0 0 320 190" width="340" style="max-width:100%;height:auto;" aria-hidden="true">';
+    s += '<text x="170" y="16" font-size="15" font-weight="900" text-anchor="middle" fill="#2B2340">' + g.title + '</text>';
+    for (i = 0; i <= top; i += 2){
+      var y = y0 - h * i / top;
+      s += '<line x1="' + x0 + '" y1="' + y + '" x2="310" y2="' + y + '" stroke="#D9D3E8" stroke-width="1.5"/><text x="' + (x0 - 6) + '" y="' + (y + 4) + '" font-size="12" font-weight="800" text-anchor="end" fill="#2B2340">' + i + '</text>';
+    }
+    g.vals.forEach(function(v, k){
+      var x = x0 + 12 + k * (bw + gap), bh = h * v / top;
+      s += '<rect x="' + x + '" y="' + (y0 - bh) + '" width="' + bw + '" height="' + bh + '" fill="#F59E0B" stroke="#2B2340" stroke-width="2.5"/><text x="' + (x + bw / 2) + '" y="' + (y0 + 17) + '" font-size="13" font-weight="800" text-anchor="middle" fill="#2B2340">' + g.labels[k] + '</text>';
+    });
+    s += '<line x1="' + x0 + '" y1="' + y0 + '" x2="310" y2="' + y0 + '" stroke="#2B2340" stroke-width="3"/><line x1="' + x0 + '" y1="' + (y0 - h) + '" x2="' + x0 + '" y2="' + y0 + '" stroke="#2B2340" stroke-width="3"/>';
+    return s + '</svg>';
+  }
+  function bar5Q(oc){
+    var g = BAR_5[randInt(0, BAR_5.length - 1)], kind = randInt(0, 2), ans, sp, pr, total = g.vals.reduce(function(a, b){ return a + b; }, 0), k = randInt(0, 3);
+    if (kind === 0){ ans = g.vals[k]; sp = 'The bar graph shows how many students chose each one. How many students chose ' + g.labels[k] + '?'; pr = 'How many students chose ' + g.labels[k] + '?'; }
+    else if (kind === 1){ ans = total; sp = 'Look at the bar graph. How many students answered in all?'; pr = 'How many students answered in all?'; }
+    else { var hi = g.vals.indexOf(Math.max.apply(null, g.vals)), lo = g.vals.indexOf(Math.min.apply(null, g.vals)); ans = g.vals[hi] - g.vals[lo]; sp = 'How many more students chose ' + g.labels[hi] + ' than ' + g.labels[lo] + '?'; pr = 'How many more chose ' + g.labels[hi] + ' than ' + g.labels[lo] + '?'; }
+    return { speak:sp, prompt:pr, visual:'<div class="add-stage">' + barSvg(g) + '</div>', options: numNear(ans, oc, [2, 4, 6, 1, 8], 0, 60) };
+  }
+  var ELAPSE_5 = [['1:35','4:10'],['8:20','11:05'],['2:45','6:30'],['10:50','1:15'],['5:05','9:40'],['11:30','2:20']];
+  function elapse5Q(oc){
+    var e = ELAPSE_5[randInt(0, ELAPSE_5.length - 1)], pt = function(t){ var a = t.split(':'); return +a[0] % 12 * 60 + +a[1]; }, mins = (pt(e[1]) - pt(e[0]) + 720) % 720;
+    var fm = function(m){ var h = Math.floor(m / 60), r = m % 60; return (h ? h + (h === 1 ? ' hour' : ' hours') : '') + (h && r ? ' ' : '') + (r ? r + ' minutes' : ''); };
+    var right = fm(mins), cand = [mins + 15, mins - 15, mins + 60, mins - 60, mins + 30, mins - 30, mins + 10].filter(function(m){ return m > 0; }).map(fm);
+    return { speak:'A movie starts at ' + e[0] + ' and ends at ' + e[1] + '. How long is the movie?', prompt:'How much time passes from ' + e[0] + ' to ' + e[1] + '?', visual:'', options: strOpts(right, cand, oc) };
+  }
+  var MONEY_5 = [
+    ['A pack of 6 pencils costs $2.40. How much does one pencil cost?', '$0.40', ['$0.30','$0.14','$0.60','$4.00']],
+    ['Fruit costs $1.25 per pound. How much do 4 pounds cost?', '$5.00', ['$4.25','$5.25','$6.00','$4.50']],
+    ['Ava has $20.00. She buys 3 books for $4.75 each. How much change does she get?', '$5.75', ['$14.25','$6.75','$5.25','$15.75']],
+    ['Two items cost $12.35 and $7.80. What is the total cost?', '$20.15', ['$19.15','$20.25','$5.55','$19.05']],
+    ['Mia pays for a $36.28 jacket with a $50.00 bill. How much change should she get?', '$13.72', ['$14.72','$13.28','$12.72','$86.28']],
+    ['Sam earns $7.50 each hour. How much does he earn in 3 hours?', '$22.50', ['$21.50','$10.50','$23.50','$20.00']]
+  ];
+  function money5Q(oc){
+    var m = MONEY_5[randInt(0, MONEY_5.length - 1)];
+    return { speak:m[0], prompt:m[0], visual:'', options: strOpts(m[1], m[2], oc, true) };
+  }
+  function fifth_compare(){
+    return shuffle(tagSkill([conv5Q(5), conv5Q(5)], 'Unit Conversions').concat(tagSkill([fracPlot5Q(5)], 'Line Plots')).concat(tagSkill([bar5Q(5)], 'Bar Graphs')).concat(tagSkill([elapse5Q(5)], 'Elapsed Time')).concat(tagSkill([money5Q(5)], 'Money & Decimals')));
+  }
+
+  /* ---------------- Community Camp: early America, the Revolution, the Constitution ---------------- */
+  var EARLY_5 = [
+    P('Which group of people lived in North America long before European explorers arrived?', '🪶|Native American nations', ['⛵|The Pilgrims','🏰|Soldiers from Spain','📜|Colonial governors','🚀|Astronauts']),
+    P('In 1492, which explorer sailed across the Atlantic Ocean for Spain?', '⛵|Christopher Columbus', ['🎩|George Washington','🧭|Lewis and Clark','🪓|Daniel Boone','📜|Abraham Lincoln']),
+    P('What was the name of the ship that carried the Pilgrims to America in 1620?', '⛵|The Mayflower', ['🚢|The Titanic','⛵|The Santa Maria','⛵|The Niña','📜|The Constitution']),
+    P('What was the first permanent English settlement in America, founded in 1607?', '🏘️|Jamestown', ['🏘️|Plymouth','🏙️|Salt Lake City','🏙️|Philadelphia','🏙️|Boston']),
+    P('How many original English colonies were there?', '13', ['10','50','7','12']),
+    P('Why did many colonists come to America?', '🌾|For religious freedom, land, and new opportunities', ['🎮|To find video games','✈️|To build airports','🏞️|To visit national parks','🏭|To work in electric factories'])
+  ];
+  var REV_5 = [
+    P('Which document announced that the American colonies were free from Britain?', '📜|The Declaration of Independence', ['📜|The Constitution','📜|The Bill of Rights','⛵|The Mayflower Compact','📜|The Emancipation Proclamation']),
+    P('Who was the main writer of the Declaration of Independence?', '✍️|Thomas Jefferson', ['🎩|George Washington','⚡|Benjamin Franklin','🎩|Abraham Lincoln','🎩|King George III']),
+    P('In what year was the Declaration of Independence adopted?', '1776', ['1492','1620','1865','1787']),
+    P('Who led the American army during the Revolutionary War?', '🎖️|George Washington', ['✍️|Thomas Jefferson','👑|King George III','⚡|Benjamin Franklin','🐎|Paul Revere']),
+    P('Colonists protested "taxation without representation." What did that mean?', '🗳️|They paid taxes to Britain but had no voice in its government', ['🏫|They wanted lower school fees','👑|They liked the king','🍵|They wanted more tea','💰|They paid no taxes at all']),
+    P('What happened at the Boston Tea Party?', '🍵|Colonists dumped tea into the harbor to protest a tax', ['🏪|A tea shop opened','🕊️|A war ended','👑|A king visited','🫖|Colonists drank tea with soldiers']),
+    P('Which country did the colonies fight in the Revolutionary War?', '👑|Great Britain', ['🏰|Spain','🌵|Mexico','🍁|Canada','🥖|France'])
+  ];
+  var CONST_5 = [
+    P('What are the three branches of the U.S. government?', '🏛️|Legislative, executive, and judicial', ['🇺🇸|Red, white, and blue','🏙️|Mayor, governor, and president','🎖️|Army, navy, and air force','🗺️|Local, state, and county']),
+    P('Which branch makes the laws?', '🏛️|Legislative branch (Congress)', ['🎩|Executive branch','⚖️|Judicial branch','🎖️|The military','🚓|The police']),
+    P('Which branch carries out the laws and is led by the President?', '🎩|Executive branch', ['🏛️|Legislative branch','⚖️|Judicial branch','🏛️|The Senate','🏛️|Congress']),
+    P('Which branch decides what the laws mean?', '⚖️|Judicial branch (the courts)', ['🏛️|Legislative branch','🎩|Executive branch','🎖️|The military','🚓|The police']),
+    P('What are the first ten amendments to the Constitution called?', '📜|The Bill of Rights', ['📜|The Declaration','📜|The Preamble','🗽|The Pledge','📜|The Articles']),
+    P('What are checks and balances?', '⚖️|A system that keeps any one branch from having too much power', ['💰|A way to count money','🏦|A bank rule','🧮|A kind of math','📋|A tax form']),
+    P('Congress has two parts. What are they?', '🏛️|The Senate and the House of Representatives', ['⚖️|The Court and the Cabinet','🎩|The President and Vice President','🎖️|The Army and Navy','🏙️|The Governor and Mayor']),
+    P('The Constitution begins with a short introduction called the…', '📜|Preamble', ['📜|Amendment','📜|Article','🗽|Pledge','📜|Treaty']),
+    P('Which freedom is protected by the First Amendment?', '🗣️|Freedom of speech', ['🚗|The right to drive','🍬|The right to free candy','🏫|The right to skip school','📜|The right to ignore laws'])
+  ];
+  var USGEO_5 = [
+    P('Which ocean is on the east coast of the United States?', '🌊|Atlantic Ocean', ['🌊|Pacific Ocean','🌊|Indian Ocean','🧊|Arctic Ocean','🌊|Gulf of Mexico']),
+    P('Which river runs through the middle of the United States and flows into the Gulf of Mexico?', '🌊|Mississippi River', ['🌊|Colorado River','🌊|Hudson River','🌊|Columbia River','🌊|Snake River']),
+    P('Which mountain range runs along the western United States?', '⛰️|Rocky Mountains', ['⛰️|Appalachian Mountains','🏔️|The Alps','🏔️|The Himalayas','⛰️|The Ozarks']),
+    P('Which mountains are in the eastern United States?', '⛰️|Appalachian Mountains', ['⛰️|Rocky Mountains','🏔️|The Alps','🏔️|The Himalayas','🏔️|The Andes']),
+    P('How many states are in the United States?', '50', ['13','48','52','45']),
+    P('What is the capital of the United States?', '🏛️|Washington, D.C.', ['🏙️|New York City','🏙️|Philadelphia','🏙️|Salt Lake City','🏙️|Boston']),
+    P('Which state is the largest in the United States by area?', '🐻|Alaska', ['🤠|Texas','🐝|Utah','🌴|California','🏔️|Montana'])
+  ];
+  function fifth_community(){
+    return shuffle(pqs(EARLY_5, 1, 5, 'Early America').concat(pqs(REV_5, 2, 5, 'The American Revolution')).concat(pqs(CONST_5, 2, 5, 'The Constitution & Government')).concat(pqs(USGEO_5, 1, 5, 'U.S. Geography')));
+  }
+
+  var FIFTH_BUILDERS = {
+    myname: function(){ return buildMyName('first'); }, rhyme: fifth_rhyme, letters: fifth_letters, story: fifth_story,
+    sightwords: fifth_sightwords, counting: fifth_counting, patterns: fifth_patterns, shapes: fifth_shapes, colors: fifth_colors,
+    adding: fifth_adding, nature: fifth_nature, health: fifth_health, typing: fifth_typing, feelings: fifth_feelings,
+    compare: fifth_compare, community: fifth_community
+  };
+  Object.keys(FIFTH_BUILDERS).forEach(function(id){
+    if (id === 'myname') return;
+    var fn = FIFTH_BUILDERS[id];
+    FIFTH_BUILDERS[id] = function(){
+      var r;
+      for (var t = 0; t < 40; t++){
+        r = fn();
+        var ks = r.map(function(q){ return q.skill + '|' + qKey(q, id); });
+        if (ks.filter(function(k, i){ return ks.indexOf(k) === i; }).length === ks.length) return r;
+      }
+      return r;
+    };
+  });
+  var FIFTH_DESC = {
+    myname:'Spell my name', rhyme:'Roots & confused words', letters:'Perfect tenses & punctuation', story:'Evidence & figurative language',
+    sightwords:'Vocabulary in context', counting:'Decimals & fractions', patterns:'Order of operations & grids', shapes:'Volume & angles',
+    colors:'Perspective & art forms', adding:'Long division & fractions', nature:'Matter, space & ecosystems', health:'Labels, body & safety',
+    typing:'Type long words', feelings:'Integrity & compromise', compare:'Conversions & graphs', community:'Early America & the Constitution'
+  };
+
   var STATIONS = [
     { id:'myname', accent:'--cyan', accentInk:'--cyan-ink', name:'My Trail Sign', stop:'Stop 1', requiresName:true,
       desc:{preschool:'Letters in my name', kindergarten:'Match my letters', first:'Spell my name'}, build:buildMyName },
@@ -4799,11 +6221,13 @@
       desc:{preschool:'Helpers & rules', kindergarten:'Needs, maps & Utah', first:'Goods, jobs & Utah'}, build:buildCommunity }
   ];
   STATIONS.forEach(function(st){
-    var orig = st.build, sec = SECOND_BUILDERS[st.id], thr = THIRD_BUILDERS[st.id];
+    var orig = st.build, sec = SECOND_BUILDERS[st.id], thr = THIRD_BUILDERS[st.id], fou = FOURTH_BUILDERS[st.id], fif = FIFTH_BUILDERS[st.id];
     if (!sec) return;
-    st.build = function(level){ return level === 'third' && thr ? thr() : (level === 'second' ? sec() : orig(level)); };
+    st.build = function(level){ return level === 'fifth' && fif ? fif() : (level === 'fourth' && fou ? fou() : (level === 'third' && thr ? thr() : (level === 'second' ? sec() : orig(level)))); };
     st.desc.second = SECOND_DESC[st.id];
     if (thr) st.desc.third = THIRD_DESC[st.id];
+    if (fou) st.desc.fourth = FOURTH_DESC[st.id];
+    if (fif) st.desc.fifth = FIFTH_DESC[st.id];
   });
   function visibleStations(){
     return STATIONS.filter(function(s){ return !s.requiresName || (STATE.hasCustomName && STATE.userName); });
@@ -6394,7 +7818,7 @@
 
   /* ---- Parent summary ---- */
   function stripTags(t){ return String(t == null ? '' : t).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(); }
-  function nextLevelOf(id){ return id === 'preschool' ? 'kindergarten' : (id === 'kindergarten' ? 'first' : (id === 'first' ? 'second' : (id === 'second' ? 'third' : null))); }
+  function nextLevelOf(id){ return id === 'preschool' ? 'kindergarten' : (id === 'kindergarten' ? 'first' : (id === 'first' ? 'second' : (id === 'second' ? 'third' : (id === 'third' ? 'fourth' : (id === 'fourth' ? 'fifth' : null))))); }
   function stillWorkingOn(st){
     var out = [];
     Object.keys((st && st.missed) || {}).forEach(function(k){
