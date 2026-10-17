@@ -1186,7 +1186,6 @@
           <span class="check-ic" aria-hidden="true">🧭</span>
           <span class="check-text"><b>Trail Check</b><span>18 questions · 3 from every camp site · includes ones you missed</span></span>
         </button>
-        <label class="check-grade">Grade <select id="checkGrade" aria-label="Grade for the Trail Check"></select></label>
       </div>
     </div>
     <div class="camp-bar" id="campBar" hidden>
@@ -1241,7 +1240,7 @@
           <ul class="how-tips how-grid">
             <li><span class="how-ic how-pill">⭐ 12/48</span><span><b>Star count.</b> Stars earned out of all the stars in this grade (3 per trail).</span></li>
             <li><span class="how-ic">🦍</span><span><b>Sasquatch.</b> Tap him for a random trail. It favors trails with fewer stars or shaky answers, and never the same one twice in a row.</span></li>
-            <li><span class="how-ic">🧭</span><span><b>Trail Check.</b> An 18-question check-up with 3 questions from every camp site. Two of each 3 come from the questions this explorer has missed most; the rest are fresh. Use the Grade box beside it to try another grade without changing the setting.</span></li>
+            <li><span class="how-ic">🧭</span><span><b>Trail Check.</b> An 18-question check-up with 3 questions from every camp site. Two of each 3 come from the questions this explorer has missed most; the rest are fresh. It uses the grade you set in the dashboard.</span></li>
             <li><span class="how-ic">🪵</span><span><b>Campfire logs.</b> Every finished round adds a log. Three logs a day (adjustable) light the fire; playing on back-to-back days builds a streak.</span></li>
             <li><span class="how-ic">👪</span><span><b>Grown-up dashboard.</b> Opens this explorer’s own progress page (details below).</span></li>
             <li><span class="how-ic">🚪</span><span><b>Exit.</b> Saves progress and goes back to “Who’s hiking today?” so someone else can play.</span></li>
@@ -7588,12 +7587,6 @@
     if (elCheckWrap) elCheckWrap.hidden = !!camp;
     if (!camp){
       /* home: one card per camp site */
-      try{
-        var elCG = document.getElementById('checkGrade');
-        if (elCG){
-          elCG.innerHTML = LEVELS.map(function(l){ return '<option value="' + l.id + '"' + (l.id === STATE.level ? ' selected' : '') + '>' + l.label + '</option>'; }).join('');
-        }
-      }catch(e){}
       if (elHeading) elHeading.textContent = 'Pick a camp site';
       if (elCampBar) elCampBar.hidden = true;
       elTrailList.innerHTML = CAMPS.map(function(c){
@@ -8771,7 +8764,7 @@
   elBackBtn.addEventListener('click', function(){ if (STATE.mode === 'check'){ STATE.mode = null; currentCamp = null; } renderTrail(); showView('trail'); });
   document.getElementById('campBackBtn').addEventListener('click', function(){ currentCamp = null; renderTrail(); try{ window.scrollTo(0, 0); }catch(e){} });
   elToTrail.addEventListener('click', function(){ if (STATE.mode === 'check'){ STATE.mode = null; currentCamp = null; } renderTrail(); showView('trail'); });
-  document.getElementById('checkBtn').addEventListener('click', function(){ startTrailCheck(document.getElementById('checkGrade').value); });
+  document.getElementById('checkBtn').addEventListener('click', function(){ startTrailCheck(STATE.level); });
   elPlayAgain.addEventListener('click', function(){ if (STATE.mode === 'check') startTrailCheck(STATE.checkLevel); else openStation(STATE.stationId); });
   elSpeakBtn.addEventListener('click', function(){
     var q = STATE.round && STATE.round[STATE.qIndex];
