@@ -344,6 +344,23 @@
     display:flex; flex-direction:column; align-items:center; width:100%;
   }
   .stop-eyebrow{ display:none; }
+  .check-wrap{ margin:0 0 12px; }
+  .check-wrap[hidden]{ display:none; }
+  .check-card{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px; background:var(--surface); border:3px solid var(--outline-strong); border-radius:18px; box-shadow:var(--shadow); }
+  .check-go{ flex:1 1 280px; display:flex; align-items:center; gap:12px; text-align:left; padding:6px 8px; background:transparent; border:none; cursor:pointer; color:inherit; font:inherit; }
+  .check-ic{ flex:0 0 auto; width:52px; height:52px; display:flex; align-items:center; justify-content:center; font-size:1.7rem; border-radius:50%; background:var(--indigo); color:var(--indigo-ink); border:3px solid var(--surface); box-shadow:0 0 0 2px var(--indigo); }
+  .check-text b{ display:block; font-size:1.05rem; }
+  .check-text span{ font-size:0.78rem; font-weight:700; color:var(--ink-soft); }
+  .check-grade{ display:flex; align-items:center; gap:6px; font-size:0.8rem; font-weight:800; color:var(--ink-soft); }
+  .check-grade select{ font:inherit; font-weight:800; padding:6px 8px; border-radius:10px; border:2px solid var(--line); background:var(--surface-2); color:var(--ink); }
+  .check-camp-row{ display:flex; align-items:center; gap:10px; padding:6px 4px; border-bottom:1px solid var(--line); font-weight:700; text-align:left; }
+  .check-camp-row .cc-name{ flex:1; }
+  .check-camp-row .cc-dots{ letter-spacing:2px; }
+  .check-block{ margin:10px 0; padding:10px 12px; border-radius:14px; background:var(--surface-2); border:2px solid var(--line); }
+  .check-block .cb-hint{ font-weight:800; margin:6px 0 2px; }
+  .check-block .cb-small{ font-size:0.78rem; color:var(--ink-soft); }
+  .check-block table{ width:100%; border-collapse:collapse; font-size:0.85rem; }
+  .check-block td{ padding:3px 6px; }
   .camp-bar{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:4px 0 12px; }
   .camp-bar[hidden]{ display:none; }
   .camp-title{ font-size:1.25rem; font-weight:800; }
@@ -1129,6 +1146,15 @@
     <div class="voice-note" id="voiceNote" hidden></div>
     <div class="goal-card" id="goalCard" hidden></div>
     <div class="level-switch" id="levelSwitch" aria-live="polite"></div>
+    <div class="check-wrap" id="checkWrap" hidden>
+      <div class="check-card">
+        <button type="button" class="check-go" id="checkBtn" aria-label="Start a Trail Check: 18 questions, 3 from every camp site">
+          <span class="check-ic" aria-hidden="true">🧭</span>
+          <span class="check-text"><b>Trail Check</b><span>18 questions · 3 from every camp site · includes ones you missed</span></span>
+        </button>
+        <label class="check-grade">Grade <select id="checkGrade" aria-label="Grade for the Trail Check"></select></label>
+      </div>
+    </div>
     <div class="camp-bar" id="campBar" hidden>
       <button class="back-btn" id="campBackBtn" type="button">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -1181,6 +1207,7 @@
           <ul class="how-tips how-grid">
             <li><span class="how-ic how-pill">⭐ 12/48</span><span><b>Star count.</b> Stars earned out of all the stars in this grade (3 per trail).</span></li>
             <li><span class="how-ic">🦍</span><span><b>Sasquatch.</b> Tap him for a random trail. It favors trails with fewer stars or shaky answers, and never the same one twice in a row.</span></li>
+            <li><span class="how-ic">🧭</span><span><b>Trail Check.</b> An 18-question check-up with 3 questions from every camp site. Two of each 3 come from the questions this explorer has missed most; the rest are fresh. Use the Grade box beside it to try another grade without changing the setting.</span></li>
             <li><span class="how-ic">🪵</span><span><b>Campfire logs.</b> Every finished round adds a log. Three logs a day (adjustable) light the fire; playing on back-to-back days builds a streak.</span></li>
             <li><span class="how-ic">👪</span><span><b>Grown-up dashboard.</b> Opens this explorer’s own progress page (details below).</span></li>
             <li><span class="how-ic">🚪</span><span><b>Exit.</b> Saves progress and goes back to “Who’s hiking today?” so someone else can play.</span></li>
@@ -1193,6 +1220,7 @@
           <ul class="how-tips">
             <li><span class="how-ic">📚</span><span><b>Grade level.</b> Pick Preschool through 5th. Each trail has its own questions for every grade.</span></li>
             <li><span class="how-ic">🎯</span><span><b>Daily goal.</b> Choose 1–6 rounds a day for the campfire.</span></li>
+            <li><span class="how-ic">🧭</span><span><b>Trail Check results.</b> The latest score, how each camp site went, and a gentle hint about the grade fit. It is only 18 questions, so it is a hint, not a placement.</span></li>
             <li><span class="how-ic">📈</span><span><b>Progress at a glance.</b> Streak, best streak, today’s rounds, days played in the last 7, what’s going great and what needs practice, plus right/wrong counts, accuracy and minutes.</span></li>
             <li><span class="how-ic">🗓️</span><span><b>Week by week.</b> Activity, questions, time and stars for each week, and which skills were practiced.</span></li>
             <li><span class="how-ic">📄</span><span><b>Download report</b> or <b>Print</b> a progress report to share with a teacher.</span></li>
@@ -6369,13 +6397,14 @@
   }
 
   function defaultStats(){
-    return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[], weekly:{}, missed:{}, right:{}, daily:{}, recent:{}, goal:3, bestStreak:0 };
+    return { stars:{}, tally:{}, skillTally:{}, totalCorrect:0, totalWrong:0, totalTimeSec:0, lastActive:null, sessions:[], weekly:{}, missed:{}, right:{}, daily:{}, recent:{}, goal:3, bestStreak:0, checks:[] };
   }
   function normalizeStats(){
     if (!stats.daily) stats.daily = {};
     if (!stats.recent) stats.recent = {};
     if (!stats.goal) stats.goal = 3;
     if (typeof stats.bestStreak !== 'number') stats.bestStreak = 0;
+    if (!Array.isArray(stats.checks)) stats.checks = [];
   }
 
   /* On claude.ai this app uses the Artifact db capability. This GitHub Pages copy has no
@@ -6836,6 +6865,32 @@
     return '<table class="admin-table week-table"><thead><tr><th>Week</th><th>Activity</th><th>Questions</th><th>Time</th><th>Stars</th></tr></thead><tbody>'+rows+'</tbody></table>';
   }
 
+  function renderCheckBlock(st){
+    var list = (st && st.checks) || [];
+    if (!list.length) return '<div class="check-block"><div class="grade-label" style="margin-bottom:2px;">🧭 Trail Check</div><div class="cb-small">No Trail Check yet. It is the compass card on the home screen: 18 questions, 3 from every camp site, with 2 of each 3 from questions this explorer has missed most.</div></div>';
+    var last = list[list.length - 1], pct = last.n ? last.r / last.n : 0, idx = 0, lv = levelInfo(last.lv);
+    LEVELS.forEach(function(l, i){ if (l.id === last.lv) idx = i; });
+    var hint;
+    if (pct >= 0.85) hint = idx < LEVELS.length - 1 ? ('Looks ready to try ' + LEVELS[idx + 1].label + '.') : ('A strong fit — this is the top level.');
+    else if (pct >= 0.6) hint = 'A good fit for ' + lv.label + '.';
+    else if (pct >= 0.4 || idx === 0) hint = 'Still building ' + lv.label + ' skills — more practice there before moving on.';
+    else hint = 'Tough going at ' + lv.label + ' — more practice there, or try ' + LEVELS[idx - 1].label + ' for a confidence boost.';
+    var rows = CAMPS.filter(function(c){ return last.c && last.c[c.id]; }).map(function(c){
+      var b = last.c[c.id];
+      return '<tr><td>' + c.icon + ' ' + c.name + '</td><td style="font-weight:800;">' + b[0] + ' of ' + b[1] + '</td><td>' + (b[0] === b[1] ? '💪 strong' : (b[0] <= 1 ? '🌱 needs practice' : '')) + '</td></tr>';
+    }).join('');
+    var older = list.slice(0, -1).slice(-3).reverse().map(function(e){
+      return '<div class="cb-small">' + new Date(e.d).toLocaleDateString() + ' · ' + levelInfo(e.lv).label + ' · ' + e.r + ' of ' + e.n + '</div>';
+    }).join('');
+    return '<div class="check-block"><div class="grade-label" style="margin-bottom:2px;">🧭 Trail Check</div>' +
+      '<div style="font-weight:800;">' + last.r + ' of ' + last.n + ' right on the first try · ' + lv.label + ' · ' + new Date(last.d).toLocaleDateString() + '</div>' +
+      '<table>' + rows + '</table>' +
+      '<div class="cb-hint">' + hint + '</div>' +
+      '<div class="cb-small">Only 18 questions, so treat this as a hint, not a placement.</div>' +
+      (older ? '<div style="margin-top:6px;font-weight:800;font-size:0.78rem;color:var(--ink-soft);">EARLIER CHECKS</div>' + older : '') +
+      '</div>';
+  }
+
   function renderUserCard(u, st, showDelete){
     st = st || {};
     var correct = st.totalCorrect || 0, wrong = st.totalWrong || 0;
@@ -6862,6 +6917,8 @@
     }).join('');
     var summaryBlock = '';
     try{ summaryBlock = renderSummaryBlock(u, st, skillEntries); }catch(e){ summaryBlock = ''; }
+    var checkBlock = '';
+    try{ checkBlock = renderCheckBlock(st); }catch(e){ checkBlock = ''; }
     var lvl = levelInfo(u.level);
     var gradeBlock = '<div class="grade-row"><div class="grade-label">Grade level</div>'+
           '<div class="level-switch" data-grade-for="'+u.slug+'">'+
@@ -6878,6 +6935,7 @@
       '</div>'+
       gradeBlock+
       summaryBlock+
+      checkBlock+
       '<div style="display:flex;gap:18px;flex-wrap:wrap;font-size:0.9rem;font-weight:700;margin-bottom:10px;">'+
         '<span>✅ '+correct+' correct</span><span>❌ '+wrong+' wrong</span>'+
         '<span>'+(acc===null?'—':acc+'%')+' accuracy</span><span>⏱ '+minutes+' min total</span>'+
@@ -7114,7 +7172,7 @@
     var slug = STATE.userSlug;
     pendingSave = pendingSave.then(function(){
       pruneWeekly();
-      var payload = { totalCorrect: stats.totalCorrect, totalWrong: stats.totalWrong, totalTimeSec: stats.totalTimeSec, lastActive: stats.lastActive, sessions: stats.sessions, stars: stats.stars, tally: stats.tally, skillTally: stats.skillTally, weekly: stats.weekly, missed: stats.missed || {}, right: stats.right || {}, daily: stats.daily || {}, recent: stats.recent || {}, goal: stats.goal || 3, bestStreak: stats.bestStreak || 0 };
+      var payload = { totalCorrect: stats.totalCorrect, totalWrong: stats.totalWrong, totalTimeSec: stats.totalTimeSec, lastActive: stats.lastActive, sessions: stats.sessions, stars: stats.stars, tally: stats.tally, skillTally: stats.skillTally, weekly: stats.weekly, missed: stats.missed || {}, right: stats.right || {}, daily: stats.daily || {}, recent: stats.recent || {}, goal: stats.goal || 3, bestStreak: stats.bestStreak || 0, checks: stats.checks || [] };
       /* Building a db path/doc reference can throw SYNCHRONOUSLY (not just reject) if anything about
          it is ever malformed -- and this now runs on every single answered question via
          recordAnswer(), inside the same call stack as the correct-answer feedback. An uncaught throw
@@ -7492,8 +7550,16 @@
     var elHeading = document.getElementById('trailHeading'), elCampBar = document.getElementById('campBar'), elCampTitle = document.getElementById('campTitle');
     var camp = currentCamp ? campById(currentCamp) : null;
     if (camp && !camp.trails.some(function(t){ return vis.some(function(s){ return s.id === t; }); })){ camp = null; currentCamp = null; }
+    var elCheckWrap = document.getElementById('checkWrap');
+    if (elCheckWrap) elCheckWrap.hidden = !!camp;
     if (!camp){
       /* home: one card per camp site */
+      try{
+        var elCG = document.getElementById('checkGrade');
+        if (elCG){
+          elCG.innerHTML = LEVELS.map(function(l){ return '<option value="' + l.id + '"' + (l.id === STATE.level ? ' selected' : '') + '>' + l.label + '</option>'; }).join('');
+        }
+      }catch(e){}
       if (elHeading) elHeading.textContent = 'Pick a camp site';
       if (elCampBar) elCampBar.hidden = true;
       elTrailList.innerHTML = CAMPS.map(function(c){
@@ -7587,6 +7653,10 @@
         gets that question right on the first try. */
   var MISSED_CAP = 6, MISSED_PER_ROUND = 3, MAX_REPEATS_PER_ROUND = 3;
   function missedKey(stationId, level){ return stationId + ':' + level; }
+  /* Trail Check rounds mix questions from many trails, so each question carries its own trail (q.stationId)
+     and the check runs at STATE.checkLevel; in every normal round these fall back to the open trail / grade. */
+  function qStation(q){ return (STATE.mode === 'check' && q && q.stationId) ? q.stationId : STATE.stationId; }
+  function qLevel(){ return (STATE.mode === 'check' && STATE.checkLevel) ? STATE.checkLevel : STATE.level; }
   function qSig(q){
     return (q.speak || '') + '|' + (q.prompt || '') + '|' + q.options.filter(function(o){ return o.correct; }).map(function(o){ return o.html; }).join(',');
   }
@@ -7648,6 +7718,7 @@
   function openStation(id){
     var station = stationById(id);
     currentCamp = campOfStation(id) || currentCamp;
+    STATE.mode = null;
     STATE.stationId = id;
     STATE.roundTally = { correct:0, wrong:0 };
     STATE.roundSkillTally = {};
@@ -7671,6 +7742,68 @@
     renderQuestion();
   }
 
+  /* ---- Trail Check: 3 questions from every camp site (18 in all). Two of the three come from the child's own
+     most-missed questions (the "practice again" bank) at the chosen grade; the rest are fresh. ---- */
+  function buildTrailCheck(level){
+    var vis = visibleStations(), out = [];
+    CAMPS.forEach(function(c){
+      var ts = vis.filter(function(s){ return c.trails.indexOf(s.id) !== -1; });
+      if (!ts.length) return;
+      var pool = [];
+      ts.forEach(function(s){
+        var bank = stats.missed && stats.missed[missedKey(s.id, level)];
+        (bank || []).forEach(function(e){ pool.push({ e:e, id:s.id, r:Math.random() }); });
+      });
+      pool.sort(function(a, b){ return ((b.e.n || 1) - (a.e.n || 1)) || (a.r - b.r); });
+      var qs = [], seen = {};
+      pool.forEach(function(p){
+        if (qs.length >= 2 || seen[p.e.sig]) return;
+        seen[p.e.sig] = true;
+        var q = cloneQuestion(p.e.q);
+        q.stationId = p.id; q.camp = c.id; q.fromBank = true;
+        qs.push(q);
+      });
+      var usedTrails = {};
+      qs.forEach(function(q){ usedTrails[q.stationId] = (usedTrails[q.stationId] || 0) + 1; });
+      for (var tries = 0; qs.length < 3 && tries < 60; tries++){
+        var fresh = ts.filter(function(s){ return !usedTrails[s.id]; });
+        var st = (fresh.length && tries < 30) ? fresh[randInt(0, fresh.length - 1)] : ts[randInt(0, ts.length - 1)];
+        var rd = st.build(level);
+        if (!rd || !rd.length) continue;
+        var q = rd[randInt(0, rd.length - 1)];
+        if (qs.some(function(x){ return qSig(x) === qSig(q); })) continue;
+        q.stationId = st.id; q.camp = c.id; q.fromBank = false;
+        usedTrails[st.id] = (usedTrails[st.id] || 0) + 1;
+        qs.push(q);
+      }
+      out = out.concat(shuffle(qs));
+    });
+    return out;
+  }
+  function startTrailCheck(level){
+    level = normLevel(level || STATE.level);
+    STATE.mode = 'check'; STATE.checkLevel = level; STATE.checkLog = [];
+    STATE.stationId = null;
+    STATE.roundTally = { correct:0, wrong:0 };
+    STATE.roundSkillTally = {};
+    STATE.roundLog = [];
+    var round = [];
+    STATE.includeName = true;
+    try{ round = buildTrailCheck(level); }catch(e){ round = []; }
+    STATE.includeName = false;
+    if (!round.length){ STATE.mode = null; return; }
+    STATE.round = round;
+    STATE.extraCount = 0;
+    STATE.qIndex = 0;
+    STATE.correctFirstTry = 0;
+    try{ elStageIconBg.innerHTML = ''; }catch(e){}
+    elQuestionCard.hidden = false;
+    elResultsCard.hidden = true;
+    showView('station');
+    renderDots();
+    renderQuestion();
+  }
+
   function renderDots(){
     elDots.innerHTML = '';
     var total = (STATE.round && STATE.round.length) || 6;
@@ -7684,6 +7817,13 @@
   function renderQuestion(){
     var q = STATE.round[STATE.qIndex];
     STATE.wrongOnCurrent = false;
+    if (STATE.mode === 'check'){
+      try{
+        var cp = campById(q.camp);
+        elViewStation.style.setProperty('--stop-accent', 'var(' + (cp ? cp.accent : '--forest') + ')');
+        elStationTitle.innerHTML = '🧭 Trail Check · ' + (cp ? cp.icon + ' ' + cp.name : '') + ' <span class="station-level-tag">' + levelInfo(STATE.checkLevel).label + '</span>';
+      }catch(e){}
+    }
     clearCustom();
     STATE.typedAny = false;
     elStage.innerHTML = q.visual || '';
@@ -7739,13 +7879,14 @@
     }
     return hashStr((q.speak || '') + '|' + (q.prompt || '') + '|' + correct);
   }
-  function recordRight(skill, level, q){
+  function recordRight(skill, level, q, sid){
+    sid = sid || STATE.stationId;
     if (!stats.right) stats.right = {};
     var k = skill + '|' + level;
     var arr = stats.right[k] || (stats.right[k] = []);
-    var h = qKey(q, STATE.stationId);
+    var h = qKey(q, sid);
     if (arr.length < 600 && arr.indexOf(h) === -1) arr.push(h);
-    try{ pushRecent(STATE.stationId, level, q); }catch(e){}
+    try{ pushRecent(sid, level, q); }catch(e){}
   }
   var COVERAGE_RUNS = 400;
   var totalsCache = {};
@@ -8077,7 +8218,7 @@
     if (elCustom){ elCustom.innerHTML = ''; elCustom.hidden = true; }
     elOptions.hidden = false;
   }
-  function currentSkill(q){ return q.skill || (stationById(STATE.stationId) || {}).name || STATE.stationId; }
+  function currentSkill(q){ return q.skill || (stationById(qStation(q)) || {}).name || qStation(q); }
   function advanceAfter(ms){
     setTimeout(function(){
       STATE.qIndex++;
@@ -8099,16 +8240,17 @@
     STATE.roundTally.correct++;
     STATE.roundSkillTally[skill].correct++;
     STATE.roundLog.push({ skill:skill, label:(q.isRepeat ? '(again) ' : '') + (q.prompt || q.speak), correct:!STATE.wrongOnCurrent });
+    if (STATE.mode === 'check' && STATE.checkLog) STATE.checkLog.push({ camp:q.camp, station:q.stationId, skill:skill, firstTry:!STATE.wrongOnCurrent });
     try{
-      if (firstTry){ removeFromMissedBank(STATE.stationId, STATE.level, q); recordRight(skill, STATE.level, q); }
-      else if ((q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
+      if (firstTry){ removeFromMissedBank(qStation(q), qLevel(), q); recordRight(skill, qLevel(), q, qStation(q)); }
+      else if (STATE.mode !== 'check' && (q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
         var again = cloneQuestion(q); again.reps = (q.reps || 0) + 1; again.isRepeat = true; again.fromBank = false;
         STATE.round.splice(Math.min(STATE.qIndex + 3, STATE.round.length), 0, again);
         STATE.extraCount = (STATE.extraCount || 0) + 1;
       }
     }catch(e){}
     advanceAfter(opts.advance || 1100);
-    try{ recordAnswer(STATE.stationId, skill, true); }catch(e){}
+    try{ recordAnswer(qStation(q), skill, true); }catch(e){}
     try{
       var praise = PRAISE[randInt(0, PRAISE.length - 1)];
       elFeedback.textContent = praise;
@@ -8121,11 +8263,11 @@
   function missCustom(q){
     var skill = currentSkill(q);
     if (!STATE.roundSkillTally[skill]) STATE.roundSkillTally[skill] = { correct:0, wrong:0 };
-    if (!STATE.wrongOnCurrent){ try{ addToMissedBank(STATE.stationId, STATE.level, q); }catch(e){} }
+    if (!STATE.wrongOnCurrent){ try{ addToMissedBank(qStation(q), qLevel(), q); }catch(e){} }
     STATE.wrongOnCurrent = true;
     STATE.roundTally.wrong++;
     STATE.roundSkillTally[skill].wrong++;
-    try{ recordAnswer(STATE.stationId, skill, false); }catch(e){}
+    try{ recordAnswer(qStation(q), skill, false); }catch(e){}
   }
 
   /* ---------- typing ---------- */
@@ -8191,7 +8333,7 @@
     var q = STATE.round[STATE.qIndex];
     var opt = q.options[idx];
     if (btn.disabled) return;
-    var skill = q.skill || (stationById(STATE.stationId) || {}).name || STATE.stationId;
+    var skill = q.skill || (stationById(qStation(q)) || {}).name || qStation(q);
     if (!STATE.roundSkillTally[skill]) STATE.roundSkillTally[skill] = { correct:0, wrong:0 };
     if (opt.correct){
       Array.prototype.forEach.call(elOptions.querySelectorAll('.option-btn'), function(b){ b.disabled = true; });
@@ -8201,9 +8343,10 @@
       STATE.roundTally.correct++;
       STATE.roundSkillTally[skill].correct++;
       STATE.roundLog.push({ skill:skill, label:(q.isRepeat ? '(again) ' : '') + (q.prompt || q.speak), correct: !STATE.wrongOnCurrent });
+      if (STATE.mode === 'check' && STATE.checkLog) STATE.checkLog.push({ camp:q.camp, station:q.stationId, skill:skill, firstTry:!STATE.wrongOnCurrent });
       try{
-        if (firstTry){ removeFromMissedBank(STATE.stationId, STATE.level, q); recordRight(skill, STATE.level, q); }
-        else if ((q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
+        if (firstTry){ removeFromMissedBank(qStation(q), qLevel(), q); recordRight(skill, qLevel(), q, qStation(q)); }
+        else if (STATE.mode !== 'check' && (q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
           var again = cloneQuestion(q); again.reps = (q.reps || 0) + 1; again.isRepeat = true; again.fromBank = false;
           STATE.round.splice(Math.min(STATE.qIndex + 3, STATE.round.length), 0, again);
           STATE.extraCount = (STATE.extraCount || 0) + 1;
@@ -8229,17 +8372,17 @@
          praise text, speaking it, and popping the star animation must never be able to take each
          other down. If saving progress ever hits a snag, the star should still pop and the praise
          text should still show; the reverse is just as true. */
-      try{ recordAnswer(STATE.stationId, skill, true); }catch(e){}
+      try{ recordAnswer(qStation(q), skill, true); }catch(e){}
       try{ elFeedback.textContent = PRAISE[randInt(0,PRAISE.length-1)]; speak(elFeedback.textContent); }catch(e){}
       try{ popStar(); }catch(e){}
     } else {
       btn.disabled = true;
       btn.classList.add('is-wrong');
-      if (!STATE.wrongOnCurrent){ try{ addToMissedBank(STATE.stationId, STATE.level, q); }catch(e){} }
+      if (!STATE.wrongOnCurrent){ try{ addToMissedBank(qStation(q), qLevel(), q); }catch(e){} }
       STATE.wrongOnCurrent = true;
       STATE.roundTally.wrong++;
       STATE.roundSkillTally[skill].wrong++;
-      try{ recordAnswer(STATE.stationId, skill, false); }catch(e){}
+      try{ recordAnswer(qStation(q), skill, false); }catch(e){}
       try{
         var pickedLabel = getOptionLabel(btn);
         var msg = pickedLabel ? ('That was ' + pickedLabel + ' — try again!') : 'Try again!';
@@ -8285,6 +8428,7 @@
     elResultsCard.hidden = false;
     var goalInfo = null;
     try{ goalInfo = recordRoundDone(); }catch(e){}
+    if (STATE.mode === 'check'){ try{ showCheckResults(goalInfo); }catch(e){} return; }
     try{
       var stars = STATE.correctFirstTry === 6 ? 3 : (STATE.correctFirstTry >= 4 ? 2 : 1);
       setBestStars(STATE.stationId, stars);
@@ -8323,6 +8467,49 @@
     }catch(e){}
   }
 
+  function showCheckResults(goalInfo){
+    var total = STATE.round.length, right = 0, byCamp = {};
+    (STATE.checkLog || []).forEach(function(e){
+      var b = byCamp[e.camp] || (byCamp[e.camp] = [0, 0]);
+      b[1]++; if (e.firstTry){ b[0]++; right++; }
+    });
+    var stars = right >= Math.ceil(total * 0.89) ? 3 : (right >= Math.ceil(total * 0.61) ? 2 : 1);
+    try{
+      if (!Array.isArray(stats.checks)) stats.checks = [];
+      stats.checks.push({ d:new Date().toISOString(), lv:STATE.checkLevel, n:total, r:right, c:byCamp });
+      while (stats.checks.length > 12) stats.checks.shift();
+    }catch(e){}
+    try{ flushSession(false); }catch(e){}
+    elResultsReview.innerHTML = CAMPS.filter(function(c){ return byCamp[c.id]; }).map(function(c){
+      var b = byCamp[c.id], dots = '';
+      for (var i = 0; i < b[1]; i++) dots += (i < b[0] ? '⭐' : '▫️');
+      return '<div class="check-camp-row"><span>' + c.icon + '</span><span class="cc-name">' + c.name + '</span><span class="cc-dots">' + dots + '</span><span>' + b[0] + ' of ' + b[1] + '</span></div>';
+    }).join('');
+    elResultsStars.innerHTML = '';
+    for (var i = 0; i < 3; i++){
+      var span = document.createElement('span');
+      span.style.color = i < stars ? 'var(--gold)' : 'var(--line)';
+      span.style.animationDelay = (i * 0.15) + 's';
+      span.innerHTML = i < stars ? STAR_SVG : STAR_OUTLINE_SVG;
+      elResultsStars.appendChild(span);
+    }
+    if (stars === 3){ try{ popConfetti(); }catch(e){} }
+    elResultsLine.textContent = stars === 3 ? 'Trail Check champion!' : (stars === 2 ? 'Great Trail Check!' : 'Trail Check done, explorer!');
+    elResultsSub.textContent = 'You got ' + right + ' of ' + total + ' right on the first try. A grown-up can see the details in the 👪 dashboard.';
+    try{
+      if (goalInfo){
+        var lit = goalInfo.rounds >= goalInfo.goal;
+        elResultsGoal.textContent = lit
+          ? ('🔥 Campfire lit! ' + goalInfo.streak + (goalInfo.streak === 1 ? ' day' : ' days') + ' in a row.')
+          : ('🪵 Trek ' + goalInfo.rounds + ' of ' + goalInfo.goal + ' for today’s campfire!');
+        if (goalInfo.rounds === goalInfo.goal){ popConfetti(); setTimeout(function(){ speak('Your campfire is lit!'); }, 1200); }
+      }
+    }catch(e){}
+    elReadCheck.hidden = true;
+    speak(elResultsLine.textContent);
+    elStarTotal.textContent = '⭐ ' + totalStars() + ' / ' + maxStars();
+  }
+
   function showReadCheck(){
     if (STATE.stationId !== 'myname'){ elReadCheck.hidden = true; return; }
     var name = (STATE.userName || 'Explorer').toUpperCase().replace(/[^A-Z]/g,'') || 'EXPLORER';
@@ -8355,10 +8542,11 @@
     elSasquatchBtn.classList.add('is-wiggle');
     setTimeout(function(){ elSasquatchBtn.classList.remove('is-wiggle'); openStation(id); }, 350);
   });
-  elBackBtn.addEventListener('click', function(){ renderTrail(); showView('trail'); });
+  elBackBtn.addEventListener('click', function(){ if (STATE.mode === 'check'){ STATE.mode = null; currentCamp = null; } renderTrail(); showView('trail'); });
   document.getElementById('campBackBtn').addEventListener('click', function(){ currentCamp = null; renderTrail(); try{ window.scrollTo(0, 0); }catch(e){} });
-  elToTrail.addEventListener('click', function(){ renderTrail(); showView('trail'); });
-  elPlayAgain.addEventListener('click', function(){ openStation(STATE.stationId); });
+  elToTrail.addEventListener('click', function(){ if (STATE.mode === 'check'){ STATE.mode = null; currentCamp = null; } renderTrail(); showView('trail'); });
+  document.getElementById('checkBtn').addEventListener('click', function(){ startTrailCheck(document.getElementById('checkGrade').value); });
+  elPlayAgain.addEventListener('click', function(){ if (STATE.mode === 'check') startTrailCheck(STATE.checkLevel); else openStation(STATE.stationId); });
   elSpeakBtn.addEventListener('click', function(){
     var q = STATE.round && STATE.round[STATE.qIndex];
     if (q) speak(q.speak);
