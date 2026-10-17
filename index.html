@@ -356,6 +356,29 @@
   .stop-stars{ display:flex; gap:3px; margin-top:4px; justify-content:center; }
   .stop-stars svg{ width:14px; height:14px; }
 
+  footer.notes .notes-body.how{ max-width:none; font-size:0.9rem; line-height:1.45; color:var(--ink); }
+  .how-lead{ margin:4px 0 12px; font-weight:700; color:var(--ink-soft); }
+  .how-h{ font-size:0.78rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin:20px 0 8px; }
+  .how-flow{ display:flex; align-items:stretch; gap:6px; }
+  .how-step{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; text-align:center; gap:3px; padding:10px 6px; background:var(--surface); border:2px solid var(--line); border-radius:14px; }
+  .how-step b{ font-size:0.82rem; line-height:1.2; }
+  .how-step span{ font-size:0.74rem; color:var(--ink-soft); line-height:1.25; }
+  .how-arrow{ align-self:center; font-size:1.6rem; font-weight:800; color:var(--ink-soft); }
+  .how-camps, .how-tips{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+  .how-camps{ grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); }
+  .how-camps li, .how-tips li{ display:flex; gap:10px; align-items:flex-start; padding:8px 10px; background:var(--surface); border:2px solid var(--line); border-radius:12px; }
+  .how-camps b{ display:block; }
+  .how-ic{ flex:0 0 auto; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-size:1.25rem; background:var(--surface-2); border-radius:50%; }
+  .how-stars{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:6px; }
+  .how-stars > div{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px; background:var(--surface); border:2px solid var(--line); border-radius:12px; text-align:center; font-weight:700; font-size:0.82rem; }
+  .how-starrow{ display:flex; gap:2px; }
+  .how-grid{ grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+  .how-pill{ width:auto; min-width:30px; padding:0 8px; border-radius:999px; font-size:0.78rem; font-weight:800; white-space:nowrap; }
+  .how-small{ font-size:0.8rem; color:var(--ink-soft); margin:8px 0 0; }
+  .how-grades{ display:flex; flex-wrap:wrap; gap:6px; }
+  .how-grades span{ display:flex; flex-direction:column; align-items:center; min-width:62px; padding:6px 10px; font-weight:800; font-size:0.8rem; color:#fff; background:linear-gradient(135deg,var(--sunset),var(--berry)); border-radius:12px; }
+  .how-grades i{ font-style:normal; font-weight:700; font-size:0.7rem; opacity:.9; }
+  @media (max-width:560px){ .how-flow{ flex-wrap:wrap; } .how-step{ flex:1 1 42%; } .how-arrow{ display:none; } }
   footer.notes{ margin-top:26px; }
   footer.notes summary{
     cursor:pointer; font-weight:700; color:var(--ink-soft); font-size:0.9rem;
@@ -1116,101 +1139,70 @@
     <ul class="trail" id="trailList"></ul>
     <footer class="notes">
       <details>
-        <summary>For grown-ups: what this practices</summary>
-        <div class="notes-body">
-          <strong>Camp sites.</strong> The home screen shows six camp sites — Word, Number, Nature, Art, Heart &amp; Home, and Skills — and
-          each one opens the trails that belong to it.
-          <br><br>
-          Each stop offers seven levels — Preschool (ages 3–4), Kindergarten (age 5), 1st Grade (age 6), 2nd Grade (age 7), 3rd Grade (age 8), 4th Grade (age 9), and 5th Grade (age 10) — drawn from
-          the Utah Core Standards for Early Learning and the Kindergarten, 1st, 2nd, 3rd, 4th, and 5th Grade Cores. A round is 6 questions
-          at whichever level is selected; every completed round earns at least one star, so nothing here is a "fail" —
-          missed answers just get another gentle try.
-          <br><br>
-          <strong>Why the stops are in this order.</strong> The National Reading Panel's "five pillars" of reading
-          instruction build in a sequence: phonemic/phonological awareness (hearing and playing with sounds), then
-          phonics (connecting those sounds to letters), then fluency, vocabulary, and comprehension (using both to
-          read and understand real text). So Rhyme River (sound play) now comes before ABC Trailhead (letter-sound
-          matching), which comes before the new <strong>Story Cove</strong> stop — where preschoolers match a spoken
-          phrase to a picture, kindergartners read one decodable sentence and answer a question about it, and 1st
-          graders read a short two-sentence passage and answer a comprehension question. That's the actual point of
-          the earlier phonics work, so it gets its own stop instead of stopping at single letters and words.
-          <br><br>
-          <strong>Look-alike letters.</strong> Reading researcher Tim Shanahan notes there's no single
-          research-proven "best" order for teaching letters — but there is broad agreement on a few things: teach
-          frequent letters before rare ones, mix consonants and vowels early, and keep visually or phonetically
-          similar letters (like <em>b</em> and <em>d</em>, or <em>p</em> and <em>q</em>) apart at first. All 26 letters
-          now appear in the letter games, but at Preschool look-alike letters are never shown next to each other as
-          choices.
-          <br><br>
-          <strong>Daily campfire.</strong> Finishing a trek (a round of 6 questions) adds a log to today's campfire;
-          the daily goal (3 treks by default, adjustable in the dashboard) lights the fire, and playing on
-          consecutive days builds a streak. <strong>Keyboard Camp</strong> builds first typing skills — and says each letter out loud as it is typed — finding letter keys at Preschool, typing short words at Kindergarten, and typing words and their own name in 1st Grade.
-          Questions answered right on the first try are held back for a while so practice keeps moving on to fresh
-          ones, while missed questions keep coming back until they are right.
-          <br><br>
-          <strong>Campfire Circle &amp; Compare Ridge.</strong> Two newer stops follow the school's family handouts: Campfire Circle
-          covers feelings, family members and relatives, staying safe, and the weekly vocabulary words; Compare Ridge covers big/small
-          and bigger/longer/heavier, position words (top, bottom, left, right, between), open and closed shapes, and the sides and
-          corners of shapes. My Trail Sign now also asks the first letter, last letter and number of letters in the explorer's name,
-          and Health Hollow adds a body map (head, shoulders, knees and feet) and texture words.
-          <br><br>
-          <strong>2nd Grade.</strong> The fourth level follows the Utah 2nd Grade Core. Rhyme River covers silent e, vowel teams,
-          syllables and blends; ABC Trailhead covers spelling, word endings, plurals, contractions and sentences; Story Cove has longer
-          passages, main idea, fact versus opinion and word meanings; Critter Count works with numbers to 1,000, even and odd, and skip
-          counting; Base Camp Math adds and subtracts to 100 and covers coins, clocks, arrays and word problems; Shape Overlook covers
-          faces and sides and equal parts; Compare Ridge uses rulers and bar graphs; Nature Notebook covers matter, Earth and plants;
-          Health Hollow covers body systems and safety; and Community Camp adds laws, maps, communities and more about Utah.
-          <br><br>
-          <strong>3rd Grade.</strong> The fifth level follows the Utah 3rd Grade Core. Rhyme River covers prefixes, suffixes,
-          homophones and syllables; ABC Trailhead covers parts of speech, verb tenses, possessives, commas and spelling; Story Cove covers
-          theme, cause and effect, figurative language and text features; Critter Count covers rounding, fractions on a number line and
-          equivalent fractions; Pattern Pass covers multiplying patterns and input-output tables; Base Camp Math covers multiplication and
-          division facts, area, perimeter and elapsed time; Shape Overlook covers quadrilaterals, angles and symmetry; Nature Notebook
-          covers forces, weather and life cycles; and Community Camp covers government, economics and maps.
-          <br><br>
-          <strong>4th Grade.</strong> The sixth level follows the Utah 4th Grade Core. Rhyme River covers Greek and Latin roots, prefixes, suffixes
-          and commonly confused words; ABC Trailhead covers verb tenses, modal verbs, sentences, punctuation and spelling; Story Cove covers
-          theme, point of view and text structure; Critter Count covers place value, rounding, large sums and differences, fractions and decimals;
-          Pattern Pass covers factors, multiples, primes and rules; Shape Overlook covers triangles, angles in degrees and polygons; Base Camp Math
-          covers multi-digit multiplication, division with remainders and multi-step word problems; Nature Notebook covers energy, Earth changes and
-          plant and animal structures; and Community Camp covers Utah history, geography and government.
-          <br><br>
-          <strong>5th Grade.</strong> The seventh level follows the Utah 5th Grade Core. Rhyme River covers Greek and Latin roots and commonly
-          confused words; ABC Trailhead covers perfect tenses, conjunctions, prepositions, punctuation and spelling; Story Cove covers theme,
-          figurative language, text structure and text evidence; Critter Count covers decimal place value, rounding and operations with decimals
-          and fractions; Pattern Pass covers the order of operations, powers of ten and the coordinate grid; Shape Overlook covers volume,
-          classifying shapes and angle facts; Base Camp Math covers multiplying two-digit numbers, long division and multi-step problems;
-          Nature Notebook covers matter, Earth systems and ecosystems; Compare Ridge covers unit conversions and graphs; and Community Camp
-          covers early America, the Revolution and the Constitution.
-          <br><br>
-          <strong>Community Camp &amp; the newest skills.</strong> Community Camp (Stop 16) covers community helpers, rules and manners,
-          needs and wants, simple maps, goods and services, jobs and money, and facts about Utah. These skills were added after
-          comparing the app to the Utah early-learning and K-1 core standards: counting syllables, beginning / ending / middle
-          sounds, blending letters into words, letter teams (sh, ch, th, wh) and compound words in Rhyme River; number order, teen
-          numbers, counting by tens, place value, skip counting and comparing numbers in Critter Count; putting together and
-          taking away in Base Camp Math; measuring length in Compare Ridge; main idea in Story Cove; light, sound, plants
-          and seasons in Nature Notebook; and healthy habits in Health Hollow.
-          <br><br>
-          <strong>Color Canyon.</strong> Utah's Core Standards for Early Learning list "recognize and name multiple
-          colors" as a Fine Arts skill for 4-year-olds, so it earned its own stop. Preschool is pure color
-          recognition (matching a color swatch, no words to lean on); Kindergarten connects a color name to a
-          real object (an apple is red, a blueberry is blue); 1st Grade moves into basic color mixing — red and
-          blue make purple, blue and yellow make green, red and yellow make orange.
-          <br><br>
-          <strong>Health Hollow.</strong> Utah's Core Standards for Early Learning list naming major body parts
-          under Health, Safety & Nutrition, so Preschool is pure point-to-it recognition — eyes, ears, arms, toes,
-          and the rest. Kindergarten steps up to function ("what do you use to see?"), a distinct and harder skill
-          than labeling alone. 1st Grade formalizes that into the five senses (sight, hearing, smell, taste, touch)
-          plus a first look at simple body systems — the heart, lungs, brain, and bones — matching how NGSS-aligned
-          1st grade life science introduces structure and function in the body.
+        <summary>For grown-ups: how Trailhead Trek works</summary>
+        <div class="notes-body how">
+          <p class="how-lead">A trail-themed practice app for ages 3–10. Short rounds, gentle feedback, and no way to “fail.”</p>
 
-          <br><br>
-          <div class="footer-voice">
-            <div class="voice-row"><label for="voiceSelect">Voice</label><select id="voiceSelect"></select></div>
-            <div class="voice-row"><label for="voiceRate">Speed</label><input type="range" id="voiceRate" min="0.7" max="1.2" step="0.05" value="0.95"><span id="voiceRateLbl"></span></div>
-            <button type="button" class="btn secondary voice-test-btn">🔊 Test voice</button><span id="voiceStatus"></span>
-            <div class="grade-note">Voices come from this tablet, so this is saved on this tablet only.</div>
+          <div class="how-flow" aria-label="How a play session goes">
+            <div class="how-step"><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><path d="M6 40 24 8l18 32z" fill="var(--sunset)" stroke="var(--outline-strong)" stroke-width="2.5" stroke-linejoin="round"/><path d="M19 40l5-12 5 12z" fill="var(--surface)" stroke="var(--outline-strong)" stroke-width="2" stroke-linejoin="round"/></svg><b>1. Pick a camp site</b><span>Six subjects on the home screen.</span></div>
+            <div class="how-arrow" aria-hidden="true">›</div>
+            <div class="how-step"><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><rect x="22" y="6" width="5" height="38" rx="2" fill="var(--cocoa)" stroke="var(--outline-strong)" stroke-width="2"/><path d="M27 10h14l4 5-4 5H27z" fill="var(--forest)" stroke="var(--outline-strong)" stroke-width="2" stroke-linejoin="round"/><path d="M22 24H9l-4 5 4 5h13z" fill="var(--gold)" stroke="var(--outline-strong)" stroke-width="2" stroke-linejoin="round"/></svg><b>2. Pick a trail</b><span>Each camp has 1–5 trails.</span></div>
+            <div class="how-arrow" aria-hidden="true">›</div>
+            <div class="how-step"><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><g fill="var(--indigo)" stroke="var(--outline-strong)" stroke-width="2"><circle cx="9" cy="16" r="5"/><circle cx="24" cy="16" r="5"/><circle cx="39" cy="16" r="5"/><circle cx="9" cy="33" r="5"/><circle cx="24" cy="33" r="5"/><circle cx="39" cy="33" r="5"/></g></svg><b>3. Answer 6 questions</b><span>Read aloud. Tap the answer.</span></div>
+            <div class="how-arrow" aria-hidden="true">›</div>
+            <div class="how-step"><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><path d="M24 4l5.5 11.5 12.5 1.7-9.2 8.8 2.3 12.5L24 32.5 12.9 38.5l2.3-12.5L6 17.2l12.5-1.7z" fill="var(--gold)" stroke="var(--outline-strong)" stroke-width="2.5" stroke-linejoin="round"/></svg><b>4. Earn stars</b><span>Then try again or move on.</span></div>
           </div>
+
+          <h3 class="how-h">The six camp sites</h3>
+          <ul class="how-camps">
+            <li><span class="how-ic">📖</span><span><b>Word Camp</b> Rhymes, letters and phonics, vocabulary, reading stories.</span></li>
+            <li><span class="how-ic">🔢</span><span><b>Number Camp</b> Counting, patterns, add &amp; subtract, measuring, shapes.</span></li>
+            <li><span class="how-ic">🌲</span><span><b>Nature Camp</b> Science and health: plants, animals, Earth, the body, staying safe.</span></li>
+            <li><span class="how-ic">🎨</span><span><b>Art Camp</b> Colors, lines, and the building blocks of design.</span></li>
+            <li><span class="how-ic">🔥</span><span><b>Heart &amp; Home Camp</b> Feelings, kind choices, family, community, Utah and U.S. history.</span></li>
+            <li><span class="how-ic">⌨️</span><span><b>Skills Camp</b> Spelling your own name and first typing.</span></li>
+          </ul>
+
+          <h3 class="how-h">How stars work</h3>
+          <div class="how-stars">
+            <div><span class="how-starrow"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="var(--gold)" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="var(--gold)" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="var(--gold)" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span>All 6 right on the first try</span></div>
+            <div><span class="how-starrow"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="var(--gold)" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="var(--gold)" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span>4 or 5 right on the first try</span></div>
+            <div><span class="how-starrow"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="var(--gold)" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" fill="none" stroke="var(--outline-strong)" stroke-width="1.6" stroke-linejoin="round"/></svg></span><span>Finished the round</span></div>
+          </div>
+          <p class="how-small">Missed questions come back a couple of questions later and again in the next rounds, until they’re answered right. Ones answered right away rest for a while so practice keeps moving on to fresh questions.</p>
+
+          <h3 class="how-h">Seven grade levels</h3>
+          <div class="how-grades" aria-label="Grade levels">
+            <span>Preschool<i>3–4</i></span><span>Kinder<i>5</i></span><span>1st<i>6</i></span><span>2nd<i>7</i></span><span>3rd<i>8</i></span><span>4th<i>9</i></span><span>5th<i>10</i></span>
+          </div>
+          <p class="how-small">Questions follow the Utah Core Standards. Change the grade any time in the 👪 dashboard — each trail has its own questions for every grade.</p>
+
+          <h3 class="how-h">Buttons &amp; symbols</h3>
+          <ul class="how-tips how-grid">
+            <li><span class="how-ic how-pill">⭐ 12/48</span><span><b>Star count.</b> Stars earned out of all the stars in this grade (3 per trail).</span></li>
+            <li><span class="how-ic">🦍</span><span><b>Sasquatch.</b> Tap him for a random trail. It favors trails with fewer stars or shaky answers, and never the same one twice in a row.</span></li>
+            <li><span class="how-ic">🪵</span><span><b>Campfire logs.</b> Every finished round adds a log. Three logs a day (adjustable) light the fire; playing on back-to-back days builds a streak.</span></li>
+            <li><span class="how-ic">👪</span><span><b>Grown-up dashboard.</b> Opens this explorer’s own progress page (details below).</span></li>
+            <li><span class="how-ic">🚪</span><span><b>Exit.</b> Saves progress and goes back to “Who’s hiking today?” so someone else can play.</span></li>
+            <li><span class="how-ic">🔊</span><span><b>Sound.</b> Turns reading aloud and sound effects on or off (🔇). Questions are read aloud so pre-readers can play alone.</span></li>
+            <li><span class="how-ic">🏷️</span><span><b>Grade badge.</b> Shows the current grade. Change it in the grown-up dashboard.</span></li>
+            <li><span class="how-ic">🧭</span><span><b>Pulsing icon.</b> A gentle “up next” hint on the first camp or trail not yet at 3 stars. Everything is always open.</span></li>
+          </ul>
+
+          <h3 class="how-h">Inside the grown-up dashboard</h3>
+          <ul class="how-tips">
+            <li><span class="how-ic">📚</span><span><b>Grade level.</b> Pick Preschool through 5th. Each trail has its own questions for every grade.</span></li>
+            <li><span class="how-ic">🎯</span><span><b>Daily goal.</b> Choose 1–6 rounds a day for the campfire.</span></li>
+            <li><span class="how-ic">📈</span><span><b>Progress at a glance.</b> Streak, best streak, today’s rounds, days played in the last 7, what’s going great and what needs practice, plus right/wrong counts, accuracy and minutes.</span></li>
+            <li><span class="how-ic">🗓️</span><span><b>Week by week.</b> Activity, questions, time and stars for each week, and which skills were practiced.</span></li>
+            <li><span class="how-ic">📄</span><span><b>Download report</b> or <b>Print</b> a progress report to share with a teacher.</span></li>
+          </ul>
+
+          <h3 class="how-h">Good to know</h3>
+          <ul class="how-tips">
+            <li><span class="how-ic">💾</span><span><b>Progress is saved</b> separately for each explorer, so siblings can share one device.</span></li>
+            <li><span class="how-ic">🔇</span><span><b>No sound?</b> A “Test voice” button appears if the device has no voice. Check the volume (and the iPad silent switch).</span></li>
+          </ul>
         </div>
       </details>
     </footer>
