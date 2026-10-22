@@ -43,6 +43,8 @@
     --rose-ink:#FFF1F7;
     --brick:#B91C1C;
     --brick-ink:#FFF1F1;
+    --amber:#B45309;
+    --amber-ink:#FFFBEB;
     --shadow: 4px 6px 0 rgba(58,43,18,0.25);
     --focus: #1C5C9C;
     --outline-strong:#3A2B12;
@@ -108,6 +110,8 @@
       --rose-ink:#500724;
       --brick:#FCA5A5;
       --brick-ink:#450A0A;
+      --amber:#FCD34D;
+      --amber-ink:#451A03;
       --shadow: 4px 6px 0 rgba(0,0,0,0.55);
       --focus: #8FD0F0;
       --outline-strong:#F0D9A8;
@@ -173,6 +177,8 @@
     --rose-ink:#500724;
     --brick:#FCA5A5;
     --brick-ink:#450A0A;
+    --amber:#FCD34D;
+    --amber-ink:#451A03;
     --shadow: 4px 6px 0 rgba(0,0,0,0.55);
     --focus: #8FD0F0;
     --outline-strong:#F0D9A8;
@@ -1215,7 +1221,7 @@
           <h3 class="how-h">The six camp sites</h3>
           <ul class="how-camps">
             <li><span class="how-ic">📖</span><span><b>Word Camp</b> Rhymes, letters and phonics, vocabulary, reading stories.</span></li>
-            <li><span class="how-ic">🔢</span><span><b>Number Camp</b> Counting, patterns, add &amp; subtract, measuring, shapes.</span></li>
+            <li><span class="how-ic">🔢</span><span><b>Number Camp</b> Counting, patterns, add &amp; subtract, measuring, shapes, days &amp; calendars.</span></li>
             <li><span class="how-ic">🌲</span><span><b>Nature Camp</b> Science and health: plants, animals, Earth, the body, staying safe.</span></li>
             <li><span class="how-ic">🎨</span><span><b>Art Camp</b> Colors, lines, and the building blocks of design.</span></li>
             <li><span class="how-ic">🔥</span><span><b>Heart &amp; Home Camp</b> Feelings, kind choices, family, community, Utah and U.S. history.</span></li>
@@ -1434,6 +1440,7 @@
   STOP_ICONS.feelings = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.6 2.5 2.4 4 2.4s3-.8 4-2.4M9 9.5h.01M15 9.5h.01"/></svg>';
   STOP_ICONS.compare = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-8M12 20V5M19 20v-5M3 20h18"/></svg>';
   STOP_ICONS.community = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10l5-4 5 4v10M13 20v-6l4-3 4 3v6M2 20h20M7 20v-5h2v5"/></svg>';
+  STOP_ICONS.calendar = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><circle cx="8" cy="14" r="0.8" fill="currentColor"/><circle cx="12" cy="14" r="0.8" fill="currentColor"/><circle cx="16" cy="14" r="0.8" fill="currentColor"/><circle cx="8" cy="18" r="0.8" fill="currentColor"/><circle cx="12" cy="18" r="0.8" fill="currentColor"/></svg>';
   STOP_ICONS.typing = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>';
 
   /* ---------------- content pools ---------------- */
@@ -6256,6 +6263,214 @@
     typing:'Type long words', feelings:'Integrity & compromise', compare:'Conversions & graphs', community:'Early America & the Constitution'
   };
 
+  /* ======================================================================================
+     Calendar Cove (Stop 17, Number Camp): days of the week, months & seasons, reading a calendar,
+     and counting days and weeks -- written for every grade from preschool through 5th.
+     ====================================================================================== */
+  var CAL_DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var CAL_MONTHS = [['January',31],['February',28],['March',31],['April',30],['May',31],['June',30],['July',31],['August',31],['September',30],['October',31],['November',30],['December',31]];
+  function calOrd(n){ var s = ['th','st','nd','rd'], v = n % 100; return n + (s[(v - 20) % 10] || s[v] || s[0]); }
+  function calWords(arr, correct, oc){
+    var others = shuffle(arr.filter(function(v){ return v !== correct; })).slice(0, Math.max(1, oc - 1));
+    return shuffle([correct].concat(others)).map(function(v){ return { html:wordHtml({ label:v }), correct:v === correct }; });
+  }
+  function calGrid(mi, start, marks){
+    var dim = CAL_MONTHS[mi][1], cells = '', i, d;
+    ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(h){ cells += '<div style="font-size:.72rem;font-weight:800;color:var(--ink-soft);">' + h + '</div>'; });
+    for (i = 0; i < start; i++) cells += '<div></div>';
+    for (d = 1; d <= dim; d++){
+      var on = marks.indexOf(d) !== -1;
+      cells += '<div style="padding:5px 0;border-radius:8px;background:' + (on ? 'var(--gold)' : 'var(--surface-2)') + ';color:' + (on ? 'var(--gold-ink)' : 'var(--ink)') + ';' + (on ? 'outline:3px solid var(--outline-strong);' : '') + '">' + d + '</div>';
+    }
+    return '<div class="add-stage"><div style="display:inline-block;width:min(100%,340px);background:var(--surface);border:3px solid var(--outline-strong);border-radius:14px;padding:8px 10px;"><div style="font-weight:800;text-align:center;margin-bottom:4px;">' + CAL_MONTHS[mi][0] + '</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;font-weight:700;font-size:.95rem;">' + cells + '</div></div></div>';
+  }
+  function calQ(sp, visual, options){ return { speak:sp, prompt:sp, visual:visual || '', options:options }; }
+  function calReadDay(oc, lo, hi){
+    var mi = randInt(0, 11), dim = CAL_MONTHS[mi][1], st = randInt(0, 6), d = randInt(lo, Math.min(hi, dim));
+    return calQ('Look at the calendar. What day of the week is ' + CAL_MONTHS[mi][0] + ' ' + calOrd(d) + '?', calGrid(mi, st, [d]), calWords(CAL_DOW, CAL_DOW[(st + d - 1) % 7], oc));
+  }
+  function calFirstDate(oc, nth){
+    var mi = randInt(0, 11), dim = CAL_MONTHS[mi][1], st = randInt(0, 6), w = randInt(0, 6);
+    var date = ((w - st + 7) % 7) + 1 + 7 * (nth - 1);
+    return calQ('Look at the calendar. What is the date of the ' + (nth === 1 ? 'first' : 'second') + ' ' + CAL_DOW[w] + ' in ' + CAL_MONTHS[mi][0] + '?', calGrid(mi, st, []), numNear(date, oc, [7, 1, 2, 3], 1, dim));
+  }
+  function calCount(oc){
+    var mi = randInt(0, 11), dim = CAL_MONTHS[mi][1], st = randInt(0, 6), w = randInt(0, 6), cnt = 0, d;
+    for (d = 1; d <= dim; d++){ if ((st + d - 1) % 7 === w) cnt++; }
+    return calQ('Look at the calendar. How many ' + CAL_DOW[w] + 's are in ' + CAL_MONTHS[mi][0] + '?', calGrid(mi, st, []), numNear(cnt, oc, [1, 2, 3], 2, 7));
+  }
+  function calWeekLater(oc, weeks){
+    var mi = randInt(0, 11), dim = CAL_MONTHS[mi][1], st = randInt(0, 6), d = randInt(1, dim - 7 * weeks), c = d + 7 * weeks;
+    var sp = weeks === 1 ? 'Look at the calendar. What is the date exactly one week after the ' + calOrd(d) + '?'
+      : 'Look at the calendar. A field trip is ' + weeks + ' weeks after the ' + calOrd(d) + '. What is the date of the trip?';
+    return calQ(sp, calGrid(mi, st, [d]), numNear(c, oc, [7, 1, 2, 3], 1, dim));
+  }
+  function calSpan(oc){
+    var mi = randInt(0, 11), dim = CAL_MONTHS[mi][1], st = randInt(0, 6), d1 = randInt(1, dim - 6), d2 = randInt(d1 + 3, Math.min(dim, d1 + 20));
+    return calQ('Look at the calendar. How many days pass from the ' + calOrd(d1) + ' to the ' + calOrd(d2) + '?', calGrid(mi, st, [d1, d2]), numNear(d2 - d1, oc, [1, 2, 7, 3], 1, 30));
+  }
+  function calSpanWeeks(oc){
+    var mi = randInt(0, 11), dim = CAL_MONTHS[mi][1], st = randInt(0, 6), k = randInt(2, 4), d1 = randInt(1, dim - 7 * k);
+    return calQ('Look at the calendar. How many weeks are there from the ' + calOrd(d1) + ' to the ' + calOrd(d1 + 7 * k) + '?', calGrid(mi, st, [d1, d1 + 7 * k]), numNear(k, oc, [1, 2, 3], 1, 7));
+  }
+  function calDowAfter(oc, lo, hi){
+    var s = randInt(0, 6), n = randInt(lo, hi);
+    return calQ('Today is ' + CAL_DOW[s] + '. What day of the week will it be in ' + n + ' days?', '', calWords(CAL_DOW, CAL_DOW[(s + n) % 7], oc));
+  }
+  function calBetween(oc){
+    var m = randInt(0, 10); if (m === 1) m = 2;
+    var d1 = randInt(5, 25), d2 = randInt(2, 20), ans = (CAL_MONTHS[m][1] - d1) + d2;
+    return calQ('How many days pass from ' + CAL_MONTHS[m][0] + ' ' + d1 + ' to ' + CAL_MONTHS[m + 1][0] + ' ' + d2 + '?', '', numNear(ans, oc, [1, 2, 3, 10], 1, 70));
+  }
+
+  var CAL_PRE_DAYS = [
+    P('Which one is a day of the week?', 'Saturday', ['January','Summer','Breakfast','Pancake']),
+    P('How many days are in a week?', '7', ['3','5','10','12']),
+    P('What day comes after Monday?', 'Tuesday', ['Sunday','Friday','Thursday','Saturday']),
+    P('What day comes after Sunday?', 'Monday', ['Friday','Saturday','Tuesday','Wednesday']),
+    P('Which day is part of the weekend?', 'Saturday', ['Monday','Tuesday','Wednesday','Thursday']),
+    P('Today is Monday. What day will it be tomorrow?', 'Tuesday', ['Sunday','Wednesday','Friday','Saturday']),
+    P('Today is Friday. What day will it be tomorrow?', 'Saturday', ['Thursday','Monday','Wednesday','Tuesday']),
+    P('What day comes before Wednesday?', 'Tuesday', ['Thursday','Friday','Sunday','Saturday'])
+  ];
+  var CAL_PRE_MONTHS = [
+    P('Which one is a month?', 'March', ['Tuesday','Pizza','Winter','Monday']),
+    P('Which season is cold and snowy?', '❄️|Winter', ['☀️|Summer','🌸|Spring','🍂|Fall','🌈|Rainbow']),
+    P('Which season is hot and sunny?', '☀️|Summer', ['❄️|Winter','🍂|Fall','🌸|Spring','🌨️|Snowstorm']),
+    P('In which season do flowers start to bloom?', '🌸|Spring', ['❄️|Winter','🍂|Fall','☀️|Summer','🌙|Night']),
+    P('In which season do leaves fall from the trees?', '🍂|Fall', ['🌸|Spring','❄️|Winter','☀️|Summer','🌙|Night']),
+    P('How many seasons are there in a year?', '4', ['2','3','7','10'])
+  ];
+  var CAL_PRE_CAL = [
+    P('What do we use to see the days and months?', '📅|A calendar', ['🧭|A compass','🍞|A loaf of bread','🪑|A chair','🥾|A boot']),
+    P('A calendar helps us know…', '📅|What day it is', ['🍕|What pizza tastes like','🎵|How loud a song is','👟|How big a shoe is','🌈|What colors are in a rainbow'])
+  ];
+  var CAL_K_DAYS = [
+    P('How many days are in one week?', '7', ['5','6','8','10']),
+    P('What day comes after Wednesday?', 'Thursday', ['Tuesday','Friday','Sunday','Monday']),
+    P('What day comes before Friday?', 'Thursday', ['Saturday','Wednesday','Monday','Sunday']),
+    P('What day comes between Monday and Wednesday?', 'Tuesday', ['Thursday','Friday','Sunday','Saturday']),
+    P('Today is Thursday. What was yesterday?', 'Wednesday', ['Friday','Tuesday','Saturday','Sunday']),
+    P('Today is Sunday. What will tomorrow be?', 'Monday', ['Saturday','Tuesday','Friday','Wednesday']),
+    P('Which two days make the weekend?', 'Saturday and Sunday', ['Monday and Tuesday','Friday and Saturday','Wednesday and Thursday','Sunday and Monday']),
+    P('Which day is the first day of the week on most calendars?', 'Sunday', ['Monday','Wednesday','Friday','Saturday']),
+    P('Today is Saturday. What was yesterday?', 'Friday', ['Sunday','Monday','Thursday','Tuesday']),
+    P('Which day comes right before Sunday?', 'Saturday', ['Monday','Friday','Thursday','Tuesday'])
+  ];
+  var CAL_K_MONTHS = [
+    P('How many months are in one year?', '12', ['7','10','11','52']),
+    P('What is the first month of the year?', 'January', ['March','June','December','September']),
+    P('What is the last month of the year?', 'December', ['November','January','October','August']),
+    P('Which month comes after January?', 'February', ['March','December','April','June']),
+    P('Which month comes before March?', 'February', ['April','May','December','June']),
+    P('In which season does it snow the most in Utah?', '❄️|Winter', ['☀️|Summer','🌸|Spring','🍂|Fall','🌙|Midnight']),
+    P('Which season comes after winter?', '🌸|Spring', ['☀️|Summer','🍂|Fall','❄️|Winter','🌙|Night']),
+    P('Which season comes after summer?', '🍂|Fall', ['❄️|Winter','🌸|Spring','☀️|Summer','🌙|Night']),
+    P('Which season has the hottest days?', '☀️|Summer', ['❄️|Winter','🌸|Spring','🍂|Fall','🌙|Night']),
+    P('On a calendar, one row of 7 days is called…', 'A week', ['A month','A year','A day','A season']),
+    P('Your birthday happens once every…', 'Year', ['Day','Week','Month','Hour'])
+  ];
+  var CAL_1_DM = [
+    P('Which month comes between June and August?', 'July', ['May','September','April','October']),
+    P('Which month is the 10th month of the year?', 'October', ['September','November','December','August']),
+    P('What month comes right before December?', 'November', ['October','January','September','August']),
+    P('What month comes right after April?', 'May', ['March','June','July','February']),
+    P('How many days are in 2 weeks?', '14', ['7','12','10','21']),
+    P('What day is two days after Monday?', 'Wednesday', ['Tuesday','Thursday','Friday','Sunday']),
+    P('What day is three days before Friday?', 'Tuesday', ['Wednesday','Thursday','Monday','Sunday']),
+    P('Which day is the second day of the week, counting from Sunday?', 'Monday', ['Sunday','Tuesday','Wednesday','Saturday']),
+    P('Which day is the fifth day of the week, counting from Sunday?', 'Thursday', ['Wednesday','Friday','Tuesday','Saturday']),
+    P('Which month is the first month of summer?', 'June', ['May','July','August','September']),
+    P('There are 12 months in a year. How many months are left after June?', '6', ['5','7','12','4']),
+    P('Which three months make up winter?', 'December, January, February', ['March, April, May','June, July, August','September, October, November','July, August, September'])
+  ];
+  var CAL_1_CAL = [
+    P('A calendar page shows one…', 'Month', ['Year','Day','Hour','Minute']),
+    P('Which is the short way to write Monday?', 'Mon', ['Man','Mom','Mod','Min'])
+  ];
+  var CAL_2_FACT = [
+    P('Which month has only 28 days in most years?', 'February', ['January','April','June','September']),
+    P('Which month has 30 days?', 'April', ['January','March','July','December']),
+    P('Which month has 31 days?', 'July', ['April','June','September','November']),
+    P('How many months have exactly 30 days?', '4', ['3','5','6','7']),
+    P('About how many weeks are in a year?', '52', ['12','30','100','365']),
+    P('How many days are in 3 weeks?', '21', ['14','24','18','30']),
+    P('How many days are in 4 weeks?', '28', ['24','30','21','35']),
+    P('How many months are in half a year?', '6', ['3','4','5','12']),
+    P('Which season comes right before summer?', 'Spring', ['Winter','Fall','Night','Snow'])
+  ];
+  var CAL_2_ORDER = [
+    P('Which month comes 2 months after January?', 'March', ['February','April','May','December']),
+    P('Which month is 3 months after October?', 'January', ['December','February','November','March']),
+    P('Which month is 2 months before May?', 'March', ['April','February','June','July']),
+    P('What is the name of the 9th month?', 'September', ['August','October','November','July'])
+  ];
+  var CAL_3_FACT = [
+    P('How many days are in a regular year?', '365', ['360','364','366','350']),
+    P('How many days are in a leap year?', '366', ['365','360','367','364']),
+    P('Which month has an extra day in a leap year?', 'February', ['January','March','December','July']),
+    P('How many months of the year have 31 days?', '7', ['5','6','8','4']),
+    P('How many days are in 5 weeks?', '35', ['30','25','40','28']),
+    P('How many weeks are in a year?', '52', ['48','50','12','365']),
+    P('There are 12 months in a year. How many months are in 3 years?', '36', ['24','30','12','48']),
+    P('Utah celebrates Pioneer Day on July 24. In which season is that?', 'Summer', ['Winter','Spring','Fall','No season']),
+    P('Utah became a state on January 4, 1896. In which month did that happen?', 'January', ['December','February','July','April']),
+    P('A school quarter lasts about 9 weeks. About how many days is that?', '63', ['54','72','81','45'])
+  ];
+  var CAL_4_FACT = [
+    P('A decade is how many years?', '10', ['5','20','100','50']),
+    P('A century is how many years?', '100', ['10','50','1,000','20']),
+    P('A century is how many decades?', '10', ['5','100','20','1']),
+    P('Which of these years is a leap year?', '2028', ['2026','2027','2029','2030']),
+    P('Which of these years is a leap year?', '2032', ['2031','2033','2034','2035']),
+    P('Which of these years is NOT a leap year?', '2026', ['2024','2028','2032','2036']),
+    P('How many days are in 8 weeks?', '56', ['48','54','64','49']),
+    P('If February 1 is a Monday in a regular year, what day is March 1?', 'Monday', ['Sunday','Tuesday','Friday','Saturday']),
+    P('How many hours are in one day?', '24', ['12','60','48','7']),
+    P('How many minutes are in 2 hours?', '120', ['60','100','180','90'])
+  ];
+  var CAL_5_FACT = [
+    P('Which of these years is a leap year?', '2000', ['1900','2026','2022','2023']),
+    P('Is the year 1900 a leap year?', 'No, a year divisible by 100 must also be divisible by 400', ['Yes, because it is divisible by 4','Yes, every 4th year is a leap year','No, because it is an odd number','Only in Utah']),
+    P('How many days are in January, February, and March of a regular year?', '90', ['89','91','92','88']),
+    P('A regular year of 365 days is how many weeks?', '52 weeks and 1 day', ['52 weeks and 0 days','51 weeks and 3 days','53 weeks','50 weeks and 2 days']),
+    P('If January 1 is a Wednesday in a regular year, what day is December 31?', 'Wednesday', ['Tuesday','Thursday','Monday','Friday']),
+    P('If January 1 is a Wednesday in a leap year, what day is December 31?', 'Thursday', ['Wednesday','Friday','Tuesday','Monday']),
+    P('A millennium is how many years?', '1,000', ['100','10','10,000','500']),
+    P('A fortnight is how many days?', '14', ['7','10','28','30']),
+    P('How many hours are in one week?', '168', ['144','120','180','24']),
+    P('How many minutes are in one day?', '1,440', ['1,200','1,000','1,640','2,400']),
+    P('How many days are in September, October, and November together?', '91', ['90','92','89','93'])
+  ];
+  function calBuild(level){
+    var oc = optionCountForLevel(level), out;
+    if (level === 'preschool'){
+      out = pqs(CAL_PRE_DAYS, 3, oc, 'Days of the Week').concat(pqs(CAL_PRE_MONTHS, 2, oc, 'Months & Seasons')).concat(pqs(CAL_PRE_CAL, 1, oc, 'Calendar Words'));
+    } else if (level === 'kindergarten'){
+      out = pqs(CAL_K_DAYS, 3, oc, 'Days of the Week').concat(pqs(CAL_K_MONTHS, 3, oc, 'Months & Seasons'));
+    } else if (level === 'first'){
+      out = pqs(CAL_1_DM, 3, oc, 'Days & Months').concat(tagSkill([calReadDay(oc, 1, 14), calFirstDate(oc, 1)], 'Reading a Calendar')).concat(pqs(CAL_1_CAL, 1, oc, 'Calendar Words'));
+    } else if (level === 'second'){
+      out = pqs(CAL_2_FACT, 2, oc, 'Days, Weeks & Months').concat(pqs(CAL_2_ORDER, 1, oc, 'Months in Order')).concat(tagSkill([calReadDay(oc, 1, 31), calCount(oc)], 'Reading a Calendar')).concat(tagSkill([calWeekLater(oc, 1)], 'Dates & Weeks'));
+    } else if (level === 'third'){
+      out = pqs(CAL_3_FACT, 3, oc, 'Years, Weeks & Days').concat(tagSkill([calWeekLater(oc, 2)], 'Dates & Weeks')).concat(tagSkill([calSpan(oc)], 'Days Between Dates')).concat(tagSkill([calDowAfter(oc, 8, 20)], 'What Day Will It Be?'));
+    } else if (level === 'fourth'){
+      out = pqs(CAL_4_FACT, 3, oc, 'Calendar Facts').concat(tagSkill([calDowAfter(oc, 10, 40)], 'What Day Will It Be?')).concat(tagSkill([calSpanWeeks(oc)], 'Weeks Between Dates')).concat(tagSkill([calReadDay(oc, 15, 31)], 'Reading a Calendar'));
+    } else {
+      out = pqs(CAL_5_FACT, 3, oc, 'Calendar Facts').concat(tagSkill([calDowAfter(oc, 20, 100), calDowAfter(oc, 100, 400)], 'What Day Will It Be?')).concat(tagSkill([calBetween(oc)], 'Days Between Dates'));
+    }
+    return shuffle(out);
+  }
+  function buildCalendar(level){
+    var r;
+    for (var t = 0; t < 40; t++){
+      r = calBuild(level);
+      var ks = r.map(function(q){ return q.skill + '|' + qKey(q, 'calendar'); });
+      if (ks.filter(function(k, i){ return ks.indexOf(k) === i; }).length === ks.length) return r;
+    }
+    return r;
+  }
+
   var STATIONS = [
     { id:'myname', accent:'--cyan', accentInk:'--cyan-ink', name:'My Trail Sign', stop:'Stop 1', requiresName:true,
       desc:{preschool:'Letters in my name', kindergarten:'Match my letters', first:'Spell my name'}, build:buildMyName },
@@ -6288,7 +6503,9 @@
     { id:'compare', accent:'--rose', accentInk:'--rose-ink', name:'Compare Ridge', stop:'Stop 15',
       desc:{preschool:'Big, small & where', kindergarten:'Bigger, longer & where', first:'Which is the most? Measuring'}, build:buildCompare },
     { id:'community', accent:'--brick', accentInk:'--brick-ink', name:'Community Camp', stop:'Stop 16',
-      desc:{preschool:'Helpers & rules', kindergarten:'Needs, maps & Utah', first:'Goods, jobs & Utah'}, build:buildCommunity }
+      desc:{preschool:'Helpers & rules', kindergarten:'Needs, maps & Utah', first:'Goods, jobs & Utah'}, build:buildCommunity },
+    { id:'calendar', accent:'--amber', accentInk:'--amber-ink', name:'Calendar Cove', stop:'Stop 17',
+      desc:{preschool:'Days of the week', kindergarten:'Days, months & seasons', first:'Days, months & calendars', second:'Reading a calendar', third:'Dates, weeks & years', fourth:'Leap years & days between', fifth:'Calendar math'}, build:buildCalendar }
   ];
   STATIONS.forEach(function(st){
     var orig = st.build, sec = SECOND_BUILDERS[st.id], thr = THIRD_BUILDERS[st.id], fou = FOURTH_BUILDERS[st.id], fif = FIFTH_BUILDERS[st.id];
@@ -6302,7 +6519,7 @@
   /* ---- camp sites: the home screen shows these; each opens the trails (stops) that belong to it ---- */
   var CAMPS = [
     { id:'word', name:'Word Camp', icon:'📖', accent:'--berry', accentInk:'--berry-ink', trails:['rhyme','letters','sightwords','story'] },
-    { id:'number', name:'Number Camp', icon:'🔢', accent:'--sunset', accentInk:'--sunset-ink', trails:['counting','patterns','adding','compare','shapes'] },
+    { id:'number', name:'Number Camp', icon:'🔢', accent:'--sunset', accentInk:'--sunset-ink', trails:['counting','patterns','adding','compare','shapes','calendar'] },
     { id:'nature', name:'Nature Camp', icon:'🌲', accent:'--lime', accentInk:'--lime-ink', trails:['nature','health'] },
     { id:'art', name:'Art Camp', icon:'🎨', accent:'--teal', accentInk:'--teal-ink', trails:['colors'] },
     { id:'heart', name:'Heart & Home Camp', icon:'🔥', accent:'--magenta', accentInk:'--magenta-ink', trails:['feelings','community'] },
