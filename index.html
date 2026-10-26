@@ -565,6 +565,46 @@
   }
   .hero-scene{ position:relative; }
   .hero-scene svg{ display:block; width:100%; height:auto; }
+  /* ---- learning games: Trail Match, Sort the Pack, Word Builder ---- */
+  .gm-wrap{ display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; }
+  .gm-hint{ font-weight:800; color:var(--ink-soft); text-align:center; min-height:1.4em; font-size:1rem; }
+  .gm-grid{ display:grid; grid-template-columns:repeat(var(--cols,4),minmax(0,1fr)); gap:10px; width:100%; max-width:600px; }
+  .gm-card{ position:relative; min-height:84px; padding:4px; border:3px solid var(--outline-strong); border-radius:16px; cursor:pointer; background:var(--stop-accent,var(--sky)); color:var(--surface);
+    font-family:'Baloo 2',sans-serif; font-weight:800; box-shadow:0 3px 0 rgba(0,0,0,.18); transition:transform .15s ease; -webkit-tap-highlight-color:transparent; }
+  .gm-card:active{ transform:scale(.96); }
+  .gm-card .gm-back{ font-size:2rem; line-height:1; }
+  .gm-card .gm-face{ display:none; font-size:clamp(1rem,4vw,1.9rem); line-height:1.1; color:var(--ink); word-break:break-word; hyphens:auto; }
+  @media (max-width:420px){ .gm-grid.many{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+  .gm-card.sm .gm-face{ font-size:clamp(.8rem,2.8vw,1.05rem); line-height:1.15; }
+  .gm-card.is-up, .gm-card.is-done{ background:var(--surface); }
+  .gm-card.is-up .gm-back, .gm-card.is-done .gm-back{ display:none; }
+  .gm-card.is-up .gm-face, .gm-card.is-done .gm-face{ display:block; }
+  .gm-card.is-done{ border-color:var(--forest); background:color-mix(in srgb, var(--forest) 18%, var(--surface)); cursor:default; animation:gm-pop .35s ease; }
+  .gm-card.is-bad{ animation:gm-shake .35s ease; }
+  .gm-baskets{ display:grid; grid-template-columns:repeat(var(--n,2),minmax(0,1fr)); gap:10px; width:100%; max-width:640px; }
+  .gm-basket{ border:3px dashed var(--stop-accent,var(--sky)); border-radius:18px; background:var(--surface-2); padding:8px; min-height:120px; display:flex; flex-direction:column; gap:6px; transition:background .15s ease, transform .15s ease; cursor:pointer; }
+  .gm-basket.is-over, .gm-basket.is-ready{ background:color-mix(in srgb, var(--stop-accent,var(--sky)) 22%, var(--surface)); transform:scale(1.02); }
+  .gm-basket.is-bad{ animation:gm-shake .35s ease; border-color:#d33; }
+  .gm-bhead{ font-weight:800; text-align:center; font-size:clamp(.95rem,3.2vw,1.2rem); line-height:1.15; }
+  .gm-bin{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; align-content:flex-start; flex:1; }
+  .gm-tray{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; max-width:640px; min-height:60px; }
+  .gm-item{ touch-action:none; user-select:none; -webkit-user-select:none; padding:10px 14px; border:3px solid var(--line); border-radius:14px; background:var(--surface); color:var(--ink);
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(1rem,3.6vw,1.25rem); cursor:grab; box-shadow:0 3px 0 rgba(0,0,0,.12); position:relative; }
+  .gm-item.is-sel{ border-color:var(--stop-accent,var(--sky)); background:color-mix(in srgb, var(--stop-accent,var(--sky)) 16%, var(--surface)); transform:translateY(-2px); }
+  .gm-item.is-drag{ z-index:30; cursor:grabbing; box-shadow:0 10px 18px rgba(0,0,0,.25); transition:none; }
+  .gm-item.is-bad{ animation:gm-shake .35s ease; }
+  .gm-item.placed{ cursor:default; touch-action:auto; padding:5px 9px; font-size:clamp(.85rem,2.8vw,1rem); border-color:var(--forest); background:color-mix(in srgb, var(--forest) 16%, var(--surface)); box-shadow:none; animation:gm-pop .3s ease; }
+  .gm-clue{ font-weight:800; font-size:1.15rem; text-align:center; max-width:30ch; color:var(--ink); }
+  .gm-tiles{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:560px; }
+  .gm-tile{ min-width:54px; height:58px; padding:0 10px; border:3px solid var(--outline-strong); border-radius:14px; background:var(--surface); color:var(--ink); cursor:pointer;
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.8rem; box-shadow:0 3px 0 rgba(0,0,0,.15); }
+  .gm-tile:disabled{ opacity:.18; box-shadow:none; cursor:default; }
+  .gm-tile.hint{ background:var(--gold); color:var(--gold-ink); animation:gm-pulse .8s ease-in-out infinite; }
+  .gm-tile.is-bad{ animation:gm-shake .35s ease; }
+  @keyframes gm-shake{ 0%,100%{ transform:translateX(0) } 25%{ transform:translateX(-6px) } 75%{ transform:translateX(6px) } }
+  @keyframes gm-pop{ 0%{ transform:scale(.85) } 60%{ transform:scale(1.08) } 100%{ transform:scale(1) } }
+  @keyframes gm-pulse{ 0%,100%{ transform:scale(1) } 50%{ transform:scale(1.1) } }
+  @media (prefers-reduced-motion: reduce){ .gm-card, .gm-basket, .gm-item, .gm-tile{ animation:none !important; transition:none !important; } }
   /* ---- Finish animations: a short camping scene plays before the results page ---- */
   .fa-overlay{ position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; -webkit-tap-highlight-color:transparent; animation:fa-in .25s ease both; }
   .fa-overlay.fa-out{ animation:fa-fade .35s ease forwards; pointer-events:none; }
@@ -1257,6 +1297,7 @@
           <ul class="how-tips how-grid">
             <li><span class="how-ic how-pill">⭐ 12/48</span><span><b>Star count.</b> Stars earned out of all the stars in this grade (3 per trail).</span></li>
             <li><span class="how-ic">🦍</span><span><b>Sasquatch.</b> Tap him for a random trail. It favors trails with fewer stars or shaky answers, and never the same one twice in a row.</span></li>
+            <li><span class="how-ic">🎮</span><span><b>Games.</b> Some trails are games: Trail Match (flip cards to find pairs), Sort the Pack (drag things into baskets) and Word Builder (tap letters to spell a word). They give stars and show up in the dashboard like any other trail.</span></li>
             <li><span class="how-ic">🧭</span><span><b>Trail Check.</b> An 18-question check-up with 3 questions from every camp site. Two of each 3 come from the questions this explorer has missed most; the rest are fresh. It uses the grade you set in the dashboard.</span></li>
             <li><span class="how-ic">🪵</span><span><b>Campfire logs.</b> Every finished round adds a log. Three logs a day (adjustable) light the fire; playing on back-to-back days builds a streak.</span></li>
             <li><span class="how-ic">👪</span><span><b>Grown-up dashboard.</b> Opens this explorer’s own progress page (details below).</span></li>
@@ -1452,6 +1493,9 @@
   STOP_ICONS.compare = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20v-8M12 20V5M19 20v-5M3 20h18"/></svg>';
   STOP_ICONS.community = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20V10l5-4 5 4v10M13 20v-6l4-3 4 3v6M2 20h20M7 20v-5h2v5"/></svg>';
   STOP_ICONS.calendar = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><circle cx="8" cy="14" r="0.8" fill="currentColor"/><circle cx="12" cy="14" r="0.8" fill="currentColor"/><circle cx="16" cy="14" r="0.8" fill="currentColor"/><circle cx="8" cy="18" r="0.8" fill="currentColor"/><circle cx="12" cy="18" r="0.8" fill="currentColor"/></svg>';
+  STOP_ICONS.matchword = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="10" height="14" rx="2.5"/><rect x="11.5" y="5" width="10" height="14" rx="2.5" fill="currentColor" fill-opacity=".15"/><path d="M7.5 10v4M16.5 10.5l1.2 1.5-1.2 1.5-1.2-1.5z"/></svg>';
+  STOP_ICONS.wordbuild = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="8" height="12" rx="2"/><rect x="13.5" y="6" width="8" height="12" rx="2"/><path d="M4.8 15l1.7-6 1.7 6M5.4 13h2.2M16 9v6h2.2a1.6 1.6 0 0 0 0-3H16"/></svg>';
+  STOP_ICONS.sortnum = STOP_ICONS.sortnature = STOP_ICONS.sortheart = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10h17l-1.6 9a2 2 0 0 1-2 1.6H7.1a2 2 0 0 1-2-1.6L3.5 10z"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
   STOP_ICONS.typing = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2.5"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>';
 
   /* ---------------- content pools ---------------- */
@@ -6516,7 +6560,17 @@
     { id:'community', accent:'--brick', accentInk:'--brick-ink', name:'Community Camp', stop:'Stop 16',
       desc:{preschool:'Helpers & rules', kindergarten:'Needs, maps & Utah', first:'Goods, jobs & Utah'}, build:buildCommunity },
     { id:'calendar', accent:'--amber', accentInk:'--amber-ink', name:'Calendar Cove', stop:'Stop 17',
-      desc:{preschool:'Days of the week', kindergarten:'Days, months & seasons', first:'Days, months & calendars', second:'Reading a calendar', third:'Dates, weeks & years', fourth:'Leap years & days between', fifth:'Calendar math'}, build:buildCalendar }
+      desc:{preschool:'Days of the week', kindergarten:'Days, months & seasons', first:'Days, months & calendars', second:'Reading a calendar', third:'Dates, weeks & years', fourth:'Leap years & days between', fifth:'Calendar math'}, build:buildCalendar },
+    { id:'matchword', accent:'--indigo', accentInk:'--indigo-ink', name:'Trail Match', stop:'Game', game:true,
+      desc:{preschool:'Letters, numbers & pictures', kindergarten:'Letters, words & shapes', first:'Rhymes, sums & words', second:'Opposites, synonyms & facts', third:'Facts, fractions & homophones', fourth:'Decimals, roots & Utah', fifth:'Percents, powers & history'}, build:buildMatchWord },
+    { id:'wordbuild', accent:'--teal', accentInk:'--teal-ink', name:'Word Builder', stop:'Game', game:true,
+      desc:{preschool:'Build 3-letter words', kindergarten:'Build short words', first:'Build picture words', second:'Spell from a clue', third:'Spell tricky words', fourth:'Spell science & Utah words', fifth:'Spell big words'}, build:buildWordBuilder },
+    { id:'sortnum', accent:'--sky', accentInk:'--sky-ink', name:'Sort the Pack: Numbers', stop:'Game', game:true,
+      desc:{preschool:'Shapes, sizes & counts', kindergarten:'Shapes & numbers', first:'Even, odd & 3D shapes', second:'Sides & place value', third:'Fractions & rounding', fourth:'Primes, angles & factors', fifth:'Decimals, primes & units'}, build:buildSortNum },
+    { id:'sortnature', accent:'--cocoa', accentInk:'--cocoa-ink', name:'Sort the Pack: Nature', stop:'Game', game:true,
+      desc:{preschool:'Living, hot & cold', kindergarten:'Living things & seasons', first:'Plants, seasons & night', second:'Habitats & matter', third:'Diets & food chains', fourth:'Energy, rocks & forces', fifth:'Changes & land shaping'}, build:buildSortNature },
+    { id:'sortheart', accent:'--clay', accentInk:'--clay-ink', name:'Sort the Pack: Home', stop:'Game', game:true,
+      desc:{preschool:'Needs, wants & kindness', kindergarten:'Needs, kindness & safety', first:'Goods & long ago', second:'Goods, past & kindness', third:'Government & rights', fourth:'Utah regions & government', fifth:'Colonies & fact vs opinion'}, build:buildSortHeart }
   ];
   STATIONS.forEach(function(st){
     var orig = st.build, sec = SECOND_BUILDERS[st.id], thr = THIRD_BUILDERS[st.id], fou = FOURTH_BUILDERS[st.id], fif = FIFTH_BUILDERS[st.id];
@@ -6529,11 +6583,11 @@
   });
   /* ---- camp sites: the home screen shows these; each opens the trails (stops) that belong to it ---- */
   var CAMPS = [
-    { id:'word', name:'Word Camp', icon:'📖', accent:'--berry', accentInk:'--berry-ink', trails:['rhyme','letters','sightwords','story'] },
-    { id:'number', name:'Number Camp', icon:'🔢', accent:'--sunset', accentInk:'--sunset-ink', trails:['counting','patterns','adding','compare','shapes','calendar'] },
-    { id:'nature', name:'Nature Camp', icon:'🌲', accent:'--lime', accentInk:'--lime-ink', trails:['nature','health'] },
+    { id:'word', name:'Word Camp', icon:'📖', accent:'--berry', accentInk:'--berry-ink', trails:['rhyme','letters','sightwords','story','matchword','wordbuild'] },
+    { id:'number', name:'Number Camp', icon:'🔢', accent:'--sunset', accentInk:'--sunset-ink', trails:['counting','patterns','adding','compare','shapes','calendar','sortnum'] },
+    { id:'nature', name:'Nature Camp', icon:'🌲', accent:'--lime', accentInk:'--lime-ink', trails:['nature','health','sortnature'] },
     { id:'art', name:'Art Camp', icon:'🎨', accent:'--teal', accentInk:'--teal-ink', trails:['colors'] },
-    { id:'heart', name:'Heart & Home Camp', icon:'🔥', accent:'--magenta', accentInk:'--magenta-ink', trails:['feelings','community'] },
+    { id:'heart', name:'Heart & Home Camp', icon:'🔥', accent:'--magenta', accentInk:'--magenta-ink', trails:['feelings','community','sortheart'] },
     { id:'skills', name:'Skills Camp', icon:'⌨️', accent:'--cyan', accentInk:'--cyan-ink', trails:['myname','typing'] }
   ];
   var currentCamp = null;
@@ -7980,8 +8034,11 @@
     STATE.roundLog = [];
     STATE.includeName = true; /* tracing/typing may add the child's own name to a round */
     STATE.round = station.build(STATE.level);
-    try{ STATE.round = spaceOutRepeats(STATE.round, station, STATE.level); }catch(e){}
-    try{ STATE.round = injectMissedQuestions(STATE.round, id, STATE.level); }catch(e){}
+    if (!station.game){
+      try{ STATE.round = spaceOutRepeats(STATE.round, station, STATE.level); }catch(e){}
+      try{ STATE.round = injectMissedQuestions(STATE.round, id, STATE.level); }catch(e){}
+    }
+    STATE.roundBase = STATE.round.length;
     STATE.includeName = false;
     STATE.extraCount = 0;
     STATE.qIndex = 0;
@@ -8002,7 +8059,7 @@
   function buildTrailCheck(level){
     var vis = visibleStations(), out = [];
     CAMPS.forEach(function(c){
-      var ts = vis.filter(function(s){ return c.trails.indexOf(s.id) !== -1; });
+      var ts = vis.filter(function(s){ return c.trails.indexOf(s.id) !== -1 && !s.game; });
       if (!ts.length) return;
       var pool = [];
       ts.forEach(function(s){
@@ -8084,6 +8141,13 @@
     elStage.innerHTML = q.visual || '';
     elPromptText.textContent = q.prompt || q.speak;
     elFeedback.textContent = '';
+    if (q.kind && GAME_KINDS[q.kind]){
+      elOptions.innerHTML = ''; elOptions.hidden = true; elCustom.hidden = false;
+      renderDots();
+      GAME_KINDS[q.kind](q);
+      setTimeout(function(){ if (!STATE.typedAny) speak(q.speak); }, 300);
+      return;
+    }
     if (q.kind === 'type'){
       elOptions.innerHTML = '';
       elOptions.hidden = true;
@@ -8498,7 +8562,7 @@
     if (STATE.mode === 'check' && STATE.checkLog) STATE.checkLog.push({ camp:q.camp, station:q.stationId, skill:skill, firstTry:!STATE.wrongOnCurrent });
     try{
       if (firstTry){ removeFromMissedBank(qStation(q), qLevel(), q); recordRight(skill, qLevel(), q, qStation(q)); }
-      else if (STATE.mode !== 'check' && (q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
+      else if (STATE.mode !== 'check' && !q.noRepeat && (q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
         var again = cloneQuestion(q); again.reps = (q.reps || 0) + 1; again.isRepeat = true; again.fromBank = false;
         STATE.round.splice(Math.min(STATE.qIndex + 3, STATE.round.length), 0, again);
         STATE.extraCount = (STATE.extraCount || 0) + 1;
@@ -8518,11 +8582,437 @@
   function missCustom(q){
     var skill = currentSkill(q);
     if (!STATE.roundSkillTally[skill]) STATE.roundSkillTally[skill] = { correct:0, wrong:0 };
-    if (!STATE.wrongOnCurrent){ try{ addToMissedBank(qStation(q), qLevel(), q); }catch(e){} }
+    if (!STATE.wrongOnCurrent && !q.noBank){ try{ addToMissedBank(qStation(q), qLevel(), q); }catch(e){} }
     STATE.wrongOnCurrent = true;
     STATE.roundTally.wrong++;
     STATE.roundSkillTally[skill].wrong++;
     try{ recordAnswer(qStation(q), skill, false); }catch(e){}
+  }
+
+  /* ======================================================================================
+     Learning games. Each game is a "trail" whose boards are played with taps and drags instead of
+     multiple choice. A board finishes through the same completeCustom()/missCustom() calls typing
+     uses, so stars, the campfire, the grown-up dashboard and the finish animation all just work.
+     ====================================================================================== */
+  var GAME_KINDS = {};
+  function gmPlain(h){ return String(h).replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').trim(); }
+  function gmSpeakFace(h){
+    try{
+      var t = gmPlain(h);
+      if (/^[A-Za-z]$/.test(t)) speakLetter(t);
+      else if (/^[A-Za-z0-9 ,.'’\-]+$/.test(t) && t.length <= 26) speak(t);
+    }catch(e){}
+  }
+  function gmBoard(kind, o){
+    return { kind:kind, speak:o.speak, prompt:o.prompt, visual:'', skill:o.skill, data:o.data, noRepeat:true, noBank:true, options:[{ html:o.sig, correct:true }] };
+  }
+  function gmHint(msg){ try{ var m = document.getElementById('gmHint'); if (m) m.textContent = msg; }catch(e){} }
+  function gmFinish(q, msg, adv){
+    gmHint(msg || 'You did it!');
+    completeCustom(q, !STATE.wrongOnCurrent, { delay:500, advance:adv || 2200 });
+  }
+  function gmSlip(q, msg){
+    missCustom(q);
+    try{ elFeedback.textContent = msg; speak(msg); }catch(e){}
+  }
+  function gmTone(ok){
+    try{ if (faEnsureAudio()){ if (ok){ faNote(660, 0, 0.14, 'triangle', 0.08); faNote(880, 0.1, 0.18, 'triangle', 0.08); } else { faNote(196, 0, 0.18, 'sine', 0.08); } } }catch(e){}
+  }
+  function gmShake(el){ try{ el.classList.remove('is-bad'); void el.offsetWidth; el.classList.add('is-bad'); setTimeout(function(){ el.classList.remove('is-bad'); }, 400); }catch(e){} }
+
+  /* ---- Trail Match: flip two cards to find a pair ---- */
+  GAME_KINDS.match = function(q){
+    var d = q.data, cards = [], i;
+    d.pairs.forEach(function(p, n){ cards.push({ pair:n, h:p[0] }); cards.push({ pair:n, h:p[1] }); });
+    cards = shuffle(cards);
+    var cols = d.pairs.length <= 3 ? 3 : 4;
+    var html = '<div class="gm-wrap"><div class="gm-hint" id="gmHint">Flip two cards to find a match.</div><div class="gm-grid' + (cards.length >= 8 ? ' many' : '') + '" style="--cols:' + cols + '">';
+    cards.forEach(function(c, k){
+      html += '<button type="button" class="gm-card' + (gmPlain(c.h).length > 11 ? ' sm' : '') + '" data-i="' + k + '" data-pair="' + c.pair + '" aria-label="Face-down card"><span class="gm-back" aria-hidden="true">⛺</span><span class="gm-face">' + c.h + '</span></button>';
+    });
+    elCustom.innerHTML = html + '</div></div>';
+    var els = Array.prototype.slice.call(elCustom.querySelectorAll('.gm-card'));
+    var open = [], lock = false, found = 0, misses = 0, allowed = d.pairs.length;
+    els.forEach(function(el, k){
+      el.addEventListener('click', function(){
+        if (lock || el.classList.contains('is-done') || el.classList.contains('is-up')) return;
+        el.classList.add('is-up'); el.setAttribute('aria-label', gmPlain(cards[k].h) || 'Card');
+        gmSpeakFace(cards[k].h);
+        open.push(k);
+        if (open.length < 2) return;
+        var a = open[0], b = open[1]; open = [];
+        if (cards[a].pair === cards[b].pair){
+          found++; gmTone(true);
+          els[a].classList.remove('is-up'); els[b].classList.remove('is-up');
+          els[a].classList.add('is-done'); els[b].classList.add('is-done');
+          if (found >= d.pairs.length){ lock = true; setTimeout(function(){ gmFinish(q, 'You found every pair!', 2400); }, 500); }
+          else gmHint('A match! ' + (d.pairs.length - found) + ' to go.');
+        } else {
+          misses++; lock = true; gmTone(false);
+          gmHint('Not a pair. Remember where they are!');
+          if (misses === allowed + 1) missCustom(q);
+          setTimeout(function(){ els[a].classList.remove('is-up'); els[b].classList.remove('is-up'); lock = false; }, 1100);
+        }
+      });
+    });
+  };
+
+  /* ---- Sort the Pack: drag (or tap, then tap a basket) each thing into the right basket ---- */
+  GAME_KINDS.sort = function(q){
+    var d = q.data, items = shuffle(d.items.slice());
+    var html = '<div class="gm-wrap"><div class="gm-hint" id="gmHint">Drag each one into its basket. You can also tap it, then tap a basket.</div><div class="gm-baskets" style="--n:' + d.baskets.length + '">';
+    d.baskets.forEach(function(b){
+      html += '<div class="gm-basket" role="button" tabindex="0" data-b="' + b.id + '"><div class="gm-bhead">' + b.icon + ' ' + b.label + '</div><div class="gm-bin"></div></div>';
+    });
+    html += '</div><div class="gm-tray">';
+    items.forEach(function(it, k){ html += '<button type="button" class="gm-item" data-b="' + it.b + '" data-k="' + k + '">' + it.h + '</button>'; });
+    elCustom.innerHTML = html + '</div></div>';
+    var baskets = Array.prototype.slice.call(elCustom.querySelectorAll('.gm-basket'));
+    var itemEls = Array.prototype.slice.call(elCustom.querySelectorAll('.gm-item'));
+    var sel = null, drag = null, placed = 0;
+    function select(el){
+      if (sel) sel.classList.remove('is-sel');
+      sel = el; if (el) el.classList.add('is-sel');
+      baskets.forEach(function(b){ b.classList.toggle('is-ready', !!el); });
+    }
+    function basketAt(x, y, it){
+      var vis = it.style.visibility; it.style.visibility = 'hidden';
+      var el = document.elementFromPoint(x, y); it.style.visibility = vis;
+      return el && el.closest ? el.closest('.gm-basket') : null;
+    }
+    function place(it, bk){
+      if (!it || it.classList.contains('placed')) return;
+      if (it.getAttribute('data-b') === bk.getAttribute('data-b')){
+        it.classList.remove('is-sel', 'is-drag'); it.style.transform = ''; it.classList.add('placed');
+        bk.querySelector('.gm-bin').appendChild(it);
+        if (sel === it) sel = null;
+        baskets.forEach(function(b){ b.classList.remove('is-ready'); });
+        placed++; gmTone(true); gmSpeakFace(it.textContent);
+        if (placed >= items.length) setTimeout(function(){ gmFinish(q, 'Everything is packed!', 2400); }, 450);
+        else gmHint((items.length - placed) + ' more to sort.');
+      } else {
+        gmShake(it); gmShake(bk); gmTone(false); select(null);
+        gmSlip(q, 'Not that basket. Try another!');
+      }
+    }
+    itemEls.forEach(function(it){
+      it.addEventListener('pointerdown', function(e){
+        if (it.classList.contains('placed')) return;
+        drag = { el:it, x:e.clientX, y:e.clientY, moved:false };
+        try{ it.setPointerCapture(e.pointerId); }catch(err){}
+      });
+      it.addEventListener('pointermove', function(e){
+        if (!drag || drag.el !== it) return;
+        var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (!drag.moved && Math.sqrt(dx * dx + dy * dy) > 8){ drag.moved = true; it.classList.add('is-drag'); select(it); }
+        if (drag.moved){
+          it.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+          var bk = basketAt(e.clientX, e.clientY, it);
+          baskets.forEach(function(b){ b.classList.toggle('is-over', b === bk); });
+        }
+      });
+      function endDrag(e, cancelled){
+        if (!drag || drag.el !== it) return;
+        var moved = drag.moved; drag = null;
+        it.classList.remove('is-drag'); it.style.transform = '';
+        baskets.forEach(function(b){ b.classList.remove('is-over'); });
+        if (cancelled) return;
+        if (moved){ var bk = basketAt(e.clientX, e.clientY, it); if (bk) place(it, bk); }
+        else select(sel === it ? null : it);
+      }
+      it.addEventListener('pointerup', function(e){ endDrag(e, false); });
+      it.addEventListener('pointercancel', function(e){ endDrag(e, true); });
+    });
+    baskets.forEach(function(bk){
+      bk.addEventListener('click', function(){ if (sel) place(sel, bk); });
+      bk.addEventListener('keydown', function(e){ if ((e.key === 'Enter' || e.key === ' ') && sel){ e.preventDefault(); place(sel, bk); } });
+    });
+  };
+
+  /* ---- Word Builder: tap the letter tiles to spell the word ---- */
+  GAME_KINDS.build = function(q){
+    var d = q.data, word = d.word.toUpperCase(), idx = 0, misses = 0, done = false, i;
+    var slots = '';
+    for (i = 0; i < word.length; i++) slots += '<span class="type-slot' + (i === 0 ? ' now' : '') + '" data-i="' + i + '"><span class="type-ghost"> </span></span>';
+    var tiles = '';
+    d.tiles.forEach(function(l, k){ tiles += '<button type="button" class="gm-tile" data-l="' + l + '" data-k="' + k + '">' + l + '</button>'; });
+    elCustom.innerHTML = '<div class="gm-wrap">' +
+      (d.emoji ? '<div class="type-pic">' + d.emoji + '</div>' : '') +
+      '<div class="type-target" id="gmSlots" aria-label="Word to build">' + slots + '</div>' +
+      '<div class="gm-hint" id="gmHint">Tap the letters in order.</div>' +
+      '<div class="gm-tiles" id="gmTiles">' + tiles + '</div></div>';
+    var slotEls = elCustom.querySelectorAll('#gmSlots .type-slot');
+    var tileEls = Array.prototype.slice.call(elCustom.querySelectorAll('.gm-tile'));
+    function clearHint(){ tileEls.forEach(function(t){ t.classList.remove('hint'); }); }
+    function press(letter, tile){
+      if (done) return;
+      letter = letter.toUpperCase(); STATE.typedAny = true;
+      var want = word.charAt(idx);
+      if (letter === want){
+        if (!tile) tile = tileEls.filter(function(t){ return !t.disabled && t.getAttribute('data-l') === letter; })[0];
+        if (tile) tile.disabled = true;
+        var slot = slotEls[idx];
+        slot.classList.remove('now'); slot.classList.add('got');
+        slot.insertAdjacentHTML('beforeend', '<span class="type-letter">' + letter + '</span>');
+        try{ speakLetter(letter); }catch(e){}
+        clearHint(); misses = 0; idx++;
+        if (idx >= word.length){
+          done = true; gmTone(true);
+          try{ speak(d.word.toLowerCase()); }catch(e){}
+          setTimeout(function(){ gmFinish(q, 'You built it: ' + d.word.toLowerCase() + '!', 2600); }, 700);
+          return;
+        }
+        slotEls[idx].classList.add('now');
+      } else {
+        misses++;
+        if (tile) gmShake(tile);
+        gmTone(false);
+        gmSlip(q, 'Not that one. Look for ' + want + '.');
+        if (misses >= 2){ var h = tileEls.filter(function(t){ return !t.disabled && t.getAttribute('data-l') === want; })[0]; if (h) h.classList.add('hint'); }
+      }
+    }
+    tileEls.forEach(function(t){ t.addEventListener('click', function(){ press(t.getAttribute('data-l'), t); }); });
+    typeKeyHandler = function(e){
+      if (STATE.view !== 'station' || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key && e.key.length === 1 && /[a-zA-Z]/.test(e.key)){ e.preventDefault(); press(e.key, null); }
+    };
+    document.addEventListener('keydown', typeKeyHandler, true);
+  };
+
+  /* ---------------- game content (by grade) ---------------- */
+  var GM_LEVELS = ['preschool','kindergarten','first','second','third','fourth','fifth'];
+  function gmRange(lo, hi, step, test){
+    var out = [];
+    for (var n = lo; n <= hi; n += (step || 1)){ if (!test || test(n)) out.push(String(n)); }
+    return out;
+  }
+  function gmIsPrime(n){ if (n < 2) return false; for (var k = 2; k * k <= n; k++){ if (n % k === 0) return false; } return true; }
+  function gmPairsOf(list, n){
+    for (var t = 0; t < 40; t++){
+      var pick = shuffle(list.slice()).slice(0, n), seen = {}, ok = true;
+      pick.forEach(function(p){ [p[0], p[1]].forEach(function(f){ if (seen[f]) ok = false; seen[f] = 1; }); });
+      if (ok) return pick;
+    }
+    return shuffle(list.slice()).slice(0, n);
+  }
+  function gmMatchBoard(th, n){
+    var pairs = th.make ? th.make(n) : gmPairsOf(th.pairs, n);
+    return gmBoard('match', { speak:th.say, prompt:th.title, skill:th.skill, sig:'match:' + th.id, data:{ pairs:pairs } });
+  }
+  var GM_ANIMALS = ['🐶','🐱','🐸','🐻','🦊','🐰','🐼','🐯','🐮','🐷','🐵','🦁'];
+  var GM_PIC_WORDS_K = [['🐱','cat'],['🐶','dog'],['☀️','sun'],['🎩','hat'],['🚌','bus'],['🐷','pig'],['🛏️','bed'],['🐝','bee'],['🚗','car'],['🦊','fox'],['🦉','owl'],['🐜','ant'],['⭐','star'],['🐟','fish'],['🌳','tree'],['⚽','ball']];
+  var GM_PIC_WORDS_1 = [['🐸','frog'],['🚢','ship'],['🦆','duck'],['🍞','bread'],['🚂','train'],['🐌','snail'],['☁️','cloud'],['🌸','flower'],['🍎','apple'],['🐴','horse'],['🐋','whale'],['🏠','house'],['🐍','snake'],['🥄','spoon'],['🍋','lemon'],['🍇','grapes']];
+  var GM_SHAPES_K = [['🔴','circle'],['🟦','square'],['🔺','triangle'],['⭐','star'],['❤️','heart'],['🔷','diamond']];
+  var GM_NUMWORDS = [['1','one'],['2','two'],['3','three'],['4','four'],['5','five'],['6','six'],['7','seven'],['8','eight'],['9','nine'],['10','ten'],['11','eleven'],['12','twelve']];
+  function gmLetterPairs(n){
+    return shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')).slice(0, n).map(function(l){ return [l, l.toLowerCase()]; });
+  }
+  function gmDotPairs(n, max){
+    return shuffle(gmRange(1, max)).slice(0, n).map(function(v){ var s = ''; for (var k = 0; k < +v; k++) s += '🔵'; return [v, s]; });
+  }
+  function gmSumPairs(n, max){
+    var out = [], used = {}, guard = 0;
+    while (out.length < n && guard++ < 200){
+      var a = randInt(1, max - 1), b = randInt(1, max - a), s = a + b;
+      if (used[s]) continue; used[s] = 1; out.push([a + ' + ' + b, String(s)]);
+    }
+    return out;
+  }
+  function gmDiffPairs(n, max){
+    var out = [], used = {}, guard = 0;
+    while (out.length < n && guard++ < 200){
+      var a = randInt(6, max), b = randInt(1, a - 1), s = a - b;
+      if (used[s]) continue; used[s] = 1; out.push([a + ' − ' + b, String(s)]);
+    }
+    return out;
+  }
+  function gmMixPairs(n, max){
+    var s1 = gmSumPairs(Math.ceil(n / 2), max), s2 = gmDiffPairs(n - s1.length, max), seen = {}, out = [];
+    s1.concat(s2).forEach(function(p){ if (!seen[p[1]]){ seen[p[1]] = 1; out.push(p); } });
+    return out.length >= n ? out : gmSumPairs(n, max);
+  }
+  function gmTimesPairs(n, lo, hi){
+    var out = [], used = {}, guard = 0;
+    while (out.length < n && guard++ < 300){
+      var a = randInt(lo, hi), b = randInt(lo, hi), p = a * b;
+      if (used[p]) continue; used[p] = 1; out.push([a + ' × ' + b, String(p)]);
+    }
+    return out;
+  }
+  function gmTimePairs(n){
+    return shuffle(gmRange(1, 12)).slice(0, n).map(function(h){ return [h + ':00', h + " o'clock"]; });
+  }
+  function gmMonthPairs(n){
+    var m = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return shuffle(gmRange(1, 12)).slice(0, n).map(function(v){ return [m[v - 1], 'month ' + v]; });
+  }
+  var GM_MATCH = {
+    preschool: [
+      { id:'letters', skill:'Matching Letters', title:'Match the big and little letters', say:'Find the big letter and its little letter. Flip two cards.', make:gmLetterPairs },
+      { id:'dots', skill:'Matching Numbers', title:'Match the numbers and dots', say:'Match each number with its dots. Flip two cards.', make:function(n){ return gmDotPairs(n, 6); } },
+      { id:'pics', skill:'Matching Pictures', title:'Match the pictures', say:'Find two pictures that are the same. Flip two cards.', make:function(n){ return shuffle(GM_ANIMALS.slice()).slice(0, n).map(function(e){ return [e, e]; }); } }
+    ],
+    kindergarten: [
+      { id:'letters', skill:'Matching Letters', title:'Match the big and little letters', say:'Find the big letter and its little letter. Flip two cards.', make:gmLetterPairs },
+      { id:'picword', skill:'Matching Pictures & Words', title:'Match the picture and the word', say:'Match each picture with its word. Flip two cards.', pairs:GM_PIC_WORDS_K },
+      { id:'dots', skill:'Matching Numbers', title:'Match the numbers and dots', say:'Match each number with its dots. Flip two cards.', make:function(n){ return gmDotPairs(n, 9); } },
+      { id:'shapes', skill:'Matching Shapes', title:'Match the shapes and their names', say:'Match each shape with its name. Flip two cards.', pairs:GM_SHAPES_K }
+    ],
+    first: [
+      { id:'rhymes', skill:'Matching Rhymes', title:'Match the rhyming words', say:'Find two words that rhyme. Flip two cards.', pairs:[['cat','hat'],['dog','log'],['sun','run'],['bee','tree'],['star','car'],['cake','lake'],['boat','coat'],['ring','king'],['night','light'],['rain','train'],['book','cook'],['bell','shell']] },
+      { id:'numwords', skill:'Matching Number Words', title:'Match the numbers and number words', say:'Match each number with its word. Flip two cards.', pairs:GM_NUMWORDS },
+      { id:'sums', skill:'Matching Math Facts', title:'Match the sums', say:'Match each adding problem with its answer. Flip two cards.', make:function(n){ return gmSumPairs(n, 10); } },
+      { id:'picword', skill:'Matching Pictures & Words', title:'Match the picture and the word', say:'Match each picture with its word. Flip two cards.', pairs:GM_PIC_WORDS_1 }
+    ],
+    second: [
+      { id:'opposites', skill:'Matching Opposites', title:'Match the opposites', say:'Find two words that are opposites. Flip two cards.', pairs:[['hot','cold'],['up','down'],['big','small'],['fast','slow'],['happy','sad'],['day','night'],['open','closed'],['full','empty'],['loud','quiet'],['wet','dry'],['hard','soft'],['old','new']] },
+      { id:'synonyms', skill:'Matching Same Meanings', title:'Match words with the same meaning', say:'Find two words that mean the same thing. Flip two cards.', pairs:[['big','large'],['small','tiny'],['happy','glad'],['quick','fast'],['begin','start'],['rock','stone'],['jump','leap'],['pretty','beautiful'],['sleepy','tired'],['mad','angry'],['scared','afraid'],['shut','close']] },
+      { id:'facts', skill:'Matching Math Facts', title:'Match the problems and answers', say:'Match each math problem with its answer. Flip two cards.', make:function(n){ return gmMixPairs(n, 20); } },
+      { id:'time', skill:'Matching Times', title:'Match the clock times', say:'Match each time with its words. Flip two cards.', make:gmTimePairs },
+      { id:'months', skill:'Matching Months', title:'Match the months and their numbers', say:'Match each month with its number in the year. Flip two cards.', make:gmMonthPairs }
+    ],
+    third: [
+      { id:'times', skill:'Matching Multiplication', title:'Match the multiplication facts', say:'Match each multiplication problem with its answer. Flip two cards.', make:function(n){ return gmTimesPairs(n, 2, 9); } },
+      { id:'fractions', skill:'Matching Equal Fractions', title:'Match the equal fractions', say:'Find two fractions that are equal. Flip two cards.', pairs:[['1/2','2/4'],['1/3','2/6'],['3/4','6/8'],['1/4','2/8'],['2/3','4/6'],['1/5','2/10'],['3/5','6/10'],['4/5','8/10']] },
+      { id:'prefix', skill:'Matching Prefix Meanings', title:'Match the word and its meaning', say:'Match each word with its meaning. Flip two cards.', pairs:[['unhappy','not happy'],['rewrite','write again'],['preview','see before'],['misspell','spell wrong'],['disagree','not agree'],['unlock','not locked'],['replay','play again'],['unfair','not fair']] },
+      { id:'synonyms', skill:'Matching Same Meanings', title:'Match words with the same meaning', say:'Find two words that mean the same thing. Flip two cards.', pairs:[['enormous','huge'],['ancient','very old'],['courageous','brave'],['rapid','fast'],['silent','quiet'],['assist','help'],['purchase','buy'],['exhausted','very tired']] },
+      { id:'homophones', skill:'Matching Homophones', title:'Match words that sound the same', say:'Find two words that sound the same. Flip two cards.', pairs:[['their','there'],['to','too'],['see','sea'],['hear','here'],['write','right'],['blue','blew'],['buy','by'],['son','sun'],['no','know'],['flower','flour']] }
+    ],
+    fourth: [
+      { id:'times', skill:'Matching Multiplication', title:'Match the multiplication facts', say:'Match each multiplication problem with its answer. Flip two cards.', make:function(n){ return gmTimesPairs(n, 6, 12); } },
+      { id:'decimals', skill:'Matching Fractions & Decimals', title:'Match fractions and decimals', say:'Match each fraction with its decimal. Flip two cards.', pairs:[['1/2','0.5'],['1/4','0.25'],['3/4','0.75'],['1/10','0.1'],['7/10','0.7'],['1/5','0.2'],['3/10','0.3'],['4/5','0.8']] },
+      { id:'utah', skill:'Matching Utah Symbols', title:'Match the Utah symbols', say:'Match each Utah state symbol with its name. Flip two cards.', pairs:[['state flower','sego lily'],['state bird','California gull'],['state fruit','cherry'],['state tree','blue spruce'],['state animal','Rocky Mountain elk'],['state insect','honeybee'],['state fossil','Allosaurus'],['state gem','topaz']] },
+      { id:'roots', skill:'Matching Word Roots', title:'Match the word parts and meanings', say:'Match each word part with its meaning. Flip two cards.', pairs:[['bio','life'],['geo','earth'],['tele','far'],['aqua','water'],['photo','light'],['port','carry'],['graph','write'],['rupt','break']] },
+      { id:'units', skill:'Matching Units', title:'Match the equal measures', say:'Find two measurements that are equal. Flip two cards.', pairs:[['1 foot','12 inches'],['1 yard','3 feet'],['1 kilometer','1,000 meters'],['1 hour','60 minutes'],['1 gallon','4 quarts'],['1 pound','16 ounces'],['1 meter','100 centimeters'],['1 week','7 days']] }
+    ],
+    fifth: [
+      { id:'percent', skill:'Matching Fractions & Percents', title:'Match fractions, decimals and percents', say:'Match the fraction or decimal with its percent. Flip two cards.', pairs:[['3/4','75%'],['1/5','20%'],['0.5','50%'],['2/5','40%'],['0.1','10%'],['9/10','90%'],['0.25','25%'],['7/10','70%']] },
+      { id:'powers', skill:'Matching Powers', title:'Match the powers and their values', say:'Match each power with its value. Flip two cards.', pairs:[['2³','8'],['3²','9'],['5²','25'],['10³','1,000'],['4²','16'],['2⁵','32'],['6²','36'],['7²','49']] },
+      { id:'vocab', skill:'Matching Vocabulary', title:'Match the word and its meaning', say:'Match each word with its meaning. Flip two cards.', pairs:[['abundant','plentiful'],['reluctant','unwilling'],['fragile','easily broken'],['generous','giving freely'],['cautious','careful'],['persuade','convince'],['obstacle','something in the way'],['gradual','slow and steady']] },
+      { id:'history', skill:'Matching History Dates', title:'Match the event and the year', say:'Match each event with its year. Flip two cards.', pairs:[['Mayflower lands','1620'],['Declaration of Independence','1776'],['Constitution signed','1787'],['Louisiana Purchase','1803'],['Utah pioneers arrive','1847'],['Transcontinental railroad','1869'],['Utah becomes a state','1896']] },
+      { id:'science', skill:'Matching Science Words', title:'Match the science word and meaning', say:'Match each science word with its meaning. Flip two cards.', pairs:[['photosynthesis','plants make food'],['erosion','wearing away of land'],['evaporation','liquid to gas'],['condensation','gas to liquid'],['habitat','where a living thing lives'],['producer','makes its own food'],['consumer','eats other living things'],['decomposer','breaks down dead matter']] }
+    ]
+  };
+  var GM_MATCH_PAIRS = { preschool:3, kindergarten:4, first:5, second:6, third:6, fourth:6, fifth:6 };
+  function buildMatchWord(level){
+    var themes = shuffle(GM_MATCH[level].slice()).slice(0, 3), n = GM_MATCH_PAIRS[level];
+    return themes.map(function(th){ return gmMatchBoard(th, n); });
+  }
+
+  /* ---- Sort the Pack ---- */
+  function gmSet(id, skill, title, baskets, pools){ return { id:id, skill:skill, title:title, baskets:baskets, pools:pools }; }
+  function gmSortBoard(set, level){
+    var per = set.baskets.length === 2 ? (level === 'preschool' ? 2 : ((level === 'fourth' || level === 'fifth') ? 4 : 3)) : 2, items = [];
+    set.baskets.forEach(function(b){
+      shuffle(set.pools[b.id].slice()).slice(0, per).forEach(function(h){ items.push({ h:h, b:b.id }); });
+    });
+    var names = set.baskets.map(function(b){ return b.label; }).join(' or ');
+    return gmBoard('sort', { speak:set.title + '. Drag each one into the right basket.', prompt:set.title, skill:set.skill, sig:'sort:' + set.id,
+      data:{ baskets:set.baskets.map(function(b){ return { id:b.id, label:b.label, icon:b.icon }; }), items:items } });
+  }
+  var GM_SORT_NATURE = {
+    living: gmSet('living', 'Living or Not Living', 'Sort living and not living things', [{ id:'a', label:'Living', icon:'🌱' }, { id:'b', label:'Not living', icon:'🪨' }], { a:['🐶 dog','🐱 cat','🌳 tree','🌻 flower','🐟 fish','🐝 bee'], b:['🪨 rock','⚽ ball','🚗 car','🪑 chair','☁️ cloud','🧸 teddy bear'] }),
+    hotcold: gmSet('hotcold', 'Hot or Cold', 'Sort hot and cold things', [{ id:'a', label:'Hot', icon:'🔥' }, { id:'b', label:'Cold', icon:'❄️' }], { a:['☀️ sun','🔥 fire','☕ hot cocoa','🍲 hot soup'], b:['❄️ snow','🧊 ice','🍦 ice cream','⛄ snowman'] }),
+    move: gmSet('move', 'How Animals Move', 'Sort animals that fly and animals that swim', [{ id:'a', label:'Flies', icon:'🪽' }, { id:'b', label:'Swims', icon:'🌊' }], { a:['🦅 eagle','🦋 butterfly','🐝 bee','🦉 owl'], b:['🐟 fish','🐋 whale','🐙 octopus','🦈 shark'] }),
+    plantanimal: gmSet('plantanimal', 'Plants or Animals', 'Sort plants and animals', [{ id:'a', label:'Plants', icon:'🌿' }, { id:'b', label:'Animals', icon:'🐾' }], { a:['🌲 pine tree','🌵 cactus','🌻 sunflower','🍀 clover','🌷 tulip','🌾 grass'], b:['🐻 bear','🦌 deer','🦅 eagle','🐍 snake','🐸 frog','🐇 rabbit'] }),
+    seasons: gmSet('seasons', 'Winter or Summer', 'Sort winter things and summer things', [{ id:'a', label:'Winter', icon:'❄️' }, { id:'b', label:'Summer', icon:'☀️' }], { a:['⛄ snowman','🧣 scarf','🛷 sled','🧤 mittens','🎿 skiing'], b:['🏖️ beach','🍦 ice cream','🕶️ sunglasses','🍉 watermelon','🏊 swimming'] }),
+    daynight: gmSet('daynight', 'Day or Night', 'Sort day things and night things', [{ id:'a', label:'Day', icon:'☀️' }, { id:'b', label:'Night', icon:'🌙' }], { a:['☀️ sun','🌈 rainbow','🏃 playing outside','🐦 birds singing'], b:['🌙 moon','⭐ stars','🦉 owl','🛏️ sleeping','🦇 bat'] }),
+    habitat: gmSet('habitat', 'Where Animals Live', 'Sort where animals and plants live', [{ id:'a', label:'Desert', icon:'🏜️' }, { id:'b', label:'Forest', icon:'🌲' }, { id:'c', label:'Ocean', icon:'🌊' }], { a:['🌵 cactus','🦎 lizard','🐪 camel'], b:['🌲 pine tree','🦌 deer','🐻 bear'], c:['🐟 fish','🦀 crab','🐋 whale'] }),
+    matter: gmSet('matter', 'Solid, Liquid or Gas', 'Sort solids, liquids and gases', [{ id:'a', label:'Solid', icon:'🧊' }, { id:'b', label:'Liquid', icon:'💧' }, { id:'c', label:'Gas', icon:'💨' }], { a:['🪨 rock','🧊 ice cube','🪑 chair','📚 book'], b:['💧 water','🥛 milk','🧃 juice','🍯 honey'], c:['💨 air','♨️ steam','🎈 helium'] }),
+    classes: gmSet('classes', 'Mammal, Bird or Fish', 'Sort mammals, birds and fish', [{ id:'a', label:'Mammal', icon:'🐕' }, { id:'b', label:'Bird', icon:'🐦' }, { id:'c', label:'Fish', icon:'🐟' }], { a:['🐕 dog','🐄 cow','🐘 elephant','🐋 whale'], b:['🦅 eagle','🐧 penguin','🦉 owl','🦆 duck'], c:['🐟 trout','🦈 shark','🐠 clownfish','🐡 pufferfish'] }),
+    diet: gmSet('diet', 'What Animals Eat', 'Sort herbivores, carnivores and omnivores', [{ id:'a', label:'Herbivore', icon:'🌿' }, { id:'b', label:'Carnivore', icon:'🥩' }, { id:'c', label:'Omnivore', icon:'🍽️' }], { a:['🐄 cow','🐇 rabbit','🦌 deer','🐘 elephant'], b:['🦁 lion','🐺 wolf','🦈 shark','🐍 snake'], c:['🐻 bear','🐷 pig','🦝 raccoon','🐔 chicken'] }),
+    roles: gmSet('roles', 'Food Chain Jobs', 'Sort producers, consumers and decomposers', [{ id:'a', label:'Producer', icon:'🌱' }, { id:'b', label:'Consumer', icon:'🦊' }, { id:'c', label:'Decomposer', icon:'🍄' }], { a:['🌲 tree','🌻 sunflower','🌾 grass','🌵 cactus'], b:['🐇 rabbit','🦊 fox','🦅 eagle','🐟 fish'], c:['🍄 mushroom','🦠 bacteria','🧫 mold'] }),
+    energy: gmSet('energy', 'Energy Sources', 'Sort renewable and nonrenewable energy', [{ id:'a', label:'Renewable', icon:'♻️' }, { id:'b', label:'Nonrenewable', icon:'🛢️' }], { a:['☀️ solar','💨 wind','🌊 water power','🌋 geothermal'], b:['⚫ coal','🛢️ oil','🔥 natural gas','☢️ uranium'] }),
+    rocks: gmSet('rocks', 'Kinds of Rock', 'Sort igneous, sedimentary and metamorphic rocks', [{ id:'a', label:'Igneous', icon:'🌋' }, { id:'b', label:'Sedimentary', icon:'🏜️' }, { id:'c', label:'Metamorphic', icon:'💎' }], { a:['granite','basalt','obsidian','pumice'], b:['sandstone','limestone','shale','conglomerate'], c:['marble','slate','quartzite','gneiss'] }),
+    force: gmSet('force', 'Push or Pull', 'Sort pushes and pulls', [{ id:'a', label:'Push', icon:'👉' }, { id:'b', label:'Pull', icon:'🤏' }], { a:['🛒 pushing a cart','⚽ kicking a ball','🚪 pushing a door','🛹 pushing off on a skateboard'], b:['🚪 pulling a door','🪢 tug of war','🧲 a magnet pulling a nail','🛷 pulling a sled'] }),
+    changes: gmSet('changes', 'Physical or Chemical Change', 'Sort physical changes and chemical changes', [{ id:'a', label:'Physical change', icon:'✂️' }, { id:'b', label:'Chemical change', icon:'🔥' }], { a:['🧊 ice melting','✂️ cutting paper','🥤 crushing a can','🧂 salt dissolving','🪵 breaking a stick'], b:['🔥 burning wood','🍳 cooking an egg','🔩 a nail rusting','🍞 bread toasting','🥛 milk spoiling'] }),
+    conduct: gmSet('conduct', 'Conductor or Insulator', 'Sort conductors and insulators', [{ id:'a', label:'Conductor', icon:'⚡' }, { id:'b', label:'Insulator', icon:'🧤' }], { a:['🔩 iron nail','🪙 copper wire','🥫 aluminum foil','🥄 metal spoon'], b:['🧤 rubber glove','🪵 wooden stick','🧴 plastic bottle','🪟 glass'] }),
+    erosion: gmSet('erosion', 'Shaping the Land', 'Sort weathering, erosion and deposition', [{ id:'a', label:'Weathering', icon:'🪨' }, { id:'b', label:'Erosion', icon:'🌊' }, { id:'c', label:'Deposition', icon:'🏖️' }], { a:['frost cracking a rock','roots splitting a rock','acid rain wearing stone'], b:['a river carrying sand','wind moving soil','a glacier dragging rocks'], c:['a delta forming','a sand dune building up','mud settling in a lake'] })
+  };
+  var GM_SORT_NATURE_BY = {
+    preschool:['living','hotcold','move'], kindergarten:['living','plantanimal','seasons'], first:['plantanimal','seasons','daynight'],
+    second:['habitat','matter','classes'], third:['diet','roles','matter'], fourth:['energy','rocks','force'], fifth:['changes','conduct','erosion']
+  };
+  var GM_SORT_NUM = {
+    shapes2: gmSet('shapes2', 'Circles or Squares', 'Sort circles and squares', [{ id:'a', label:'Circles', icon:'⭕' }, { id:'b', label:'Squares', icon:'🟥' }], { a:['🔴','🟡','🟠','🟣'], b:['🟥','🟦','🟩','🟨'] }),
+    bigsmall: gmSet('bigsmall', 'Big or Small', 'Sort big things and small things', [{ id:'a', label:'Big', icon:'🐘' }, { id:'b', label:'Small', icon:'🐜' }], { a:['🐘 elephant','🏠 house','🚌 bus','🐋 whale'], b:['🐜 ant','🐞 ladybug','🔑 key','🍪 cookie'] }),
+    fewmany: gmSet('fewmany', 'Few or Many', 'Sort few and many', [{ id:'a', label:'Few', icon:'☝️' }, { id:'b', label:'Many', icon:'🙌' }], { a:['🍎','🍎🍎','🍎🍎🍎'], b:['🍎🍎🍎🍎🍎','🍎🍎🍎🍎🍎🍎','🍎🍎🍎🍎🍎🍎🍎','🍎🍎🍎🍎🍎🍎🍎🍎'] }),
+    shapes3: gmSet('shapes3', 'Circle, Square or Triangle', 'Sort circles, squares and triangles', [{ id:'a', label:'Circle', icon:'⭕' }, { id:'b', label:'Square', icon:'🟥' }, { id:'c', label:'Triangle', icon:'🔺' }], { a:['🔴','🟡','⭕'], b:['🟥','🟦','🟩'], c:['🔺','🔻','⚠️'] }),
+    lt5: gmSet('lt5', 'Less or More than 5', 'Sort numbers less than 5 and more than 5', [{ id:'a', label:'Less than 5', icon:'⬇️' }, { id:'b', label:'More than 5', icon:'⬆️' }], { a:gmRange(1, 4), b:gmRange(6, 9) }),
+    teens: gmSet('teens', 'Teens or Tens', 'Sort teen numbers and tens numbers', [{ id:'a', label:'Teen numbers', icon:'🔟' }, { id:'b', label:'Tens (10, 20, 30…)', icon:'💯' }], { a:gmRange(11, 19), b:['10','20','30','40','50','60','70','80','90'] }),
+    evenodd1: gmSet('evenodd1', 'Even or Odd', 'Sort even and odd numbers', [{ id:'a', label:'Even', icon:'2️⃣' }, { id:'b', label:'Odd', icon:'1️⃣' }], { a:gmRange(2, 20, 2), b:gmRange(1, 19, 2) }),
+    flat3d: gmSet('flat3d', 'Flat or Solid Shapes', 'Sort flat shapes and solid shapes', [{ id:'a', label:'Flat (2D)', icon:'🟦' }, { id:'b', label:'Solid (3D)', icon:'🎲' }], { a:['🟥 square','🔺 triangle','⭕ circle','▭ rectangle'], b:['🥫 a can','🍦 an ice cream cone','🎲 a die','⚽ a ball'] }),
+    lt10: gmSet('lt10', 'Less or More than 10', 'Sort numbers less than 10 and more than 10', [{ id:'a', label:'Less than 10', icon:'⬇️' }, { id:'b', label:'More than 10', icon:'⬆️' }], { a:gmRange(1, 9), b:gmRange(11, 20) }),
+    evenodd2: gmSet('evenodd2', 'Even or Odd', 'Sort even and odd numbers', [{ id:'a', label:'Even', icon:'2️⃣' }, { id:'b', label:'Odd', icon:'1️⃣' }], { a:gmRange(22, 98, 2), b:gmRange(21, 99, 2) }),
+    sides: gmSet('sides', 'Count the Sides', 'Sort shapes by how many sides they have', [{ id:'a', label:'3 sides', icon:'🔺' }, { id:'b', label:'4 sides', icon:'🟥' }, { id:'c', label:'5 or more sides', icon:'🛑' }], { a:['🔺 triangle','⚠️ yield sign','🔻 triangle'], b:['🟥 square','▭ rectangle','🔷 rhombus','🟦 square'], c:['🛑 octagon','⬠ pentagon','⬡ hexagon'] }),
+    hundreds: gmSet('hundreds', 'Less or More than 500', 'Sort numbers less than 500 and more than 500', [{ id:'a', label:'Less than 500', icon:'⬇️' }, { id:'b', label:'More than 500', icon:'⬆️' }], { a:['123','245','318','406','472','99','350'], b:['538','612','745','829','903','567','680'] }),
+    half: gmSet('half', 'Compared to One Half', 'Sort fractions that are less than, equal to, or greater than one half', [{ id:'a', label:'Less than ½', icon:'⬇️' }, { id:'b', label:'Equal to ½', icon:'🟰' }, { id:'c', label:'Greater than ½', icon:'⬆️' }], { a:['1/4','1/3','2/8','1/6','3/10'], b:['2/4','3/6','4/8','5/10'], c:['3/4','2/3','5/6','7/8','4/5'] }),
+    round100: gmSet('round100', 'Round to the Nearest 100', 'Sort numbers by what hundred they round to', [{ id:'a', label:'Rounds to 100', icon:'💯' }, { id:'b', label:'Rounds to 200', icon:'2️⃣' }], { a:['104','112','121','128','134','149','137'], b:['152','167','183','199','210','224','241'] }),
+    quad: gmSet('quad', 'Four Sides or Not', 'Sort shapes with four sides and shapes without', [{ id:'a', label:'Four sides', icon:'🟥' }, { id:'b', label:'Not four sides', icon:'🔺' }], { a:['🟥 square','▭ rectangle','🔷 rhombus','parallelogram','trapezoid'], b:['🔺 triangle','⬠ pentagon','⬡ hexagon','⭕ circle','🛑 octagon'] }),
+    primes: gmSet('primes', 'Prime or Composite', 'Sort prime and composite numbers', [{ id:'a', label:'Prime', icon:'🔒' }, { id:'b', label:'Composite', icon:'🧩' }], { a:gmRange(2, 30, 1, gmIsPrime), b:gmRange(4, 30, 1, function(n){ return !gmIsPrime(n); }) }),
+    angles: gmSet('angles', 'Kinds of Angles', 'Sort acute, right and obtuse angles', [{ id:'a', label:'Acute', icon:'📐' }, { id:'b', label:'Right', icon:'⬜' }, { id:'c', label:'Obtuse', icon:'📏' }], { a:['30°','45°','60°','85°'], b:['90°','a square corner','a book corner','a door corner'], c:['100°','120°','135°','150°','170°'] }),
+    factors: gmSet('factors', 'Factors of 24', 'Sort factors of 24 and numbers that are not factors', [{ id:'a', label:'Factors of 24', icon:'✅' }, { id:'b', label:'Not factors', icon:'❌' }], { a:['1','2','3','4','6','8','12','24'], b:['5','7','9','10','11','13','14','16','18'] }),
+    dec5: gmSet('dec5', 'Compared to 0.5', 'Sort decimals less than 0.5 and decimals greater than 0.5', [{ id:'a', label:'Less than 0.5', icon:'⬇️' }, { id:'b', label:'Greater than 0.5', icon:'⬆️' }], { a:['0.2','0.45','0.05','0.3','0.375','0.125'], b:['0.6','0.75','0.9','0.55','0.8','0.625'] }),
+    primes50: gmSet('primes50', 'Prime or Composite', 'Sort prime and composite numbers', [{ id:'a', label:'Prime', icon:'🔒' }, { id:'b', label:'Composite', icon:'🧩' }], { a:gmRange(11, 47, 1, gmIsPrime), b:gmRange(30, 50, 1, function(n){ return !gmIsPrime(n); }) }),
+    units: gmSet('units', 'Length, Area or Volume', 'Sort units of length, area and volume', [{ id:'a', label:'Length', icon:'📏' }, { id:'b', label:'Area', icon:'⬜' }, { id:'c', label:'Volume', icon:'🧊' }], { a:['cm','m','km','inches'], b:['cm²','m²','ft²','in²'], c:['cm³','m³','in³','ft³'] })
+  };
+  var GM_SORT_NUM_BY = {
+    preschool:['shapes2','bigsmall','fewmany'], kindergarten:['shapes3','lt5','teens'], first:['evenodd1','flat3d','lt10'],
+    second:['evenodd2','sides','hundreds'], third:['half','round100','quad'], fourth:['primes','angles','factors'], fifth:['dec5','primes50','units']
+  };
+  var GM_SORT_HEART = {
+    needwant: gmSet('needwant', 'Needs or Wants', 'Sort needs and wants', [{ id:'a', label:'Needs', icon:'🏠' }, { id:'b', label:'Wants', icon:'🧸' }], { a:['🍎 food','💧 water','🏠 a home','🧥 a warm coat'], b:['🧸 a toy','🍭 candy','🎮 a video game','🛹 a skateboard','📱 a phone'] }),
+    kind: gmSet('kind', 'Kind or Unkind', 'Sort kind things and unkind things', [{ id:'a', label:'Kind', icon:'💛' }, { id:'b', label:'Unkind', icon:'💔' }], { a:['🤝 sharing','🫂 a hug','🙏 saying thank you','👋 saying hello','🧹 helping clean up'], b:['👊 hitting','😡 yelling','🙊 mean words','🧸 grabbing a toy','🚪 leaving someone out'] }),
+    homeschool: gmSet('homeschool', 'Home or School', 'Sort things at home and things at school', [{ id:'a', label:'At home', icon:'🏠' }, { id:'b', label:'At school', icon:'🏫' }], { a:['🛏️ my bed','🛋️ couch','🍳 kitchen','🛁 bathtub','🧸 my toys'], b:['🎒 backpack','🧑‍🏫 teacher','🔔 school bell','🏫 classroom','🚌 school bus'] }),
+    safe: gmSet('safe', 'Safe or Unsafe', 'Sort safe choices and unsafe choices', [{ id:'a', label:'Safe', icon:'✅' }, { id:'b', label:'Unsafe', icon:'⚠️' }], { a:['🪖 wearing a helmet','🚸 looking both ways','🧼 washing hands','🚗 wearing a seat belt'], b:['🏃 running into the street','🔥 playing with matches','💊 taking pills that are not yours','🔪 playing with a sharp knife'] }),
+    goods: gmSet('goods', 'Goods or Services', 'Sort goods and services', [{ id:'a', label:'Goods (things)', icon:'📦' }, { id:'b', label:'Services (work)', icon:'🛠️' }], { a:['🍞 bread','👟 shoes','📚 a book','🚲 a bike','🧸 a toy'], b:['✂️ a haircut','🚌 a bus ride','🧑‍⚕️ a checkup','🚒 putting out a fire','🧑‍🏫 teaching a class'] }),
+    pastnow: gmSet('pastnow', 'Long Ago or Today', 'Sort things from long ago and things from today', [{ id:'a', label:'Long ago', icon:'🕰️' }, { id:'b', label:'Today', icon:'📱' }], { a:['🕯️ a candle','🐴 a horse and buggy','🐂 a covered wagon','🪶 a quill pen'], b:['💡 a light bulb','🚗 a car','📱 a phone','💻 a computer'] }),
+    branches: gmSet('branches', 'Branches of Government', 'Sort the branches of government', [{ id:'a', label:'Legislative (makes laws)', icon:'📜' }, { id:'b', label:'Executive (carries out laws)', icon:'🏛️' }, { id:'c', label:'Judicial (decides about laws)', icon:'⚖️' }], { a:['Congress','the Senate','House of Representatives','the State Legislature'], b:['the President','the Governor','the Vice President','a Mayor'], c:['the Supreme Court','a judge','a court','the justices'] }),
+    rights: gmSet('rights', 'Rights or Responsibilities', 'Sort rights and responsibilities', [{ id:'a', label:'Rights', icon:'🗽' }, { id:'b', label:'Responsibilities', icon:'✅' }], { a:['speak freely','practice any religion','have a fair trial','vote as an adult'], b:['obey the laws','pay taxes','serve on a jury','respect other people’s rights','go to school'] }),
+    utah: gmSet('utah', 'Utah’s Land Regions', 'Sort Utah places by land region', [{ id:'a', label:'Rocky Mountains', icon:'🏔️' }, { id:'b', label:'Basin and Range', icon:'🏜️' }, { id:'c', label:'Colorado Plateau', icon:'🌄' }], { a:['Uinta Mountains','Wasatch Range','Bear River Range'], b:['Great Salt Lake','Bonneville Salt Flats','Great Salt Lake Desert'], c:['Arches National Park','Bryce Canyon','Canyonlands','Lake Powell'] }),
+    colonies: gmSet('colonies', 'Colonial Regions', 'Sort the colonies by region', [{ id:'a', label:'New England', icon:'⚓' }, { id:'b', label:'Middle Colonies', icon:'🌾' }, { id:'c', label:'Southern Colonies', icon:'🌾' }], { a:['Massachusetts','New Hampshire','Connecticut','Rhode Island'], b:['New York','Pennsylvania','New Jersey','Delaware'], c:['Virginia','Maryland','North Carolina','South Carolina','Georgia'] }),
+    factop: gmSet('factop', 'Fact or Opinion', 'Sort facts and opinions', [{ id:'a', label:'Fact', icon:'📏' }, { id:'b', label:'Opinion', icon:'💭' }], { a:['Utah became a state in 1896','Water freezes at 0°C','A triangle has 3 sides','The Great Salt Lake is salty','There are 50 states'], b:['Pizza is the best food','Winter is the prettiest season','Dogs make better pets than cats','Summer is the best season','Broccoli tastes terrible'] })
+  };
+  var GM_SORT_HEART_BY = {
+    preschool:['needwant','kind','homeschool'], kindergarten:['needwant','kind','safe'], first:['needwant','goods','pastnow'],
+    second:['goods','pastnow','kind'], third:['branches','rights','goods'], fourth:['utah','branches','rights'], fifth:['colonies','factop','rights']
+  };
+  function gmBuildSort(bank, by, level){
+    return shuffle(by[level].slice()).map(function(id){ return gmSortBoard(bank[id], level); });
+  }
+  function buildSortNature(level){ return gmBuildSort(GM_SORT_NATURE, GM_SORT_NATURE_BY, level); }
+  function buildSortNum(level){ return gmBuildSort(GM_SORT_NUM, GM_SORT_NUM_BY, level); }
+  function buildSortHeart(level){ return gmBuildSort(GM_SORT_HEART, GM_SORT_HEART_BY, level); }
+
+  /* ---- Word Builder ---- */
+  var GM_WORDS = {
+    preschool: [['cat','🐱'],['dog','🐶'],['sun','☀️'],['hat','🎩'],['bus','🚌'],['pig','🐷'],['bed','🛏️'],['bee','🐝'],['car','🚗'],['fox','🦊'],['owl','🦉'],['ant','🐜']],
+    kindergarten: [['frog','🐸'],['fish','🐟'],['star','⭐'],['moon','🌙'],['tree','🌳'],['ball','⚽'],['milk','🥛'],['bird','🐦'],['duck','🦆'],['book','📖'],['cake','🎂'],['boat','⛵']],
+    first: [['apple','🍎'],['bread','🍞'],['horse','🐴'],['snail','🐌'],['train','🚂'],['plane','✈️'],['cloud','☁️'],['tiger','🐯'],['whale','🐋'],['house','🏠'],['mouse','🐭'],['snake','🐍']],
+    second: [['ocean','a very big body of salt water'],['forest','a place with lots of trees'],['planet','Earth is one'],['friend','someone you like and trust'],['garden','where flowers and vegetables grow'],['bridge','it goes over a river'],['pencil','you write with it'],['winter','the coldest season'],['summer','the hottest season'],['Tuesday','the day after Monday'],['Saturday','the day after Friday'],['February','the shortest month']],
+    third: [['adventure','an exciting trip or event'],['beautiful','very pretty'],['different','not the same'],['favorite','the one you like best'],['mountain','a very tall hill of rock'],['neighbor','someone who lives next door'],['question','you ask it to get an answer'],['remember','to keep in your mind'],['together','with each other'],['wonderful','really great'],['government','the group that runs a state or country'],['calendar','shows the days and months']],
+    fourth: [['community','people who live in the same area'],['temperature','how hot or cold something is'],['landscape','what the land looks like'],['environment','the world around living things'],['tradition','something families do year after year'],['pioneer','one of the first people to settle a place'],['canyon','a deep valley with steep sides'],['plateau','a high, flat area of land'],['irrigation','bringing water to crops'],['evaporation','liquid turning into gas'],['ecosystem','living and nonliving things working together'],['predator','an animal that hunts other animals']],
+    fifth: [['abundant','plentiful'],['constitution','the plan for how the United States is run'],['independence','freedom from outside control'],['photosynthesis','how plants make food from sunlight'],['atmosphere','the air around Earth'],['character','a person in a story'],['settlement','a new community'],['conclusion','the end of a piece of writing'],['revolution','a big change, often with a fight'],['legislature','the group that makes laws'],['frontier','the edge of settled land'],['condensation','gas turning into liquid']]
+  };
+  var GM_DECOYS = 'BCDFGHJKLMNPRSTVWXYZ';
+  function gmWordBoard(item, level){
+    var w = item[0], extra = { preschool:0, kindergarten:1, first:2, second:3, third:3, fourth:3, fifth:3 }[level], tiles = w.toUpperCase().split(''), have = {};
+    tiles.forEach(function(l){ have[l] = 1; });
+    var pool = shuffle((GM_DECOYS + 'AEIOU').split('').filter(function(l){ return !have[l]; })), k;
+    for (k = 0; k < extra; k++) tiles.push(pool[k]);
+    var emoji = (level === 'preschool' || level === 'kindergarten' || level === 'first') ? item[1] : '';
+    var clue = emoji ? '' : item[1];
+    var copy = (level === 'preschool' || level === 'kindergarten');
+    return gmBoard('build', { speak:emoji ? (copy ? 'Build the word ' + w.toLowerCase() + '. Tap the letters in order.' : 'Spell the word for the picture. Tap the letters in order.') : 'Spell the word that means: ' + clue + '. Tap the letters in order.',
+      prompt:emoji ? (copy ? 'Build the word: ' + w.toLowerCase() : 'Spell the word for the picture') : 'Spell the word: ' + clue, skill:level === 'preschool' || level === 'kindergarten' ? 'Building Short Words' : (level === 'first' ? 'Building Words' : 'Spelling Words'),
+      sig:'word:' + w.toLowerCase(), data:{ word:w, tiles:shuffle(tiles), emoji:emoji, clue:clue } });
+  }
+  function buildWordBuilder(level){
+    return shuffle(GM_WORDS[level].slice()).slice(0, 5).map(function(it){ return gmWordBoard(it, level); });
+  }
+  function roundStars(){
+    var base = STATE.roundBase || 6, c = STATE.correctFirstTry || 0;
+    return c >= base ? 3 : (c >= Math.ceil(base * 2 / 3) ? 2 : 1);
   }
 
   /* ---------- typing ---------- */
@@ -8601,7 +9091,7 @@
       if (STATE.mode === 'check' && STATE.checkLog) STATE.checkLog.push({ camp:q.camp, station:q.stationId, skill:skill, firstTry:!STATE.wrongOnCurrent });
       try{
         if (firstTry){ removeFromMissedBank(qStation(q), qLevel(), q); recordRight(skill, qLevel(), q, qStation(q)); }
-        else if (STATE.mode !== 'check' && (q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
+        else if (STATE.mode !== 'check' && !q.noRepeat && (q.reps || 0) < 2 && (STATE.extraCount || 0) < MAX_REPEATS_PER_ROUND){
           var again = cloneQuestion(q); again.reps = (q.reps || 0) + 1; again.isRepeat = true; again.fromBank = false;
           STATE.round.splice(Math.min(STATE.qIndex + 3, STATE.round.length), 0, again);
           STATE.extraCount = (STATE.extraCount || 0) + 1;
@@ -8633,7 +9123,7 @@
     } else {
       btn.disabled = true;
       btn.classList.add('is-wrong');
-      if (!STATE.wrongOnCurrent){ try{ addToMissedBank(qStation(q), qLevel(), q); }catch(e){} }
+      if (!STATE.wrongOnCurrent && !q.noBank){ try{ addToMissedBank(qStation(q), qLevel(), q); }catch(e){} }
       STATE.wrongOnCurrent = true;
       STATE.roundTally.wrong++;
       STATE.roundSkillTally[skill].wrong++;
@@ -8856,7 +9346,7 @@
           return { icon:c.icon, accent:c.accent, short:c.name.replace(/ Camp$/, '').replace('Heart & Home', 'Heart'), right:by[c.id].right, total:by[c.id].total };
         });
       } else {
-        stars = STATE.correctFirstTry === 6 ? 3 : (STATE.correctFirstTry >= 4 ? 2 : 1);
+        stars = roundStars();
         kind = stars === 3 ? 'summit' : (stars === 2 ? 'camp' : 'trail');
       }
     }catch(e){ showResultsNow(); return; }
@@ -8876,7 +9366,7 @@
     try{ goalInfo = recordRoundDone(); }catch(e){}
     if (STATE.mode === 'check'){ try{ showCheckResults(goalInfo); }catch(e){} return; }
     try{
-      var stars = STATE.correctFirstTry === 6 ? 3 : (STATE.correctFirstTry >= 4 ? 2 : 1);
+      var stars = roundStars();
       setBestStars(STATE.stationId, stars);
       /* Every answer along the way was already recorded and saved live by recordAnswer() in
          pickOption() -- this final flush just makes sure the star/session totals are current. */
@@ -8897,7 +9387,7 @@
       }
       if (stars === 3){ try{ popConfetti(); }catch(e){} }
       elResultsLine.textContent = stars === 3 ? 'Trail Master!' : (stars === 2 ? 'Great hiking!' : 'Nice try, explorer!');
-      elResultsSub.textContent = 'You got ' + STATE.correctFirstTry + ' of 6 right on the first try.';
+      elResultsSub.textContent = 'You got ' + STATE.correctFirstTry + ' of ' + (STATE.roundBase || 6) + ' right on the first try.';
       try{
         if (goalInfo){
           var lit = goalInfo.rounds >= goalInfo.goal;
